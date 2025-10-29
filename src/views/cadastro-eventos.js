@@ -13,10 +13,10 @@ import { BASE_URL } from '../config/axios';
 function CadastroEvento() {
   const { idParam } = useParams();
   const navigate = useNavigate();
-  const baseURL = `${BASE_URL}/eventos`;
+  const baseURL = `${BASE_URL}/evento`;
 
   const [id, setId] = useState('');
-  const [nome, setNome] = useState('');
+  const [nomeEvento, setNomeEvento] = useState('');
   const [modalidade, setModalidade] = useState('');
   const [tipoEvento, setTipoEvento] = useState('');
   const [descricao, setDescricao] = useState('');
@@ -39,7 +39,7 @@ function CadastroEvento() {
 
   function inicializar() {
     setId('');
-    setNome('');
+    setNomeEvento('');
     setModalidade('');
     setTipoEvento('');
     setDescricao('');
@@ -62,7 +62,7 @@ function CadastroEvento() {
   async function salvar() {
     let data = {
       id,
-      nome,
+      nomeEvento,
       modalidade,
       tipoEvento,
       descricao,
@@ -87,12 +87,12 @@ function CadastroEvento() {
         await axios.post(baseURL, data, {
           headers: { 'Content-Type': 'application/json' },
         });
-        mensagemSucesso(`Evento ${nome} cadastrado com sucesso!`);
+        mensagemSucesso(`Evento ${nomeEvento} cadastrado com sucesso!`);
       } else {
         await axios.put(`${baseURL}/${idParam}`, data, {
           headers: { 'Content-Type': 'application/json' },
         });
-        mensagemSucesso(`Evento ${nome} alterado com sucesso!`);
+        mensagemSucesso(`Evento ${nomeEvento} alterado com sucesso!`);
       }
       navigate(`/listagem-eventos`);
     } catch (error) {
@@ -107,7 +107,7 @@ function CadastroEvento() {
       const e = response.data;
       setDados(e);
       setId(e.id);
-      setNome(e.nome);
+      setNomeEvento(e.nomeEvento);
       setModalidade(e.modalidade);
       setTipoEvento(e.tipoEvento);
       setDescricao(e.descricao);
@@ -144,9 +144,9 @@ function CadastroEvento() {
                 <input
                   type='text'
                   id='inputNome'
-                  value={nome}
+                  value={nomeEvento}
                   className='form-control'
-                  onChange={(e) => setNome(e.target.value)}
+                  onChange={(e) => setNomeEvento(e.target.value)}
                 />
               </FormGroup>
 
