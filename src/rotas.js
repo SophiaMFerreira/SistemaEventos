@@ -1,15 +1,17 @@
 import React from 'react';
-
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import ListagemEventos from './views/listagem-eventos';
-import CadastroEvento from './views/cadastro-eventos';
+import MeusEventos from './components/meus-eventos';
+import EventosOrganizados from './components/eventos-organizados';
 
-function Rotas(props) {
+
+function Rotas() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/listagem-eventos' element={<ListagemEventos />} />
-        <Route path ='/cadastro-eventos' element={<CadastroEvento />} />
+       <Route path="/" element={<ListagemEventos />} />
+      <Route path="/meus-eventos" element={<MeusEventos idParticipante={3} />} />
+      <Route path="/eventos-organizados" element={<EventosOrganizados idOrganizador={2}/>} />
       </Routes>
     </BrowserRouter>
   );
