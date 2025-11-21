@@ -10,8 +10,8 @@ function Rotas() {
     <BrowserRouter>
       <Routes>
        <Route path="/" element={<ListagemEventos />} />
-      <Route path="/meus-eventos" element={<MeusEventos idParticipante={3} />} />
-      <Route path="/eventos-organizados" element={<EventosOrganizados idOrganizador={2}/>} />
+      <Route path="/meus-eventos/:idParam?" element={<MeusEventos/>} />
+      <Route path="/eventos-organizados" element={<EventosOrganizados />} />
       </Routes>
     </BrowserRouter>
   );

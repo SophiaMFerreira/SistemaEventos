@@ -13,6 +13,7 @@ import { BASE_URL } from '../config/axios';
 function CadastroEvento() {
   const { idParam } = useParams();
   const navigate = useNavigate();
+
   const baseURL = `${BASE_URL}/evento`;
 
   const [id, setId] = useState('');
@@ -35,28 +36,52 @@ function CadastroEvento() {
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
 
-  const [dados, setDados] = useState([]);
+  const [dados, setDados] = useState(null);
+
+  const idOrganizador = Number(localStorage.getItem("idUsuario"));
 
   function inicializar() {
-    setId('');
-    setNomeEvento('');
-    setModalidade('');
-    setTipoEvento('');
-    setDescricao('');
-    setValorIngresso('');
-    setIdadeMinima('');
-    setLotacaoMaxima('');
-    setDataInicio('');
-    setHoraInicio('');
-    setDataFim('');
-    setHoraFim('');
-    setCep('');
-    setLogradouro('');
-    setNumero('');
-    setComplemento('');
-    setBairro('');
-    setCidade('');
-    setEstado('');
+    if (!idParam) {
+      setId('');
+      setNomeEvento('');
+      setModalidade('');
+      setTipoEvento('');
+      setDescricao('');
+      setValorIngresso('');
+      setIdadeMinima('');
+      setLotacaoMaxima('');
+      setDataInicio('');
+      setHoraInicio('');
+      setDataFim('');
+      setHoraFim('');
+      setCep('');
+      setLogradouro('');
+      setNumero('');
+      setComplemento('');
+      setBairro('');
+      setCidade('');
+      setEstado('');
+    } else {
+      setId(dados.id);
+      setNomeEvento(dados.nomeEvento);
+      setModalidade(dados.modalidade);
+      setTipoEvento(dados.tipoEvento);
+      setDescricao(dados.descricao);
+      setValorIngresso(dados.valorIngresso);
+      setIdadeMinima(dados.idadeMinima);
+      setLotacaoMaxima(dados.lotacaoMaxima);
+      setDataInicio(dados.dataInicio);
+      setHoraInicio(dados.horaInicio);
+      setDataFim(dados.dataFim);
+      setHoraFim(dados.horaFim);
+      setCep(dados.cep);
+      setLogradouro(dados.logradouro);
+      setNumero(dados.numero);
+      setComplemento(dados.complemento);
+      setBairro(dados.bairro);
+      setCidade(dados.cidade);
+      setEstado(dados.estado);
+    }
   }
 
   async function salvar() {
@@ -80,10 +105,11 @@ function CadastroEvento() {
       bairro,
       cidade,
       estado,
+      idOrganizador
     };
 
     try {
-      if (idParam == null) {
+      if (!idParam) {
         await axios.post(baseURL, data, {
           headers: { 'Content-Type': 'application/json' },
         });
@@ -94,6 +120,7 @@ function CadastroEvento() {
         });
         mensagemSucesso(`Evento ${nomeEvento} alterado com sucesso!`);
       }
+
       navigate(`/listagem-eventos`);
     } catch (error) {
       mensagemErro(error.response?.data || 'Erro ao salvar evento.');

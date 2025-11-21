@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-function EventosOrganizados({ idOrganizador }) {
+function EventosOrganizados() {
+  const idOrganizador = Number(localStorage.getItem("idUsuario"));
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
@@ -9,16 +10,17 @@ function EventosOrganizados({ idOrganizador }) {
         const res = await fetch(`https://my-json-server.typicode.com/castrothais/jsonfake/evento`);
         const todosEventos = await res.json();
 
-        // Filtra pelos eventos onde o usuário é organizador
         const meusEventos = todosEventos.filter(ev => ev.idOrganizador === idOrganizador);
-
         setEventos(meusEventos);
+
       } catch (error) {
         console.error("Erro ao buscar eventos organizados:", error);
       }
     }
 
-    carregarEventos();
+    if (idOrganizador) {
+      carregarEventos();
+    }
   }, [idOrganizador]);
 
   return (
