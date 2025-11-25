@@ -7,7 +7,9 @@ import ListagemParticipantes from './views/listagem-participantes';
 import CadastroTipoEvento from './views/cadastro-tipoEvento';
 import CadastroPorteEvento from './views/cadastro-porteEvento';
 import CadastroAdministrador from './views/cadastro-administrador';
-import CadastroUsuario from './views/cadastro-usuario';
+import CadastroUsuarioCPF from './views/cadastro-usuarioCPF';
+import CadastroUsuarioCNPJ from './views/cadastro-usuarioCNPJ';
+
 
 function Rotas(props) {
   return (
@@ -19,7 +21,8 @@ function Rotas(props) {
         <Route path='/cadastro-tipoEvento/:idParam?' element={<CadastroTipoEvento />} />
         <Route path='/cadastro-porteEvento/:idParam?' element={<CadastroPorteEvento />} />
         <Route path='/cadastro-administrador/:idParam?' element={<CadastroAdministrador />} />
-        <Route path='/cadastro-usuario/:idParam?' element={<CadastroUsuario />} />
+        <Route path='/cadastro-usuarioCPF/:idParam?' element={<CadastroUsuarioCPF />} />
+        <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<CadastroUsuarioCNPJ />} />
       </Routes>
     </BrowserRouter>
   );
