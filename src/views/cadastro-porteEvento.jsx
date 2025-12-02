@@ -67,6 +67,22 @@ function CadastroPorteEvento() {
     }
   }
 
+  async function exclude() {
+    let data = JSON.stringify({ idParam });
+    let url = `${baseURL}/${idParam}`;
+    await axios
+      .delete(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then(function (response) {
+        mensagemSucesso(`Porte de evento ${nomePorteEvento} excluído com sucesso!`);
+        navigate(`/tela-principal`);
+      })
+      .catch(function (error) {
+        mensagemErro(`Erro ao excluir ${nomePorteEvento}`);
+      });
+  }
+    
   return (
     <Box display="flex" height="100vh" bgcolor="background.default">
       <Box>
@@ -106,6 +122,7 @@ function CadastroPorteEvento() {
                 <Stack spacing={2} direction="row">
                     <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton} Porte de Evento</Button>
+                    {idParam ? <Button variant="outlined" color="error" onClick={() => exclude()}>Excluir</Button> : false}
                 </Stack>
             </Grid>
           </Grid>

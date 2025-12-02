@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import { successMessage, errorMessage, mensagemSucesso, mensagemErro } from '../components/toastr'; 
+import { mensagemSucesso, mensagemErro } from '../components/toastr'; 
 import Box from "@mui/material/Box";
 import Sidebar from "../components/sidebar";
 import Paper from '@mui/material/Paper';
@@ -14,7 +14,7 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
-  function CadastroTipoEvento() {
+function CadastroTipoEvento() {
   const baseURL = `${BASE_URL}/tipoEvento`;
   const { idParam } = useParams();
   const navigate = useNavigate();
@@ -62,6 +62,22 @@ import { BASE_URL } from '../config/axios';
     }
   }
 
+  async function exclude() {
+    let data = JSON.stringify({ idParam });
+    let url = `${baseURL}/${idParam}`;
+    await axios
+      .delete(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then(function (response) {
+        mensagemSucesso(`Tipo de evento ${nomeTipoEvento} excluído com sucesso!`);
+        navigate(`/tela-principal`);
+      })
+      .catch(function (error) {
+        mensagemErro(`Erro ao excluir ${nomeTipoEvento}`);
+      });
+  }
+
   return (
     <Box display="flex" height="100vh" bgcolor="background.default">
       <Box>
@@ -70,7 +86,7 @@ import { BASE_URL } from '../config/axios';
 
       <Box flex={1} p={5} overflow="auto" sx={{ position: "relative", backgroundColor: "background.default", display: "flex", flexDirection: "column", justifyContent: "space-between", }}>
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography component="h1" variant="h3">{acao}  de Tipo de Evento</Typography>
+          <Typography component="h1" variant="h3">{acao} de Tipo de Evento</Typography>
           <Typography variant="h6" sx={{ mb: 3 }}>{mensagem} tipos de evento.</Typography>
           <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
             <Grid size={10} spacing={2}>
@@ -85,6 +101,7 @@ import { BASE_URL } from '../config/axios';
                 <Stack spacing={2} direction="row">
                     <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
                     <Button variant="contained" type="submit" >{acaoButton} Tipo de Evento</Button>
+                    {idParam ? <Button variant="outlined" color="error" onClick={() => exclude()}>Excluir</Button> : false}
                 </Stack>
             </Grid>
           </Grid>

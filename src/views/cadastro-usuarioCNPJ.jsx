@@ -98,6 +98,23 @@ function CadastroUsuarioCNPJ() {
           mensagemErro(error.response.data);
         }
       }
+
+  async function exclude() {
+    let data = JSON.stringify({ idParam });
+    let url = `${baseURL}/${idParam}`;
+    await axios
+      .delete(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then(function (response) {
+        mensagemSucesso(`Usuário ${nomeFantasia} excluído com sucesso!`);
+        navigate(`/tela-principal`);
+      })
+      .catch(function (error) {
+        mensagemErro(`Erro ao excluir o usuário ${nomeFantasia}`);
+      });
+  }
+
   return (
       <Box p={5} overflow="auto" sx={{ backgroundColor: "background.default", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", boxSizing:"border-box"}}>
         <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: "900px" }}>
@@ -160,6 +177,7 @@ function CadastroUsuarioCNPJ() {
                 <Stack spacing={2} direction="row">
                     <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
+                    {idParam ? <Button variant="outlined" color="error" onClick={() => exclude()}>Excluir</Button> : false}
                 </Stack>
             </Grid>
           </Grid>
