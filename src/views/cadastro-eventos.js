@@ -41,7 +41,7 @@ function CadastroEvento() {
   const idOrganizador = Number(localStorage.getItem("idUsuario"));
 
   function inicializar() {
-    if (!idParam) {
+    if (idParam == null) {
       setId('');
       setNomeEvento('');
       setModalidade('');
@@ -108,22 +108,31 @@ function CadastroEvento() {
       idOrganizador
     };
 
-    try {
-      if (!idParam) {
-        await axios.post(baseURL, data, {
+    data = JSON.stringify(data);
+    if (idParam == null) {
+      await axios
+        .post(baseURL, data, {
           headers: { 'Content-Type': 'application/json' },
+        })
+        .then(function (response) {
+          mensagemSucesso(`Evento ${nomeEvento} cadastrado com sucesso!`);
+          navigate(`/eventos-organizados`);
+        })
+        .catch(function (error) {
+          mensagemErro(error.response.data);
         });
-        mensagemSucesso(`Evento ${nomeEvento} cadastrado com sucesso!`);
-      } else {
-        await axios.put(`${baseURL}/${idParam}`, data, {
+    } else {
+      await axios
+        .put(`${baseURL}/${idParam}`, data, {
           headers: { 'Content-Type': 'application/json' },
+        })
+        .then(function (response) {
+          mensagemSucesso(`Evento ${nomeEvento} alterado com sucesso!`);
+          navigate(`/eventos-organizados`);
+        })
+        .catch(function (error) {
+          mensagemErro(error.response.data);
         });
-        mensagemSucesso(`Evento ${nomeEvento} alterado com sucesso!`);
-      }
-
-      navigate(`/listagem-eventos`);
-    } catch (error) {
-      mensagemErro(error.response?.data || 'Erro ao salvar evento.');
     }
   }
 

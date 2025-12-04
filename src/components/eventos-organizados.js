@@ -1,45 +1,144 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+
+import Card from '../components/card';
+import { mensagemSucesso, mensagemErro } from '../components/toastr';
+
+import '../custom.css';
+
+import { useNavigate } from 'react-router-dom';
+
+import Stack from '@mui/material/Stack';
+import { IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
+
+import axios from 'axios';
+import { BASE_URL } from '../config/axios';
+import BuscarEvento from './input-buscar-evento';
+
+const baseURL = `${BASE_URL}/evento`;
 
 function EventosOrganizados() {
-  const idOrganizador = Number(localStorage.getItem("idUsuario"));
-  const [eventos, setEventos] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    async function carregarEventos() {
-      try {
-        const res = await fetch(`https://my-json-server.typicode.com/castrothais/jsonfake/evento`);
-        const todosEventos = await res.json();
+  const cadastrar = () => {
+    navigate(`/cadastro-eventos`);
+  };
 
-        const meusEventos = todosEventos.filter(ev => ev.idOrganizador === idOrganizador);
-        setEventos(meusEventos);
+  const editar = (id) => {
+    navigate(`/cadastro-eventos/${id}`);
+  };
 
-      } catch (error) {
-        console.error("Erro ao buscar eventos organizados:", error);
-      }
-    }
+const idOrganizador = Number(localStorage.getItem("idUsuario"));
+const [dados, setDados] = React.useState(null);
+const [filtro, setFiltro] = React.useState("");
 
-    if (idOrganizador) {
-      carregarEventos();
-    }
+const eventosFiltrados = dados
+  ? dados.filter(ev =>
+      ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
+    )
+  : [];
+
+  async function excluir(id) {
+    let data = JSON.stringify({ id });
+    let url = `${baseURL}/${id}`;
+
+    await axios
+      .delete(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then(function () {
+        mensagemSucesso(`Evento excluído com sucesso!`);
+        setDados(dados.filter((dado) => dado.id !== id));
+      })
+      .catch(function () {
+        mensagemErro(`Erro ao excluir o evento`);
+      });
+  }
+
+  React.useEffect(() => {
+    axios.get(baseURL).then((response) => {
+      const meusEventos = response.data.filter(
+        ev => Number(ev.idOrganizador) === idOrganizador
+      );
+
+      setDados(meusEventos);
+    });
   }, [idOrganizador]);
 
-  return (
-    <div>
-      <h2>Eventos Organizados</h2>
+  if (!dados) return null;
 
-      {eventos.length === 0 ? (
-        <p>Você ainda não está organizando nenhum evento.</p>
-      ) : (
-        <ul>
-          {eventos.map(ev => (
-            <li key={ev.id}>
-              {ev.nomeEvento} — {ev.dataInicio}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+  
+  return (
+      <div className="container">
+    <Card title="Eventos Organizados">
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="bs-component">
+
+            <button
+              type="button"
+              className="btn btn-warning"
+              onClick={cadastrar}
+            >
+              Novo Evento
+            </button>
+
+           <BuscarEvento
+            value={filtro}
+            onChange={setFiltro}
+            placeholder="Digite nome do evento"
+          />
+
+
+            <table className="table table-hover">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Dia</th>
+                  <th>Mês</th>
+                  <th>Cidade</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {eventosFiltrados.map((dado) => {
+                  const data = new Date(dado.dataInicio);
+                  const dia = data.getDate();
+                  const mes = data.toLocaleString("pt-BR", { month: "long" });
+
+                  return (
+                    <tr key={dado.id}>
+                      <td>{dado.nomeEvento}</td>
+                      <td>{dia}</td>
+                      <td>{mes}</td>
+                      <td>{dado.cidade}</td>
+
+                      <td>
+                        <Stack spacing={1} padding={0} direction="row">
+                          <IconButton aria-label="edit" onClick={() => editar(dado.id)}>
+                            <EditIcon />
+                          </IconButton>
+
+                          <IconButton aria-label="delete" onClick={() => excluir(dado.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Stack>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </Card>
+  </div>
+);
+
 }
 
 export default EventosOrganizados;
