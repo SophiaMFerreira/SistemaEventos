@@ -3,12 +3,21 @@ import Card from '../components/card';
 import '../custom.css';
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
+import BuscarEvento from '../components/input-buscar-evento';
 
 const baseURL = `${BASE_URL}/evento`;
 
 function ListagemEventos() {
 
 const [dados, setDados] = React.useState(null);
+const [filtro, setFiltro] = React.useState('');
+
+
+const eventosFiltrados = dados
+  ? dados.filter(ev =>
+      ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
+    )
+  : [];
 
   React.useEffect(() => {
     axios.get(baseURL).then((response) => {
@@ -20,6 +29,11 @@ const [dados, setDados] = React.useState(null);
 
   return (
     <div className='container'>
+      <BuscarEvento
+                  value={filtro}
+                  onChange={setFiltro}
+                  placeholder="Digite nome do evento"
+                />
       <Card title='Todos os Eventos'>
         <div className='row'>
           <div className='col-lg-12'>
@@ -35,7 +49,7 @@ const [dados, setDados] = React.useState(null);
                   </tr>
                 </thead>
                 <tbody>
-                  {dados.map((dado) => (
+                  {eventosFiltrados.map((dado) => (
                     <tr key={dado.id}>
                       <td>{dado.nomeEvento}</td>
                       <td>
