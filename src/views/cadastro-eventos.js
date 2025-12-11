@@ -19,7 +19,6 @@ function CadastroEvento() {
   const [id, setId] = useState('');
   const [nomeEvento, setNomeEvento] = useState('');
   const [modalidade, setModalidade] = useState('');
-  const [tipoEvento, setTipoEvento] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorIngresso, setValorIngresso] = useState('');
   const [idadeMinima, setIdadeMinima] = useState('');
@@ -35,6 +34,7 @@ function CadastroEvento() {
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
+  const [idTipoEvento, setIdTipoEvento] = useState(0);
 
   const [dados, setDados] = useState(null);
 
@@ -45,7 +45,6 @@ function CadastroEvento() {
       setId('');
       setNomeEvento('');
       setModalidade('');
-      setTipoEvento('');
       setDescricao('');
       setValorIngresso('');
       setIdadeMinima('');
@@ -61,11 +60,11 @@ function CadastroEvento() {
       setBairro('');
       setCidade('');
       setEstado('');
+      setIdTipoEvento(0);
     } else {
       setId(dados.id);
       setNomeEvento(dados.nomeEvento);
       setModalidade(dados.modalidade);
-      setTipoEvento(dados.tipoEvento);
       setDescricao(dados.descricao);
       setValorIngresso(dados.valorIngresso);
       setIdadeMinima(dados.idadeMinima);
@@ -81,6 +80,7 @@ function CadastroEvento() {
       setBairro(dados.bairro);
       setCidade(dados.cidade);
       setEstado(dados.estado);
+      setIdTipoEvento(dados.idTipoEvento);
     }
   }
 
@@ -89,7 +89,6 @@ function CadastroEvento() {
       id,
       nomeEvento,
       modalidade,
-      tipoEvento,
       descricao,
       valorIngresso,
       idadeMinima,
@@ -105,7 +104,8 @@ function CadastroEvento() {
       bairro,
       cidade,
       estado,
-      idOrganizador
+      idOrganizador,
+      idTipoEvento
     };
 
     data = JSON.stringify(data);
@@ -145,7 +145,6 @@ function CadastroEvento() {
       setId(e.id);
       setNomeEvento(e.nomeEvento);
       setModalidade(e.modalidade);
-      setTipoEvento(e.tipoEvento);
       setDescricao(e.descricao);
       setValorIngresso(e.valorIngresso);
       setIdadeMinima(e.idadeMinima);
@@ -161,14 +160,26 @@ function CadastroEvento() {
       setBairro(e.bairro);
       setCidade(e.cidade);
       setEstado(e.estado);
+      setIdTipoEvento(e.idTipoEvento);
     } catch (error) {
       mensagemErro('Erro ao buscar dados do evento.');
     }
   }
 
+ const [dadosTipoEvento, setDadosTipoEvento] = React.useState(null);
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/tipoEvento`).then((response) => {
+      setDadosTipoEvento(response.data);
+    });
+  }, []);
+
   useEffect(() => {
     buscar(); // eslint-disable-next-line
-  }, []);
+  }, [id]);
+
+if (idParam && !dados) return null;
+if (!dadosTipoEvento) return null;
 
   return (
     <div className='container'>
@@ -200,18 +211,22 @@ function CadastroEvento() {
                 </select>
               </FormGroup>
 
-              <FormGroup label='Tipo de Evento:' htmlFor='selectTipo'>
+              <FormGroup label='Tipo de Evento: *' htmlFor='selectTipoEvento'>
                 <select
-                  id='selectTipo'
                   className='form-select'
-                  value={tipoEvento}
-                  onChange={(e) => setTipoEvento(e.target.value)}
+                  id='selectTipoEvento'
+                  name='idTipoEvento'
+                  value={idTipoEvento}
+                  onChange={(e) => setIdTipoEvento(e.target.value)}
                 >
-                  <option value=''>Selecione...</option>
-                  <option value='Palestra'>Palestra</option>
-                  <option value='Workshop'>Workshop</option>
-                  <option value='Congresso'>Congresso</option>
-                  <option value='Show'>Show</option>
+                  <option key='0' value='0'>
+                    {' '}
+                  </option>
+                  {dadosTipoEvento.map((dado) => (
+                    <option key={dado.id} value={dado.id}>
+                      {dado.nomeTipoEvento}
+                    </option>
+                  ))}
                 </select>
               </FormGroup>
 
