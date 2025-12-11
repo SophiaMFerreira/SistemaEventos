@@ -6,18 +6,14 @@ import { BASE_URL } from '../config/axios';
 import BuscarEvento from '../components/input-buscar-evento';
 
 const baseURL = `${BASE_URL}/evento`;
+const baseTipoURL = `${BASE_URL}/tipoEvento`;
 
 function ListagemEventos() {
+  const [dados, setDados] = React.useState(null);
+  const [tiposEvento, setTiposEvento] = React.useState([]);
+  const [filtroNome, setFiltroNome] = React.useState('');
+  const [filtroTipo, setFiltroTipo] = React.useState('');
 
-const [dados, setDados] = React.useState(null);
-const [filtro, setFiltro] = React.useState('');
-
-
-const eventosFiltrados = dados
-  ? dados.filter(ev =>
-      ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
-    )
-  : [];
 
   React.useEffect(() => {
     axios.get(baseURL).then((response) => {
@@ -25,16 +21,49 @@ const eventosFiltrados = dados
     });
   }, []);
 
-  if (!dados) return null;
+  React.useEffect(() => {
+    axios.get(baseTipoURL).then((response) => {
+      setTiposEvento(response.data);
+    });
+  }, []);
+
+  if (!dados) return <p>Carregando eventos...</p>;
+
+
+
+const eventosFiltrados = dados.filter(ev => {
+  const matchNome = ev.nomeEvento.toLowerCase().includes(filtroNome.toLowerCase());
+  const matchTipo = filtroTipo ? ev.idTipoEvento === filtroTipo : true;
+  return matchNome && matchTipo;
+});
+
 
   return (
     <div className='container'>
+  
       <BuscarEvento
-                  value={filtro}
-                  onChange={setFiltro}
-                  placeholder="Digite nome do evento"
-                />
-      <Card title='Todos os Eventos'>
+        value={filtroNome}
+        onChange={setFiltroNome}
+        placeholder="Digite nome do evento"
+      />
+
+      <button style={{ marginBottom: '20px' }}
+        className={`btn ${filtroTipo === null ? 'btn-primary' : 'btn-secondary'} me-2`}
+        onClick={() => setFiltroTipo(null)}
+      >
+      Todos os eventos
+</button>
+
+{tiposEvento.map(tipo => (
+  <button style={{ marginBottom: '20px' }}
+    key={tipo.id}
+    className={`btn ${filtroTipo === tipo.id ? 'btn-primary' : 'btn-secondary'} me-2`}
+    onClick={() => setFiltroTipo(tipo.id)}
+  >
+    {tipo.nomeTipoEvento}
+  </button>
+))}
+      <Card title='Eventos'>
         <div className='row'>
           <div className='col-lg-12'>
             <div className='bs-component'>
@@ -52,17 +81,11 @@ const eventosFiltrados = dados
                   {eventosFiltrados.map((dado) => (
                     <tr key={dado.id}>
                       <td>{dado.nomeEvento}</td>
-                      <td>
-                        {new Date(dado.dataInicio).toLocaleDateString('pt-BR')}
-                      </td>
-                      <td>
-                        {new Date(dado.dataFim).toLocaleDateString('pt-BR')}
-                      </td>
-                      <td>
-                        {dado.horaInicio}
-                      </td>
+                      <td>{new Date(dado.dataInicio).toLocaleDateString('pt-BR')}</td>
+                      <td>{new Date(dado.dataFim).toLocaleDateString('pt-BR')}</td>
+                      <td>{dado.horaInicio}</td>
                       <td>{dado.cidade}</td>
-                    </tr>
+                      </tr>
                   ))}
                 </tbody>
               </table>
