@@ -1,0 +1,47 @@
+#gridLogin{
+    height: 100vh;
+    width: 100vw;
+    min-height: 100vh;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    text-align: left;
+}
+
+#imagemBaloes {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100vh;
+    width: auto;
+    object-fit: cover;
+}
+
+.logo {
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+#titulo {
+    font-size: 70px !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+.linkEsqueciSenha {
+    text-decoration: none;
+    margin-top: 10px;
+    text-align: right !important;
+    display:block;
+}
+
+.linkEsqueciSenha:hover {
+    text-decoration: underline;
+}
+
+#tituloSecundario {
+    font-size: 40px !important;
+    text-align: left !important;
+}
