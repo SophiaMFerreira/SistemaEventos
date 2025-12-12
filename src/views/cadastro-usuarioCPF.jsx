@@ -1,20 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { mensagemSucesso, mensagemErro } from '../components/toastr';
-import Paper from '@mui/material/Paper';
-import Box from "@mui/material/Box";
-import Grid from '@mui/material/Grid';
-import Typography from "@mui/material/Typography";
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-
+import { Grid, Paper, Typography, TextField, Stack, Button, FormControlLabel, Checkbox, MenuItem, Select } from "@mui/material";
 import InputsEndereco from "../components/form-inputsEndereco";
 import InputsSenha from "../components/form-inputsSenha";
+import "../style/cadastro.css";
 
 import axios from 'axios';
 import { BASE_URL_S } from '../config/axios';
@@ -24,27 +14,27 @@ function CadastroUsuarioCPF() {
     const { idParam } = useParams();
     const navigate = useNavigate();
 
-    const [acao, setAcao] = React.useState("Cadastro");
-    const [mensagem, setMensagem] = React.useState("Faça Faça cadastro com seus dados, promova e participe de eventos incríveis!");
-    const [acaoButton, setAcaoButton] = React.useState("Criar conta");
+    const [acao, setAcao] = useState("Cadastro");
+    const [mensagem, setMensagem] = useState("Faça cadastro com seus dados, promova e participe de eventos incríveis!");
+    const [acaoButton, setAcaoButton] = useState("Criar conta");
        
-    const [id, setIdUsuarioCPF] = React.useState("");
-    const [nome, setNomeUsuarioCPF] = React.useState("");
-    const [cpf, setCPFUsuarioCPF] = React.useState("");
-    const [dataNascimento, setDataNascimentoUsuarioCPF] = React.useState("");
-    const [genero, setGeneroUsuarioCPF] = React.useState('Selecionar gênero');
-    const [email, setEmailUsuarioCPF] = React.useState("");
-    const [celular, setCelularUsuarioCPF] = React.useState("");
+    const [id, setIdUsuarioCPF] = useState("");
+    const [nome, setNomeUsuarioCPF] = useState("");
+    const [cpf, setCPFUsuarioCPF] = useState("");
+    const [dataNascimento, setDataNascimentoUsuarioCPF] = useState("");
+    const [genero, setGeneroUsuarioCPF] = useState('Selecionar gênero');
+    const [email, setEmailUsuarioCPF] = useState("");
+    const [celular, setCelularUsuarioCPF] = useState("");
    
-    const [cep, setCep] = React.useState("");
-    const [logradouro, setLogradouro] = React.useState("");
-    const [numero, setNumero] = React.useState("");
-    const [complemento, setComplemento] = React.useState("");
-    const [bairro, setBairro] = React.useState("");
-    const [cidade, setCidade] = React.useState("");
-    const [estado, setEstado] = React.useState("");
-    const [senha, setSenha] = React.useState("");
-    const [confirmarSenha, setConfirmarSenha] = React.useState("");
+    const [cep, setCep] = useState("");
+    const [logradouro, setLogradouro] = useState("");
+    const [numero, setNumero] = useState("");
+    const [complemento, setComplemento] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [cidade, setCidade] = useState("");
+    const [estado, setEstado] = useState("");
+    const [senha, setSenha] = useState("");
+    const [confirmarSenha, setConfirmarSenha] = useState("");
  
     const select = (event) => {
       setGeneroUsuarioCPF(event.target.value);
@@ -115,30 +105,30 @@ function CadastroUsuarioCPF() {
   }
 
   return (
-      <Box p={5} overflow="auto" sx={{ backgroundColor: "background.default", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", boxSizing:"border-box"}}>
+      <Grid container direction="row" p={5} overflow="auto" fullWidth sx={{ position: "relative", justifyContent: "center"}}>
         <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: "900px" }}>
           <Typography component="h1" variant="h3">{acao} de Usuários</Typography>
-          <Typography variant="h6" sx={{ mb: 3 }}>{mensagem}</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem}</Typography>
 
           <FormControlLabel control={<Checkbox checked={false} disabled={idParam ? true : false} onClick={() => navigate("/cadastro-usuarioCNPJ")}/>} label="Sou CNPJ" />
 
           <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
             <Grid size={10}>
-                <Typography variant="h6">Nome*</Typography>
+                <Typography variant="body1" className="label">Nome*</Typography>
                 <TextField name="nome" placeholder="Nome do usuário" value={nome} onChange={(e) => setNomeUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
             </Grid>
             <Grid size={10}>
-                <Typography variant="h6">CPF*</Typography>
+                <Typography variant="body1" className="label">CPF*</Typography>
                 <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCPFUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
             </Grid>
             <Grid size={10}>
                 <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                     <Grid size={6} spacing={2}>
-                        <Typography variant="h6">Data de nascimento*</Typography>
+                        <Typography variant="body1" className="label">Data de nascimento*</Typography>
                         <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
                     </Grid>
                     <Grid size={6} spacing={2}>
-                        <Typography variant="h6">Gênero</Typography>
+                        <Typography variant="body1" className="label">Gênero</Typography>
                         <Select name="genero" id="generoUsuario" value={genero} onChange={select} required fullWidth>
                             <MenuItem value={"femenino"}>Femenino</MenuItem>
                             <MenuItem value={"masculino"}>Masculino</MenuItem>
@@ -149,11 +139,11 @@ function CadastroUsuarioCPF() {
                 </Grid>
             </Grid>
             <Grid size={10}>
-                <Typography variant="h6">Email para contato*</Typography>
+                <Typography variant="body1" className="label">Email para contato*</Typography>
                 <TextField name="email" placeholder="usuario@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
             </Grid>
             <Grid size={10}>
-                <Typography variant="h6">Celular para contato*</Typography>
+                <Typography variant="body1" className="label">Celular para contato*</Typography>
                 <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
             </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
@@ -168,15 +158,15 @@ function CadastroUsuarioCPF() {
                           confirmarSenha={confirmarSenha}  setConfirmarSenha={setConfirmarSenha}
             />
             <Grid size={10}>
-                <Stack spacing={2} direction="row">
+                <Stack spacing={2} direction="row" sx={{ display: "flex", justifyContent: "flex-end"}}>
                     <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
-                    {idParam ? <Button variant="outlined" color="error" onClick={() => exclude()}>Excluir</Button> : false}
+                    {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>
             </Grid>
           </Grid>
         </Paper>
-      </Box>
+      </Grid>
   );
 }
 
