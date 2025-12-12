@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import BuscarEvento from "./input-buscar-evento";
 import Card from "./card";
+import { BASE_URL, BASE_URL_S } from "../config/axios";
+
+const baseURL = `${BASE_URL}/evento`;
+const baseURLIngresso = `${BASE_URL_S}/ingresso`;
 
 function MeusEventos() {
   const idParticipante = Number(localStorage.getItem("idUsuario"));
@@ -13,35 +17,32 @@ function MeusEventos() {
 
 
   useEffect(() => {
-    async function carregarEventos() {
-      try {
-        const resEventos = await fetch(
-          `https://my-json-server.typicode.com/castrothais/jsonfake/evento`
-        );
-        const eventos = await resEventos.json();
+  async function carregarEventos() {
+    try {
+      const resEventos = await fetch(baseURL);
+      const eventos = await resEventos.json();
 
-        const resIngressos = await fetch(
-          "https://my-json-server.typicode.com/SophiaMFerreira/jsonfake/ingresso"
-        );
-        const ingressos = await resIngressos.json();
+      const resIngressos = await fetch(baseURLIngresso);
+      const ingressos = await resIngressos.json();
 
-        const meusIngressos = ingressos.filter(i =>
-          Number(i.idParticipanteCPF) === idParticipante ||
-          Number(i.idParticipanteCNPJ) === idParticipante
-        );
+      const meusIngressos = ingressos.filter(i =>
+        Number(i.idParticipanteCPF) === idParticipante ||
+        Number(i.idParticipanteCNPJ) === idParticipante
+      );
 
         const eventosDoParticipante = eventos.filter(ev =>
-          meusIngressos.some(i => Number(i.idEvento) === ev.id)
-        );
+        meusIngressos.some(i => Number(i.idEvento) === ev.id)
+      );
 
-        setEventosInscritos(eventosDoParticipante);
-      } catch (err) {
-        console.error("Erro ao buscar eventos inscritos:", err);
-      }
+      setEventosInscritos(eventosDoParticipante);
+    } catch (err) {
+      console.error("Erro ao buscar eventos inscritos:", err);
     }
+  }
 
-    carregarEventos();
-  }, [idParticipante]);
+  carregarEventos();
+}, [idParticipante, baseURL, baseURLIngresso]);
+
 
   return (
   <div>
