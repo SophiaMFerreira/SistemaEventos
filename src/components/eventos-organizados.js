@@ -14,10 +14,11 @@ import EditIcon from '@mui/icons-material/Edit';
 
 
 import axios from 'axios';
-import { BASE_URL } from '../config/axios';
+import { BASE_URL, BASE_URL_S } from '../config/axios';
 import BuscarEvento from './input-buscar-evento';
 
 const baseURL = `${BASE_URL}/evento`;
+const baseURLIngresso = `${BASE_URL_S}/ingresso`;
 
 function EventosOrganizados() {
   const navigate = useNavigate();
@@ -30,15 +31,18 @@ function EventosOrganizados() {
     navigate(`/cadastro-eventos/${id}`);
   };
 
-const idOrganizador = Number(localStorage.getItem("idUsuario"));
-const [dados, setDados] = React.useState(null);
-const [filtro, setFiltro] = React.useState("");
+  const idOrganizador = Number(localStorage.getItem("idUsuario"));
+  const [dados, setDados] = React.useState(null);
+  const [filtro, setFiltro] = React.useState("");
+  const [ingressos, setIngressos] = React.useState([]);
+  const eventosNotificados = React.useRef(new Set());
 
-const eventosFiltrados = dados
-  ? dados.filter(ev =>
-      ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
-    )
-  : [];
+
+  const eventosFiltrados = dados
+    ? dados.filter(ev =>
+        ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
+      )
+    : [];
 
   async function excluir(id) {
     let data = JSON.stringify({ id });
@@ -58,87 +62,113 @@ const eventosFiltrados = dados
   }
 
   React.useEffect(() => {
-    axios.get(baseURL).then((response) => {
-      const meusEventos = response.data.filter(
+    async function buscarDados() {
+      const respEventos = await axios.get(baseURL);
+      const respIngressos = await axios.get(baseURLIngresso);
+
+      const meusEventos = respEventos.data.filter(
         ev => Number(ev.idOrganizador) === idOrganizador
       );
 
       setDados(meusEventos);
-    });
+      setIngressos(respIngressos.data);
+    }
+
+    buscarDados();
   }, [idOrganizador]);
+
+ React.useEffect(() => {
+  if (!dados || ingressos.length === 0) return;
+
+  dados.forEach(dado => {
+    const inscritos = ingressos.filter(
+      ing => Number(ing.idEvento) === dado.id && !ing.cancelado && ing.pago
+    ).length;
+
+    if (
+      inscritos >= dado.lotacaoMaxima &&
+      !eventosNotificados.current.has(dado.id)
+    ) {
+      mensagemErro(`Evento ${dado.nomeEvento} atingiu a lotação máxima!`);
+      eventosNotificados.current.add(dado.id);
+    }
+  });
+}, [dados, ingressos]);
+
 
   if (!dados) return null;
 
-  
   return (
-      <div className="container">
-    <Card title="Eventos Organizados">
-      <div className="row">
-        <div className="col-lg-12">
-          <div className="bs-component">
+    <div className="container">
+      <Card title="Eventos Organizados">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="bs-component">
 
-            <button
-              type="button"
-              className="btn btn-warning"
-              onClick={cadastrar}
-            >
-              Novo Evento
-            </button>
+              <button
+                type="button"
+                className="btn btn-warning"
+                onClick={cadastrar}
+              >
+                Novo Evento
+              </button>
 
-           <BuscarEvento
-            value={filtro}
-            onChange={setFiltro}
-            placeholder="Digite nome do evento"
-          />
+              <BuscarEvento
+                value={filtro}
+                onChange={setFiltro}
+                placeholder="Digite nome do evento"
+              />
 
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Dia</th>
+                    <th>Mês</th>
+                    <th>Cidade</th>
+                    <th>Quantidade de vagas</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
 
-            <table className="table table-hover">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Dia</th>
-                  <th>Mês</th>
-                  <th>Cidade</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
+                <tbody>
+                  {eventosFiltrados.map((dado) => {
+                    const data = new Date(dado.dataInicio);
+                    const dia = data.getDate();
+                    const mes = data.toLocaleString("pt-BR", { month: "long" });
+                    const inscritos = ingressos.filter( ing => Number(ing.idEvento) === dado.id && !ing.cancelado && ing.pago).length;
+                    const vagas = inscritos >= dado.lotacaoMaxima ? "Lotação Máxima" : `${inscritos}/${dado.lotacaoMaxima}`;
 
-              <tbody>
-                {eventosFiltrados.map((dado) => {
-                  const data = new Date(dado.dataInicio);
-                  const dia = data.getDate();
-                  const mes = data.toLocaleString("pt-BR", { month: "long" });
+                    return (
+                      <tr key={dado.id}>
+                        <td>{dado.nomeEvento}</td>
+                        <td>{dia}</td>
+                        <td>{mes}</td>
+                        <td>{dado.cidade}</td>
+                        <td>{vagas}</td>
+                        <td>
+                          <Stack spacing={1} padding={0} direction="row">
+                            <IconButton aria-label="edit" onClick={() => editar(dado.id)}>
+                              <EditIcon />
+                            </IconButton>
 
-                  return (
-                    <tr key={dado.id}>
-                      <td>{dado.nomeEvento}</td>
-                      <td>{dia}</td>
-                      <td>{mes}</td>
-                      <td>{dado.cidade}</td>
-
-                      <td>
-                        <Stack spacing={1} padding={0} direction="row">
-                          <IconButton aria-label="edit" onClick={() => editar(dado.id)}>
-                            <EditIcon />
-                          </IconButton>
-
-                          <IconButton aria-label="delete" onClick={() => excluir(dado.id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Stack>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                            <IconButton aria-label="delete" onClick={() => excluir(dado.id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Stack>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    </Card>
-  </div>
-);
-
+      </Card>
+    </div>
+  );
+  
 }
 
 export default EventosOrganizados;
