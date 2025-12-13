@@ -35,6 +35,8 @@ function EventosOrganizados() {
   const [dados, setDados] = React.useState(null);
   const [filtro, setFiltro] = React.useState("");
   const [ingressos, setIngressos] = React.useState([]);
+  const eventosNotificados = React.useRef(new Set());
+
 
   const eventosFiltrados = dados
     ? dados.filter(ev =>
@@ -74,6 +76,25 @@ function EventosOrganizados() {
 
     buscarDados();
   }, [idOrganizador]);
+
+ React.useEffect(() => {
+  if (!dados || ingressos.length === 0) return;
+
+  dados.forEach(dado => {
+    const inscritos = ingressos.filter(
+      ing => Number(ing.idEvento) === dado.id && !ing.cancelado && ing.pago
+    ).length;
+
+    if (
+      inscritos >= dado.lotacaoMaxima &&
+      !eventosNotificados.current.has(dado.id)
+    ) {
+      mensagemErro(`Evento ${dado.nomeEvento} atingiu a lotação máxima!`);
+      eventosNotificados.current.add(dado.id);
+    }
+  });
+}, [dados, ingressos]);
+
 
   if (!dados) return null;
 
@@ -115,9 +136,7 @@ function EventosOrganizados() {
                     const data = new Date(dado.dataInicio);
                     const dia = data.getDate();
                     const mes = data.toLocaleString("pt-BR", { month: "long" });
-                    const inscritos = ingressos.filter(
-                      ing => Number(ing.idEvento) === dado.id && !ing.cancelado
-                    ).length;
+                    const inscritos = ingressos.filter( ing => Number(ing.idEvento) === dado.id && !ing.cancelado && ing.pago).length;
                     const vagas = inscritos >= dado.lotacaoMaxima ? "Lotação Máxima" : `${inscritos}/${dado.lotacaoMaxima}`;
 
                     return (
