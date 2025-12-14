@@ -113,8 +113,8 @@ function ListagemDadosEvento() {
             </Box>
             <Typography variant="body1" sx={{ mb: 5, pl: 5}}>Descrição: {descricaoEvento}</Typography>
             <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
-                <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
-                <Button variant="contained" color="warning" onClick={() => navigate("/ingresso")}>Emitir ingresso</Button>
+                <Button variant="outlined" onClick={() => navigate("/meus-eventos")}>Voltar</Button>
+                <Button variant="contained" color="warning" onClick={() => navigate(`/meus-eventos/${id}/ingresso`)}>Emitir ingresso</Button>
             </Stack>
         </Stack>   
     );

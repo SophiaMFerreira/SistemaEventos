@@ -8,7 +8,7 @@ function Navbar(props) {
     <div className='navbar navbar-expand-lg fixed-top navbar-dark bg-primary'>
       <div className='container'>
         <a href='/' className='navbar-brand'>
-          Event +
+          EVENT +
         </a>
         <button
           className='navbar-toggler'
@@ -22,18 +22,30 @@ function Navbar(props) {
           <span className='navbar-toggler-icon'></span>
         </button>
         <div className='collapse navbar-collapse' id='navbarResponsive'>
+          
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/listagem-eventos' label='Eventos' />
+            <NavbarItem render='true' href='/eventos-organizados' label='Sou organizador' />
           </ul>
+
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/listagem-participantes' label='Participantes' />
           </ul>
+
+            <ul className='navbar-nav'>
+            <NavbarItem render='true' href='/meus-eventos' label='Meus Eventos' />
+          </ul>
+
+          <ul className='navbar-nav'>
+            <NavbarItem render='true' href='/meu-faturamento' label='Faturamento' />
+          </ul>
+
+          <ul className='navbar-nav'>
+            <NavbarItem render='true' href='/meus-certificados' label='Meus Certificados' />
+          </ul>
+          
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/login' label='Entrar' />
-          </ul>
-          <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/' label='Sair' />
-          </ul>
+            </ul>
         </div>
       </div>
     </div>
