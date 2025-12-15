@@ -38,15 +38,15 @@ function Login() {
 
             localStorage.setItem("idUsuario", usuario.id);
             localStorage.setItem("tipoParticipante", tipoParticipante);
-            navigate(`/tela-principal`);
+            navigate(`/listagem-eventos`);
         } catch (error) {
           mensagemErro(error.response.data);
         }
     }
 
     return(
-        <Grid container sx={{position: "relative", height: "100vh", }}>
-            <Grid item xs={12} md={6} sx={{ minHeight: "500px", height: "100%", display: { xs: "none", md: "block" }, alignItems: "center", justifyContent: "center", overflow: "hidden"}}>
+        <Grid container sx={{position: "relative", height: "100vh", width: "100vw"}}>
+            <Grid item xs={12} md={6} sx={{ height: "100%", display: { xs: "none", md: "block" }, alignItems: "center", justifyContent: "center", overflow: "hidden"}}>
                 <Box component="img" id="imagemBaloes" src={imagemBaloes} alt="Balões decorativos" sx={{ position: "relative", width: "100%", height: "100%", objectFit: "cover", display: "block" }}/>
             </Grid>
             <Grid xs={12} md={6} sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", overflow:"auto", px: { xs: 5, sm: 6 } }}>
@@ -60,8 +60,8 @@ function Login() {
                     <Typography variant="body1"mt={2}>Senha*</Typography>
                         <TextField type="password" placeholder="********" required value={senha} onChange={(e) => setSenha(e.target.value)} error={validacao} helperText={validacao ? "Senha ou email incorretos" : ""} fullWidth />
                     <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>Entrar</Button>
-                    <a href="/cadastro-usuarioCPF" className="linkEsqueciSenha" sx={{mt: 3}}>
-                        <Typography variant="body1" onClick={() => navigate("/cadastro-usuarioCPF")}>Você esqueceu a sua senha?</Typography>
+                    <a href="/tela-principal" className="linkEsqueciSenha" sx={{mt: 3}}>
+                        <Typography variant="body1">Você esqueceu a sua senha?</Typography>
                     </a>
                 
                     <Card variant="outlined" sx={{ mt: 5, p: 3 }}>

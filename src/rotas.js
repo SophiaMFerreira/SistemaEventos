@@ -1,31 +1,43 @@
-import React from 'react';
-
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
-import ListagemEventos from './views/listagem-eventos';
-import ListagemParticipantes from './views/listagem-participantes';
+import Navbar from './components/navbar.js';
+
+import Login from './views/login';
+
+import ListagemEventos from './views/listagem-todos-eventos';
+import ListagemParticipantes from './views/listagem-dadosEventoParticipante';
+import ListagemDadosEvento from './views/listagem-dados-Evento-Inscritos';
+import ListagemIngressos from './views/listagem-ingresso';
+import MeusEventos from './views/listagem-meus-eventos';
+import EventosOrganizados from './views/listagem-eventos-organizados';
+import DetalhesEventoOrganizador from './views/listagem-Dados-Eventos-Organizados';
 
 import CadastroTipoEvento from './views/cadastro-tipoEvento';
 import CadastroPorteEvento from './views/cadastro-porteEvento';
 import CadastroAdministrador from './views/cadastro-administrador';
 import CadastroUsuarioCPF from './views/cadastro-usuarioCPF';
 import CadastroUsuarioCNPJ from './views/cadastro-usuarioCNPJ';
-import Login from './views/login';
-
+import CadastroEvento from './views/cadastro-eventos';
 
 function Rotas(props) {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/login' element={<Login />} />
+        <Route path='/' element={<Login />} />
 
-        <Route path='/cadastro-tipoEvento/:idParam?' element={<CadastroTipoEvento />} />
-        <Route path='/cadastro-porteEvento/:idParam?' element={<CadastroPorteEvento />} />
-        <Route path='/cadastro-administrador/:idParam?' element={<CadastroAdministrador />} />
-        <Route path='/cadastro-usuarioCPF/:idParam?' element={<CadastroUsuarioCPF />} />
-        <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<CadastroUsuarioCNPJ />} />
-
-        <Route path='/listagem-eventos' element={<ListagemEventos />} />
-        <Route path='/listagem-participantes' element={<ListagemParticipantes />} />
+        <Route path='/listagem-eventos' element={<><Navbar /><ListagemEventos /></>} />
+        <Route path="/eventos-organizados" element={<><Navbar /><EventosOrganizados /></>} />
+        <Route path="/eventos-organizados/:idParam" element={<><Navbar /><DetalhesEventoOrganizador /></>} />
+        <Route path='/listagem-participantes' element={<><Navbar /><ListagemParticipantes /></>} />
+        <Route path="/meus-eventos" element={<><Navbar /><MeusEventos /></>} />
+        <Route path="/meus-eventos/:idParam" element={<><Navbar /><ListagemDadosEvento  /></>} />
+        <Route path="/meus-eventos/:idParam/ingresso" element={<><Navbar /><ListagemIngressos /></>} />
+        
+        <Route path='/cadastro-tipoEvento/:idParam?' element={<><Navbar /><CadastroTipoEvento /></>} />
+        <Route path='/cadastro-porteEvento/:idParam?' element={<><Navbar /><CadastroPorteEvento /></>} />
+        <Route path='/cadastro-eventos/:idParam?' element={<><Navbar /><CadastroEvento /></>} />
+        <Route path='/cadastro-administrador/:idParam?' element={<><Navbar /><CadastroAdministrador /></>} />
+        <Route path='/cadastro-usuarioCPF/:idParam?' element={<><Navbar /><CadastroUsuarioCPF /></>} />
+        <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<><Navbar /><CadastroUsuarioCNPJ /></>} />
       </Routes>
     </BrowserRouter>
   );
