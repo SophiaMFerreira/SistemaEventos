@@ -7,7 +7,7 @@ function Navbar(props) {
   return (
     <div className='navbar navbar-expand-lg fixed-top navbar-dark bg-primary'>
       <div className='container'>
-        <a href='/' className='navbar-brand'>
+        <a href='/listagem-eventos' className='navbar-brand'>
           EVENT +
         </a>
         <button
@@ -36,15 +36,11 @@ function Navbar(props) {
           </ul>
 
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/meu-faturamento' label='Faturamento' />
-          </ul>
-
-          <ul className='navbar-nav'>
             <NavbarItem render='true' href='/meus-certificados' label='Meus Certificados' />
           </ul>
           
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/login' label='Entrar' />
+            <NavbarItem render='true' href='/' label='Entrar' />
             </ul>
         </div>
       </div>

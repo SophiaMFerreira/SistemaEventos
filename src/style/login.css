@@ -1,0 +1,87 @@
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
+.logo {
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+#titulo {
+    font-size: 70px !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+.linkEsqueciSenha {
+    text-decoration: none;
+    margin-top: 10px;
+    text-align: right !important;
+    display:block;
+}
+
+.linkEsqueciSenha:hover {
+    text-decoration: underline;
+}
+
+#tituloSecundario {
+    font-size: 40px !important;
+    text-align: left !important;
+}
+
+@media (max-width: 600px) {
+    #titulo {
+        font-size: 42px !important;
+    }
+    #tituloSecundario {
+        font-size: 28px !important;
+    }
+}html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
+.logo {
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+#titulo {
+    font-size: 70px !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+.linkEsqueciSenha {
+    text-decoration: none;
+    margin-top: 10px;
+    text-align: right !important;
+    display:block;
+}
+
+.linkEsqueciSenha:hover {
+    text-decoration: underline;
+}
+
+#tituloSecundario {
+    font-size: 40px !important;
+    text-align: left !important;
+}
+
+@media (max-width: 600px) {
+    #titulo {
+        font-size: 42px !important;
+    }
+    #tituloSecundario {
+        font-size: 28px !important;
+    }
+}
