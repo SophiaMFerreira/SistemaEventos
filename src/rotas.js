@@ -13,10 +13,10 @@ import DetalhesEventoOrganizador from './views/listagem-Dados-Eventos-Organizado
 
 import CadastroTipoEvento from './views/cadastro-tipoEvento';
 import CadastroPorteEvento from './views/cadastro-porteEvento';
+import CadastroEvento from './views/cadastro-eventos';
 import CadastroAdministrador from './views/cadastro-administrador';
 import CadastroUsuarioCPF from './views/cadastro-usuarioCPF';
 import CadastroUsuarioCNPJ from './views/cadastro-usuarioCNPJ';
-import CadastroEvento from './views/cadastro-eventos';
 
 function Rotas(props) {
   return (

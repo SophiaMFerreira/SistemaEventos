@@ -1,0 +1,53 @@
+.regiao {
+    font-size: 28px !important;
+}
+
+#titulo {
+    font-size: 70px !important;
+    text-align: left !important;
+    margin-bottom: 10px;
+}
+
+.destaqueAzul {
+    color: #1a75f0;
+}
+
+.destaqueLaranja {
+    color: #ff8200;
+}
+
+@media (max-width: 900px) {
+  #titulo {
+        font-size: 48px !important;
+  }
+
+  .regiao {
+        font-size: 24px !important;
+  }
+
+  .imagemDivulgacaoEvento {
+        height: 400px;
+        max-height: 45vh;
+  }
+}
+
+@media (max-width: 600px) {
+  #titulo {
+        font-size: 34px !important;
+        text-align: center !important;
+  }
+
+  .regiao {
+        font-size: 20px !important;
+        text-align: center;
+  }
+
+  .imagemDivulgacaoEvento {
+        height: 220px;
+        max-height: 35vh;
+        border-radius: 10px;
+  }
+}
+
+
+

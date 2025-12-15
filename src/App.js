@@ -4,6 +4,7 @@ import 'toastr/build/toastr.min';
 import 'toastr/build/toastr.css';
 import Rotas from './rotas.js';
 
+
 class App extends React.Component {
   render() {
     return (

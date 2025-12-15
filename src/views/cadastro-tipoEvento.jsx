@@ -1,15 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { mensagemSucesso, mensagemErro } from '../components/toastr'; 
-import Box from "@mui/material/Box";
-import Sidebar from "../components/sidebar";
-import Paper from '@mui/material/Paper';
-import Typography from "@mui/material/Typography";
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+import { Grid, Paper, Typography, TextField, Stack, Button } from "@mui/material";
+import "../style/cadastro.css";
 
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
@@ -20,12 +14,12 @@ function CadastroTipoEvento() {
   const navigate = useNavigate();
   
   
-  const [acao, setAcao] = React.useState("Cadastro");
-  const [mensagem, setMensagem] = React.useState("Faça cadastro de novos");
-  const [acaoButton, setAcaoButton] = React.useState("Criar");
-  const [id, setIdTipoEvento] = React.useState("");
-  const [nomeTipoEvento, setNomeTipoEvento] = React.useState("");
-  const [descricao, setDescricaoTipoEvento] = React.useState("");
+  const [acao, setAcao] = useState("Cadastro");
+  const [mensagem, setMensagem] = useState("Faça cadastro de novos");
+  const [acaoButton, setAcaoButton] = useState("Criar");
+  const [id, setIdTipoEvento] = useState("");
+  const [nomeTipoEvento, setNomeTipoEvento] = useState("");
+  const [descricao, setDescricaoTipoEvento] = useState("");
   
   useEffect(() => {
     if (!idParam) return;
@@ -63,52 +57,46 @@ function CadastroTipoEvento() {
   }
 
   async function exclude() {
-    let data = JSON.stringify({ idParam });
-    let url = `${baseURL}/${idParam}`;
-    await axios
-      .delete(url, data, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      .then(function (response) {
-        mensagemSucesso(`Tipo de evento ${nomeTipoEvento} excluído com sucesso!`);
-        navigate(`/tela-principal`);
-      })
-      .catch(function (error) {
-        mensagemErro(`Erro ao excluir ${nomeTipoEvento}`);
-      });
+      let data = JSON.stringify({ idParam });
+      let url = `${baseURL}/${idParam}`;
+      await axios
+          .delete(url, data, {
+              headers: { 'Content-Type': 'application/json' },
+          })
+          .then(function (response) {
+              mensagemSucesso(`Tipo de evento ${nomeTipoEvento} excluído com sucesso!`);
+              navigate(`/tela-principal`);
+          })
+          .catch(function (error) {
+              mensagemErro(`Erro ao excluir ${nomeTipoEvento}`);
+          });
   }
 
   return (
-    <Box display="flex" height="100vh" bgcolor="background.default">
-      <Box>
-        <Sidebar />
-      </Box>
-
-      <Box flex={1} p={5} overflow="auto" sx={{ position: "relative", backgroundColor: "background.default", display: "flex", flexDirection: "column", justifyContent: "space-between", }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography component="h1" variant="h3">{acao} de Tipo de Evento</Typography>
-          <Typography variant="h6" sx={{ mb: 3 }}>{mensagem} tipos de evento.</Typography>
-          <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
-            <Grid size={10} spacing={2}>
-                <Typography variant="h6">Nome*</Typography>
-                <TextField name="nomeTipoEvento" placeholder="Nome do tipo de evento" required value={nomeTipoEvento} onChange={(e) => setNomeTipoEvento(e.target.value)} fullWidth sx={{ mb: 3, }}/>
-            </Grid>
-            <Grid size={10}>
-                <Typography variant="h6">Descrição</Typography>
-                <TextField name="descricao" placeholder="Descreva o evento" multiline rows={4} value={descricao} onChange={(e) => setDescricaoTipoEvento(e.target.value)} fullWidth sx={{ mb: 3 }}/>
-            </Grid>
-            <Grid size={10}>
-                <Stack spacing={2} direction="row">
-                    <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
-                    <Button variant="contained" type="submit" >{acaoButton} Tipo de Evento</Button>
-                    {idParam ? <Button variant="outlined" color="error" onClick={() => exclude()}>Excluir</Button> : false}
-                </Stack>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Box>
-    </Box>
-  );
+        <Grid container direction="row" p={5} overflow="auto"  fullWidth sx={{ position: "relative", justifyContent: "center"}}>
+              <Paper elevation={3} sx={{ p: 4 }}>
+                  <Typography component="h1" variant="h3">{acao} de Tipo de Evento</Typography>
+                  <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem} tipos de evento.</Typography>
+                  <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
+                      <Grid size={10} spacing={2}>
+                          <Typography variant="body1" className="label">Nome*</Typography>
+                          <TextField name="nomeTipoEvento" placeholder="Nome do tipo de evento" required value={nomeTipoEvento} onChange={(e) => setNomeTipoEvento(e.target.value)} fullWidth sx={{ mb: 3, }}/>
+                      </Grid>
+                      <Grid size={10}>
+                          <Typography variant="body1" className="label">Descrição</Typography>
+                          <TextField name="descricao" placeholder="Descreva o evento" multiline rows={4} value={descricao} onChange={(e) => setDescricaoTipoEvento(e.target.value)} fullWidth sx={{ mb: 3 }}/>
+                      </Grid>
+                      <Grid size={10}>
+                          <Stack spacing={2} direction="row" sx={{ display: "flex", justifyContent: "flex-end"}}>
+                              <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
+                              <Button variant="contained" type="submit" >{acaoButton} Tipo de Evento</Button>
+                              {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
+                          </Stack>
+                      </Grid>
+                  </Grid>
+              </Paper>
+        </Grid>
+    );
 }
 
 export default CadastroTipoEvento;

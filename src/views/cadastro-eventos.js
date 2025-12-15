@@ -13,16 +13,16 @@ import { BASE_URL } from '../config/axios';
 function CadastroEvento() {
   const { idParam } = useParams();
   const navigate = useNavigate();
-  const baseURL = `${BASE_URL}/eventos`;
+
+  const baseURL = `${BASE_URL}/evento`;
 
   const [id, setId] = useState('');
-  const [nome, setNome] = useState('');
+  const [nomeEvento, setNomeEvento] = useState('');
   const [modalidade, setModalidade] = useState('');
-  const [tipoEvento, setTipoEvento] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [valorIngresso, setValorIngresso] = useState('');
-  const [idadeMinima, setIdadeMinima] = useState('');
-  const [lotacaoMaxima, setLotacaoMaxima] = useState('');
+  const [valorIngresso, setValorIngresso] = useState(0);
+  const [idadeMinima, setIdadeMinima] = useState(0);
+  const [lotacaoMaxima, setLotacaoMaxima] = useState(0);
   const [dataInicio, setDataInicio] = useState('');
   const [horaInicio, setHoraInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
@@ -34,37 +34,69 @@ function CadastroEvento() {
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
+  const [idTipoEvento, setIdTipoEvento] = useState(0);
+  const [idPorteEvento, setIdPorteEvento] = useState(0);
 
-  const [dados, setDados] = useState([]);
+  const [dados, setDados] = useState(null);
+
+  const idOrganizador = Number(localStorage.getItem('idUsuario'));
 
   function inicializar() {
-    setId('');
-    setNome('');
-    setModalidade('');
-    setTipoEvento('');
-    setDescricao('');
-    setValorIngresso('');
-    setIdadeMinima('');
-    setLotacaoMaxima('');
-    setDataInicio('');
-    setHoraInicio('');
-    setDataFim('');
-    setHoraFim('');
-    setCep('');
-    setLogradouro('');
-    setNumero('');
-    setComplemento('');
-    setBairro('');
-    setCidade('');
-    setEstado('');
+    if (idParam == null) {
+      setId('');
+      setNomeEvento('');
+      setModalidade('');
+      setDescricao('');
+      setValorIngresso(0);
+      setIdadeMinima(0);
+      setLotacaoMaxima(0);
+      setDataInicio('');
+      setHoraInicio('');
+      setDataFim('');
+      setHoraFim('');
+      setCep('');
+      setLogradouro('');
+      setNumero('');
+      setComplemento('');
+      setBairro('');
+      setCidade('');
+      setEstado('');
+      setIdTipoEvento(0);
+      setIdPorteEvento(0);
+    } else if (dados) {
+      setId(dados.id);
+      setNomeEvento(dados.nomeEvento);
+      setModalidade(dados.modalidade);
+      setDescricao(dados.descricao);
+      setValorIngresso(dados.valorIngresso);
+      setIdadeMinima(dados.idadeMinima);
+      setLotacaoMaxima(dados.lotacaoMaxima);
+      setDataInicio(dados.dataInicio);
+      setHoraInicio(dados.horaInicio);
+      setDataFim(dados.dataFim);
+      setHoraFim(dados.horaFim);
+      setCep(dados.cep);
+      setLogradouro(dados.logradouro);
+      setNumero(dados.numero);
+      setComplemento(dados.complemento);
+      setBairro(dados.bairro);
+      setCidade(dados.cidade);
+      setEstado(dados.estado);
+      setIdTipoEvento(dados.idTipoEvento);
+      setIdPorteEvento(dados.idPorteEvento);
+    }
   }
 
   async function salvar() {
+    if (!idOrganizador) {
+      mensagemErro('Usuário não autenticado.');
+      return;
+    }
+
     let data = {
       id,
-      nome,
+      nomeEvento,
       modalidade,
-      tipoEvento,
       descricao,
       valorIngresso,
       idadeMinima,
@@ -80,59 +112,87 @@ function CadastroEvento() {
       bairro,
       cidade,
       estado,
+      idOrganizador,
+      idTipoEvento,
+      idPorteEvento
     };
 
-    try {
-      if (idParam == null) {
-        await axios.post(baseURL, data, {
-          headers: { 'Content-Type': 'application/json' },
-        });
-        mensagemSucesso(`Evento ${nome} cadastrado com sucesso!`);
-      } else {
-        await axios.put(`${baseURL}/${idParam}`, data, {
-          headers: { 'Content-Type': 'application/json' },
-        });
-        mensagemSucesso(`Evento ${nome} alterado com sucesso!`);
-      }
-      navigate(`/listagem-eventos`);
-    } catch (error) {
-      mensagemErro(error.response?.data || 'Erro ao salvar evento.');
+    data = JSON.stringify(data);
+
+    if (idParam == null) {
+      await axios
+        .post(baseURL, data, { headers: { 'Content-Type': 'application/json' } })
+        .then(() => {
+          mensagemSucesso(`Evento ${nomeEvento} cadastrado com sucesso!`);
+          navigate('/eventos-organizados');
+        })
+        .catch((error) => mensagemErro(error.response.data));
+    } else {
+      await axios
+        .put(`${baseURL}/${idParam}`, data, { headers: { 'Content-Type': 'application/json' } })
+        .then(() => {
+          mensagemSucesso(`Evento ${nomeEvento} alterado com sucesso!`);
+          navigate('/eventos-organizados');
+        })
+        .catch((error) => mensagemErro(error.response.data));
     }
   }
 
   async function buscar() {
-    if (!idParam) return;
     try {
       const response = await axios.get(`${baseURL}/${idParam}`);
-      const e = response.data;
-      setDados(e);
-      setId(e.id);
-      setNome(e.nome);
-      setModalidade(e.modalidade);
-      setTipoEvento(e.tipoEvento);
-      setDescricao(e.descricao);
-      setValorIngresso(e.valorIngresso);
-      setIdadeMinima(e.idadeMinima);
-      setLotacaoMaxima(e.lotacaoMaxima);
-      setDataInicio(e.dataInicio);
-      setHoraInicio(e.horaInicio);
-      setDataFim(e.dataFim);
-      setHoraFim(e.horaFim);
-      setCep(e.cep);
-      setLogradouro(e.logradouro);
-      setNumero(e.numero);
-      setComplemento(e.complemento);
-      setBairro(e.bairro);
-      setCidade(e.cidade);
-      setEstado(e.estado);
+      const dados = response.data;
+
+      setDados(dados);
+
+      setId(dados.id);
+      setNomeEvento(dados.nomeEvento);
+      setModalidade(dados.modalidade);
+      setDescricao(dados.descricao);
+      setValorIngresso(dados.valorIngresso);
+      setIdadeMinima(dados.idadeMinima);
+      setLotacaoMaxima(dados.lotacaoMaxima);
+      setDataInicio(dados.dataInicio);
+      setHoraInicio(dados.horaInicio);
+      setDataFim(dados.dataFim);
+      setHoraFim(dados.horaFim);
+      setCep(dados.cep);
+      setLogradouro(dados.logradouro);
+      setNumero(dados.numero);
+      setComplemento(dados.complemento);
+      setBairro(dados.bairro);
+      setCidade(dados.cidade);
+      setEstado(dados.estado);
+      setIdTipoEvento(dados.idTipoEvento);
+      setIdPorteEvento(dados.idPorteEvento);
     } catch (error) {
-      mensagemErro('Erro ao buscar dados do evento.');
+      mensagemErro('Erro ao buscar evento');
     }
   }
 
+  const [dadosTipoEvento, setDadosTipoEvento] = useState(null);
+  const [dadosPorteEvento, setDadosPorteEvento] = useState(null);
+
   useEffect(() => {
-    buscar(); // eslint-disable-next-line
+    axios.get(`${BASE_URL}/tipoEvento`).then((response) => {
+      setDadosTipoEvento(response.data);
+    });
+    axios.get(`${BASE_URL}/porteEvento`).then((response) => {
+      setDadosPorteEvento(response.data);
+    });
   }, []);
+
+  useEffect(() => {
+    if (idParam) {
+      buscar();
+    } else {
+      inicializar();
+    }
+    // eslint-disable-next-line
+  }, [idParam]);
+
+  if (!dadosTipoEvento) return null;
+  if (!dadosPorteEvento) return null;
 
   return (
     <div className='container'>
@@ -143,62 +203,70 @@ function CadastroEvento() {
               <FormGroup label='Nome do Evento: *' htmlFor='inputNome'>
                 <input
                   type='text'
+                  placeholder='Digite o nome do evento'
                   id='inputNome'
-                  value={nome}
+                  value={nomeEvento}
                   className='form-control'
-                  onChange={(e) => setNome(e.target.value)}
+                  onChange={(e) => setNomeEvento(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Modalidade:' htmlFor='selectModalidade'>
+              <FormGroup label='Modalidade: *' htmlFor='selectModalidade'>
                 <select
                   id='selectModalidade'
                   className='form-select'
                   value={modalidade}
                   onChange={(e) => setModalidade(e.target.value)}
                 >
-                  <option value=''>Selecione...</option>
+                  <option value=''>Selecione a modalidade do evento</option>
                   <option value='Presencial'>Presencial</option>
                   <option value='Online'>Online</option>
                   <option value='Híbrido'>Híbrido</option>
                 </select>
               </FormGroup>
 
-              <FormGroup label='Tipo de Evento:' htmlFor='selectTipo'>
+              <FormGroup label='Tipo de Evento: *' htmlFor='selectTipoEvento'>
                 <select
-                  id='selectTipo'
                   className='form-select'
-                  value={tipoEvento}
-                  onChange={(e) => setTipoEvento(e.target.value)}
+                  id='selectTipoEvento'
+                  name='idTipoEvento'
+                  value={idTipoEvento}
+                  onChange={(e) => setIdTipoEvento(e.target.value)}
                 >
-                  <option value=''>Selecione...</option>
-                  <option value='Palestra'>Palestra</option>
-                  <option value='Workshop'>Workshop</option>
-                  <option value='Congresso'>Congresso</option>
-                  <option value='Show'>Show</option>
+                  <option key='0' value='0'>
+                    {' '}
+                  </option>
+                  {dadosTipoEvento.map((dado) => (
+                    <option key={dado.id} value={dado.id}>
+                      {dado.nomeTipoEvento}
+                    </option>
+                  ))}
                 </select>
               </FormGroup>
 
-              <FormGroup label='Descrição:' htmlFor='inputDescricao'>
+              <FormGroup label='Descrição: *' htmlFor='inputDescricao'>
                 <textarea
                   id='inputDescricao'
                   value={descricao}
+                  placeholder='Descreva brevemente o evento, atrações e público-alvo'
                   className='form-control'
                   onChange={(e) => setDescricao(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Valor do Ingresso:' htmlFor='inputValor'>
+              <FormGroup label='Valor do Ingresso: *' htmlFor='inputValor'>
                 <input
                   type='number'
                   id='inputValor'
                   value={valorIngresso}
                   className='form-control'
+                  disabled={idParam!=null }
                   onChange={(e) => setValorIngresso(e.target.value)}
+                  
                 />
               </FormGroup>
 
-              <FormGroup label='Idade Mínima:' htmlFor='inputIdadeMinima'>
+              <FormGroup label='Idade Mínima: *' htmlFor='inputIdadeMinima'>
                 <input
                   type='number'
                   id='inputIdadeMinima'
@@ -208,7 +276,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Lotação Máxima:' htmlFor='inputLotacaoMaxima'>
+              <FormGroup label='Lotação Máxima: *' htmlFor='inputLotacaoMaxima'>
                 <input
                   type='number'
                   id='inputLotacaoMaxima'
@@ -218,7 +286,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Data de Início:' htmlFor='inputDataInicio'>
+              <FormGroup label='Data de Início: *' htmlFor='inputDataInicio'>
                 <input
                   type='date'
                   id='inputDataInicio'
@@ -228,7 +296,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Hora de Início:' htmlFor='inputHoraInicio'>
+              <FormGroup label='Hora de Início: *' htmlFor='inputHoraInicio'>
                 <input
                   type='time'
                   id='inputHoraInicio'
@@ -238,7 +306,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Data de Fim:' htmlFor='inputDataFim'>
+              <FormGroup label='Data de Fim: *' htmlFor='inputDataFim'>
                 <input
                   type='date'
                   id='inputDataFim'
@@ -248,7 +316,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Hora de Fim:' htmlFor='inputHoraFim'>
+              <FormGroup label='Hora de Fim: *' htmlFor='inputHoraFim'>
                 <input
                   type='time'
                   id='inputHoraFim'
@@ -259,7 +327,7 @@ function CadastroEvento() {
               </FormGroup>
 
               <h5 className='mt-4'>Endereço do Evento</h5>
-              <FormGroup label='CEP:' htmlFor='inputCep'>
+              <FormGroup label='CEP: *' htmlFor='inputCep'>
                 <input
                   type='text'
                   id='inputCep'
@@ -269,7 +337,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Logradouro:' htmlFor='inputLogradouro'>
+              <FormGroup label='Logradouro: *' htmlFor='inputLogradouro'>
                 <input
                   type='text'
                   id='inputLogradouro'
@@ -279,7 +347,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Número:' htmlFor='inputNumero'>
+              <FormGroup label='Número: *' htmlFor='inputNumero'>
                 <input
                   type='text'
                   id='inputNumero'
@@ -289,7 +357,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Complemento:' htmlFor='inputComplemento'>
+              <FormGroup label='Complemento: *' htmlFor='inputComplemento'>
                 <input
                   type='text'
                   id='inputComplemento'
@@ -299,7 +367,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Bairro:' htmlFor='inputBairro'>
+              <FormGroup label='Bairro: *' htmlFor='inputBairro'>
                 <input
                   type='text'
                   id='inputBairro'
@@ -309,7 +377,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Cidade:' htmlFor='inputCidade'>
+              <FormGroup label='Cidade: *' htmlFor='inputCidade'>
                 <input
                   type='text'
                   id='inputCidade'
@@ -319,7 +387,7 @@ function CadastroEvento() {
                 />
               </FormGroup>
 
-              <FormGroup label='Estado:' htmlFor='inputEstado'>
+              <FormGroup label='Estado: *' htmlFor='inputEstado'>
                 <input
                   type='text'
                   id='inputEstado'
