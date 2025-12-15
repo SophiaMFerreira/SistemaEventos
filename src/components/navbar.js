@@ -22,18 +22,30 @@ function Navbar(props) {
           <span className='navbar-toggler-icon'></span>
         </button>
         <div className='collapse navbar-collapse' id='navbarResponsive'>
+          
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/eventos-organizados' label='Sou organizador' />
           </ul>
+
           <ul className='navbar-nav'>
+            <NavbarItem render='true' href='/listagem-participantes' label='Participantes' />
+          </ul>
+
+            <ul className='navbar-nav'>
             <NavbarItem render='true' href='/meus-eventos' label='Meus Eventos' />
           </ul>
+
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/meu-faturamento' label='Faturamento' />
           </ul>
+
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/meus-certificados' label='Meus Certificados' />
           </ul>
+          
+          <ul className='navbar-nav'>
+            <NavbarItem render='true' href='/login' label='Entrar' />
+            </ul>
         </div>
       </div>
     </div>

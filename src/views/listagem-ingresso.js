@@ -12,7 +12,7 @@ const baseURLParticipanteCNPJ = `${BASE_URL_S}/participanteCNPJ`;
 
 
 function ListagemIngressos() {
-  const { idEvento } = useParams();
+  const { idParam } = useParams();
   const idParticipante = Number(localStorage.getItem("idUsuario"));
   const [ingressosExibidos, setIngressosExibidos] = useState([]);
 
@@ -43,7 +43,7 @@ function ListagemIngressos() {
 
       const meusIngressos = ingressos.filter(
         (i) =>
-          Number(i.idEvento) === Number(idEvento) &&
+          Number(i.idEvento) === Number(idParam) &&
           !i.cancelado &&
           i.pago &&
           (
@@ -76,7 +76,7 @@ function ListagemIngressos() {
   }
 
   carregarIngressos();
-}, [idParticipante, idEvento]);
+}, [idParticipante, idParam]);
 
 
   return (

@@ -12,10 +12,10 @@ import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-
 import axios from 'axios';
 import { BASE_URL, BASE_URL_S } from '../config/axios';
-import BuscarEvento from './input-buscar-evento';
+import BuscarEvento from '../components/input-buscar-evento';
+
 
 const baseURL = `${BASE_URL}/evento`;
 const baseURLIngresso = `${BASE_URL_S}/ingresso`;
@@ -140,7 +140,7 @@ function EventosOrganizados() {
                     const vagas = inscritos >= dado.lotacaoMaxima ? "Lotação Máxima" : `${inscritos}/${dado.lotacaoMaxima}`;
 
                     return (
-                      <tr key={dado.id}>
+                      <tr key={dado.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/eventos-organizados/${dado.id}`)}>
                         <td>{dado.nomeEvento}</td>
                         <td>{dia}</td>
                         <td>{mes}</td>

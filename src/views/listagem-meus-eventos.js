@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import BuscarEvento from "./input-buscar-evento";
-import Card from "./card";
 import { BASE_URL, BASE_URL_S } from "../config/axios";
+import BuscarEvento from "../components/input-buscar-evento";
+import Card from "../components/card";
+import { useNavigate } from "react-router-dom";
 
 const baseURL = `${BASE_URL}/evento`;
 const baseURLIngresso = `${BASE_URL_S}/ingresso`;
 
 function MeusEventos() {
+  const navigate = useNavigate();
   const idParticipante = Number(localStorage.getItem("idUsuario"));
   const [eventosInscritos, setEventosInscritos] = useState([]);
   const [filtro, setFiltro] = React.useState("");
@@ -71,7 +73,11 @@ function MeusEventos() {
                 </thead>
                 <tbody>
                   {eventosFiltrados.map((ev) => (
-                    <tr key={ev.id}>
+                    <tr key={ev.id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/meus-eventos/${ev.id}`)}
+
+                    >
                       <td>{ev.nomeEvento}</td>
                       <td>{new Date(ev.dataInicio).toLocaleDateString('pt-BR')}</td>
                       <td>{new Date(ev.dataFim).toLocaleDateString('pt-BR')}</td>
