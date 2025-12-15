@@ -80,7 +80,7 @@ function ListagemIngressos() {
 
 
   return (
-    <div className="container">
+    <div className="container" style={{ marginTop: '120px' }}>
       <Card title="Ingressos para Impressão">
         {ingressosExibidos.length === 0 ? (
           <p>Você não possui ingressos disponíveis.</p>

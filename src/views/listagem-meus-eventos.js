@@ -47,7 +47,7 @@ function MeusEventos() {
 
 
   return (
-  <div>
+  <div className='container' style={{ marginTop: '120px' }}>
     <Card title='Meus Eventos'>
       <BuscarEvento
         value={filtro}
