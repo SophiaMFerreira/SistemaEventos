@@ -71,13 +71,13 @@ function CadastroAdministrador(){
       if (!idParam) {
         await axios.post(baseURL, data);
           mensagemSucesso(`Novo administrador ${nome} criado com sucesso!`);
-          navigate(`/tela-principal`);
+          navigate(`/listagem-eventos`);
       } else {
         await axios.put(`${baseURL}/${idParam}`, data);
           mensagemSucesso(`Administrador ${nome} alterado com sucesso!`);
-          navigate(`/tela-principal`);
+          navigate(`/listagem-eventos`);
       }
-      navigate("/tela-principal");
+      navigate("/listagem-eventos");
     } catch (error) {
       mensagemErro(error.response.data);
     }
@@ -92,7 +92,7 @@ function CadastroAdministrador(){
       })
       .then(function (response) {
         mensagemSucesso(`Admninistrador excluído com sucesso!`);
-        navigate(`/tela-principal`);
+        navigate(`/listagem-eventos`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o admninistrador`);
@@ -100,27 +100,29 @@ function CadastroAdministrador(){
   }
 
   return (
-    <Grid container direction="row" p={5} overflow="auto"  fullWidth sx={{ position: "relative", justifyContent: "center"}}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography component="h1" variant="h3">{acao} de Administrador</Typography>
-          <Typography variant="subtitle1" className="label" sx={{ mb: 3 }}>{mensagem} administradores.</Typography>
-          <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
-            <Grid size={10}>
-                <Typography variant="body1" className="label">Nome*</Typography>
-                <TextField name="nome" placeholder="Nome do administrador" value={nome} onChange={(e) => setNomeAdministrador(e.target.value)}  required fullWidth sx={{ mb: 3, }}/>
-            </Grid>
-            <Grid size={10}>
-                <Typography variant="body1" className="label">CPF*</Typography>
-                <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCpfAdministrador(e.target.value)}  required fullWidth sx={{ mb: 3, }}/>
-            </Grid>
-            <Grid size={10}>
-                <Typography variant="body1" className="label">Email para contato*</Typography>
-                <TextField name="email" placeholder="administrador@email.com" type="email" value={email} onChange={(e) => setEmailAdministrador(e.target.value)}  required fullWidth sx={{ mb: 3, }}/>
-            </Grid>
-            <Grid size={10}>
-                <Typography variant="body1" className="label">Celular para contato*</Typography>
-                <TextField name="celular" placeholder="55 (00) 00000-0000" value={celular} onChange={(e) => setCelular(e.target.value)}  required fullWidth sx={{ mb: 3, }}/>
-            </Grid>
+    <Grid container direction="column" sx={{ minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "flex-start", mt: 8, boxSizing: "border-box", px: { xs: 1, sm: 3 } }} >
+        <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
+            <Typography component="h1" variant="h3">{acao} de Administrador</Typography>
+            <Typography variant="subtitle1" className="label" sx={{ mb: 3 }}>{mensagem} administradores.</Typography>
+            <Grid container component="form" onSubmit={save} noValidate spacing={2} sx={{ justifyContent: "center", alignItems: "stretch"}}>
+                <Grid item size={10} direction="column"> 
+                    <Grid item xs={12} md={10}>
+                        <Typography variant="body1" className="label">Nome*</Typography>
+                        <TextField name="nome" placeholder="Nome do administrador" value={nome} onChange={(e) => setNomeAdministrador(e.target.value)}  required fullWidth sx={{ mb: 2 }}/>
+                    </Grid>
+                    <Grid item xs={12} md={10}>
+                        <Typography variant="body1" className="label">CPF*</Typography>
+                        <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCpfAdministrador(e.target.value)}  required fullWidth sx={{ mb: 2 }}/>
+                    </Grid>
+                    <Grid item xs={12} md={10}>
+                        <Typography variant="body1" className="label">Email para contato*</Typography>
+                        <TextField name="email" placeholder="administrador@email.com" type="email" value={email} onChange={(e) => setEmailAdministrador(e.target.value)}  required fullWidth sx={{ mb: 2 }}/>
+                    </Grid>
+                    <Grid item xs={12} md={10}>
+                        <Typography variant="body1" className="label">Celular para contato*</Typography>
+                        <TextField name="celular" placeholder="55 (00) 00000-0000" value={celular} onChange={(e) => setCelular(e.target.value)}  required fullWidth sx={{ mb: 2 }}/>
+                    </Grid>
+                </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                             logradouro={logradouro} setLogradouro={setLogradouro}
                             bairro={bairro} setBairro={setBairro}
@@ -132,9 +134,9 @@ function CadastroAdministrador(){
             <InputsSenha  senha={senha}  setSenha={setSenha}
                           confirmarSenha={confirmarSenha}  setConfirmarSenha={setConfirmarSenha}
             />
-            <Grid size={10}>
-                <Stack spacing={2} direction="row" sx={{ display: "flex", justifyContent: "flex-end"}}>
-                    <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
+            <Grid item xs={12} justifyContent="flex-end">
+                <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
+                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton} conta de administrador</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>

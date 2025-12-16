@@ -27,7 +27,7 @@ function CadastroUsuarioCNPJ() {
     const [siteEmpresa, setSiteEmpresaUsuarioCNPJ] = useState("");
     const [nomeResponsavelLegal, setNomeResponsavelLegalUsuarioCNPJ] = useState("");
     const [cpfResponsavelLegal, setCpfResponsavelLegalUsuarioCNPJ] = useState("");
-    const [inscricaoestadualMunicipal, setInscricaoestadualMunicipalUsuarioCNPJ] = useState("");
+    const [inscricaoEstadualMunicipal, setInscricaoEstadualMunicipalUsuarioCNPJ] = useState("");
     
     const [cep, setCep] = useState("");
     const [logradouro, setLogradouro] = useState("");
@@ -54,7 +54,7 @@ function CadastroUsuarioCNPJ() {
             setSiteEmpresaUsuarioCNPJ(dados.siteEmpresa);
             setNomeResponsavelLegalUsuarioCNPJ(dados.nomeResponsavelLegal);
             setCpfResponsavelLegalUsuarioCNPJ(dados.cpfResponsavelLegal);
-            setInscricaoestadualMunicipalUsuarioCNPJ(dados.inscricaoestadualMunicipal);
+            setInscricaoEstadualMunicipalUsuarioCNPJ(dados.inscricaoEstadualMunicipal);
             setCep(dados.cep);
             setLogradouro(dados.logradouro);
             setNumero(dados.numero);
@@ -75,18 +75,18 @@ function CadastroUsuarioCNPJ() {
           return;
         }
          
-        const data = { id, razaoSocial, nomeFantasia, cnpj, email, celular, cep, logradouro, numero, complemento, bairro, cidade, estado, siteEmpresa, nomeResponsavelLegal, cpfResponsavelLegal, inscricaoestadualMunicipal};
+        const data = { id, razaoSocial, nomeFantasia, cnpj, email, celular, cep, logradouro, numero, complemento, bairro, cidade, estado, siteEmpresa, nomeResponsavelLegal, cpfResponsavelLegal, inscricaoEstadualMunicipal};
         try {
           if (!idParam) {
             await axios.post(baseURL, data);
               mensagemSucesso(`Bem vindo ${nomeFantasia}!`);
-              navigate(`/tela-principal`);
+              navigate(`/listagem-eventos`);
           } else {
             await axios.put(`${baseURL}/${idParam}`, data);
               mensagemSucesso(`${nomeFantasia} seus dados foram alterados com sucesso!`);
-              navigate(`/tela-principal`);
+              navigate(`/listagem-eventos`);
           }
-          navigate("/tela-principal");
+          navigate("/listagem-eventos");
         } catch (error) {
           mensagemErro(error.response.data);
         }
@@ -101,7 +101,7 @@ function CadastroUsuarioCNPJ() {
       })
       .then(function (response) {
         mensagemSucesso(`Usuário ${nomeFantasia} excluído com sucesso!`);
-        navigate(`/tela-principal`);
+        navigate(`/listagem-eventos`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o usuário ${nomeFantasia}`);
@@ -109,37 +109,37 @@ function CadastroUsuarioCNPJ() {
   }
 
   return (
-      <Grid container direction="row" p={5} overflow="auto" fullWidth sx={{ position: "relative", justifyContent: "center"}}>
-        <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: "900px" }}>
+      <Grid container direction="column" sx={{ minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }} >
+        <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
           <Typography component="h1" variant="h3">{acao} de Usuários</Typography>
           <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem}</Typography>
 
           <FormControlLabel control={<Checkbox checked={true} disabled={idParam ? true : false} onClick={() => navigate("/cadastro-usuarioCPF")}/>} label="Sou CNPJ" />
 
-          <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
+          <Grid container component="form" onSubmit={save} noValidate spacing={2} sx={{ justifyContent: "center", alignItems: "stretch"}}>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Razão social*</Typography>
-                <TextField name="razaoSocial" placeholder="Razão social completa" value={razaoSocial} onChange={(e) => setRazaoSocialUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="razaoSocial" placeholder="Razão social completa" value={razaoSocial} onChange={(e) => setRazaoSocialUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Nome fantasia*</Typography>
-                <TextField name="nomeFantasia" placeholder="Nome fantasia completo" value={nomeFantasia} onChange={(e) => setNomeFantasiaUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="nomeFantasia" placeholder="Nome fantasia completo" value={nomeFantasia} onChange={(e) => setNomeFantasiaUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">CNPJ*</Typography>
-                <TextField name="cnpj" placeholder="00.000.000/0001-00" value={cnpj} onChange={(e) => setCNPJUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="cnpj" placeholder="00.000.000/0001-00" value={cnpj} onChange={(e) => setCNPJUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Email*</Typography>
-                <TextField name="email" placeholder="empresa@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="email" placeholder="empresa@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Celular*</Typography>
-                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Site oficial</Typography>
-                <TextField name="siteEmpresa" placeholder="www.minhaEmpresa.com" value={siteEmpresa} onChange={(e) => setSiteEmpresaUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="siteEmpresa" placeholder="www.minhaEmpresa.com" value={siteEmpresa} onChange={(e) => setSiteEmpresaUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                             logradouro={logradouro} setLogradouro={setLogradouro}
@@ -151,22 +151,22 @@ function CadastroUsuarioCNPJ() {
             />
             <Grid size={10}>
                 <Typography variant="body1" className="label">Nome do responsável legal*</Typography>
-                <TextField name="nomeResponsavelLegal" placeholder="Nome completo do responsável legal" value={nomeResponsavelLegal} onChange={(e) => setNomeResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="nomeResponsavelLegal" placeholder="Nome completo do responsável legal" value={nomeResponsavelLegal} onChange={(e) => setNomeResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">CPF do responsável legal*</Typography>
-                <TextField name="cpfResponsavelLegal" placeholder="000.000.000-00" value={cpfResponsavelLegal} onChange={(e) => setCpfResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="cpfResponsavelLegal" placeholder="000.000.000-00" value={cpfResponsavelLegal} onChange={(e) => setCpfResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Inscrição Estatual/Municipal*</Typography>
-                <TextField name="inscricaoestadualMunicipal" placeholder="000000000" value={inscricaoestadualMunicipal} onChange={(e) => setInscricaoestadualMunicipalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="inscricaoEstadualMunicipal" placeholder="000000000" value={inscricaoEstadualMunicipal} onChange={(e) => setInscricaoEstadualMunicipalUsuarioCNPJ(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <InputsSenha  senha={senha}  setSenha={setSenha}
                           confirmarSenha={confirmarSenha}  setConfirmarSenha={setConfirmarSenha}
             />
-            <Grid size={10}>
-                <Stack spacing={2} direction="row" sx={{ display: "flex", justifyContent: "flex-end"}}>
-                    <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
+            <Grid item xs={12} justifyContent="flex-end">
+                <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
+                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>
