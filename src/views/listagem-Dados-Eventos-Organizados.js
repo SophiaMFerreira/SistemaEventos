@@ -13,11 +13,9 @@ function DetalhesEventoOrganizador() {
   useEffect(() => {
     async function carregarEvento() {
       try {
-        // Busca evento
         const respEvento = await axios.get(`${BASE_URL}/evento/${idParam}`);
         setEvento(respEvento.data);
 
-        // Busca ingressos
         const respIngressos = await axios.get(`${BASE_URL_S}/ingresso`);
         const ingressosEvento = respIngressos.data.filter(
           (i) => Number(i.idEvento) === Number(idParam) && !i.cancelado && i.pago
