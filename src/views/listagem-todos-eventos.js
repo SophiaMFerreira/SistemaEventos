@@ -4,11 +4,14 @@ import '../custom.css';
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 import BuscarEvento from '../components/input-buscar-evento';
+import { useNavigate } from 'react-router-dom';
+
 
 const baseURL = `${BASE_URL}/evento`;
 const baseTipoURL = `${BASE_URL}/tipoEvento`;
 
 function ListagemEventos() {
+ const navigate = useNavigate();
   const [dados, setDados] = React.useState(null);
   const [tiposEvento, setTiposEvento] = React.useState([]);
   const [filtroNome, setFiltroNome] = React.useState('');
@@ -79,7 +82,10 @@ const eventosFiltrados = dados.filter(ev => {
                 </thead>
                 <tbody>
                   {eventosFiltrados.map((dado) => (
-                    <tr key={dado.id}>
+                    <tr key={dado.id}
+                    onClick={() => navigate(`/meus-eventos/${dado.id}`)}
+                    style={{ cursor: 'pointer' }}   
+                    >
                       <td>{dado.nomeEvento}</td>
                       <td>{new Date(dado.dataInicio).toLocaleDateString('pt-BR')}</td>
                       <td>{new Date(dado.dataFim).toLocaleDateString('pt-BR')}</td>
