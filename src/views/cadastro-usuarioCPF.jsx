@@ -17,6 +17,7 @@ function CadastroUsuarioCPF() {
     const [acao, setAcao] = useState("Cadastro");
     const [mensagem, setMensagem] = useState("Faça cadastro com seus dados, promova e participe de eventos incríveis!");
     const [acaoButton, setAcaoButton] = useState("Criar conta");
+    const [navegacao, setNavegacao] = useState("/");
        
     const [id, setIdUsuarioCPF] = useState("");
     const [nome, setNomeUsuarioCPF] = useState("");
@@ -62,6 +63,7 @@ function CadastroUsuarioCPF() {
             setAcao("Edição");
             setMensagem("Edite seus dados aqui.");
             setAcaoButton("Editar");
+            setNavegacao("/listagem-eventos");
           });
       }, [idParam, baseURL]);
     
@@ -76,11 +78,9 @@ function CadastroUsuarioCPF() {
           if (!idParam) {
             await axios.post(baseURL, data);
               mensagemSucesso(`Bem vindo ${nome}!`);
-              navigate(`/listagem-eventos`);
           } else {
             await axios.put(`${baseURL}/${idParam}`, data);
               mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
-              navigate(`/listagem-eventos`);
           }
           navigate("/listagem-eventos");
         } catch (error) {
@@ -97,7 +97,7 @@ function CadastroUsuarioCPF() {
       })
       .then(function (response) {
         mensagemSucesso(`Usuário ${nome} excluído com sucesso!`);
-        navigate(`/listagem-eventos`);
+        navigate(`/`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o usuário ${nome}`);
@@ -159,7 +159,7 @@ function CadastroUsuarioCPF() {
             />
             <Grid item xs={12} justifyContent="flex-end">
                 <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
-                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
+                    <Button variant="outlined" onClick={() => navigate(navegacao)}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>
