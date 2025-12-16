@@ -195,7 +195,7 @@ function CadastroEvento() {
   if (!dadosPorteEvento) return null;
 
   return (
-    <div className='container'>
+    <div className='container' style={{ marginTop: '120px' }}>
       <Card title='Cadastro de Evento'>
         <div className='row'>
           <div className='col-lg-12'>
