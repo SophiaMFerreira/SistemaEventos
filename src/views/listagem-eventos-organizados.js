@@ -99,7 +99,7 @@ function EventosOrganizados() {
   if (!dados) return null;
 
   return (
-    <div className="container">
+    <div className="container" style={{ marginTop: '120px' }}>
       <Card title="Eventos Organizados">
         <div className="row">
           <div className="col-lg-12">

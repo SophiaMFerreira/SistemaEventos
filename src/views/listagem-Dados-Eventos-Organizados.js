@@ -36,7 +36,7 @@ function DetalhesEventoOrganizador() {
   const vagasDisponiveis = evento.lotacaoMaxima - ingressos.length;
 
   return (
-    <div className="container">
+    <div className="container" style={{ marginTop: '120px' }}>
       <Card title={`Detalhes do Evento:`}>
         <Stack spacing={2} direction="row">
             <Stack spacing={1} sx={{ flex: 1 }}>

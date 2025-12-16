@@ -39,7 +39,7 @@ const eventosFiltrados = dados.filter(ev => {
 
 
   return (
-    <div className='container'>
+    <div className='container' style={{ marginTop: '120px' }}>
   
       <BuscarEvento
         value={filtroNome}
