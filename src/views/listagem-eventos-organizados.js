@@ -148,11 +148,11 @@ function EventosOrganizados() {
                         <td>{vagas}</td>
                         <td>
                           <Stack spacing={1} padding={0} direction="row">
-                            <IconButton aria-label="edit" onClick={() => editar(dado.id)}>
+                            <IconButton aria-label="edit" onClick={(e) =>  {e.stopPropagation(); editar(dado.id)}}>
                               <EditIcon />
                             </IconButton>
 
-                            <IconButton aria-label="delete" onClick={() => excluir(dado.id)}>
+                            <IconButton aria-label="delete" onClick={(e) => {e.stopPropagation(); excluir(dado.id)}}>
                               <DeleteIcon />
                             </IconButton>
                           </Stack>
