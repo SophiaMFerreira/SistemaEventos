@@ -4,7 +4,7 @@ import Navbar from './components/navbar.js';
 import Login from './views/login';
 
 import ListagemEventos from './views/listagem-todos-eventos';
-import ListagemParticipantes from './views/listagem-dadosEventoParticipante';
+import ListagemParticipantes from './views/listagem-dadosEventoParticipante.jsx';
 import ListagemDadosEvento from './views/listagem-dados-Evento-Inscritos';
 import ListagemIngressos from './views/listagem-ingresso';
 import MeusEventos from './views/listagem-meus-eventos';
@@ -27,7 +27,7 @@ function Rotas(props) {
         <Route path='/listagem-eventos' element={<><Navbar /><ListagemEventos /></>} />
         <Route path="/eventos-organizados" element={<><Navbar /><EventosOrganizados /></>} />
         <Route path="/eventos-organizados/:idParam" element={<><Navbar /><DetalhesEventoOrganizador /></>} />
-        <Route path='/listagem-participantes' element={<><Navbar /><ListagemParticipantes /></>} />
+        <Route path='/listagem-participantes/:idParam' element={<><Navbar /><ListagemParticipantes /></>} />
         <Route path="/meus-eventos" element={<><Navbar /><MeusEventos /></>} />
         <Route path="/meus-eventos/:idParam" element={<><Navbar /><ListagemDadosEvento  /></>} />
         <Route path="/meus-eventos/:idParam/ingresso" element={<><Navbar /><ListagemIngressos /></>} />
