@@ -17,6 +17,7 @@ function CadastroUsuarioCNPJ() {
     const [acao, setAcao] = useState("Cadastro");
     const [mensagem, setMensagem] = useState("Faça cadastro com seus dados, promova e participe de eventos incríveis!");
     const [acaoButton, setAcaoButton] = useState("Criar conta");
+    const [navegacao, setNavegacao] = useState("/");
     
     const [id, setIdUsuarioCNPJ] = useState("");
     const [razaoSocial, setRazaoSocialUsuarioCNPJ] = useState("");
@@ -66,6 +67,7 @@ function CadastroUsuarioCNPJ() {
             setAcao("Edição");
             setMensagem("Edite seus dados aqui.");
             setAcaoButton("Editar");
+            setNavegacao("/listagem-eventos");
           });
       }, [idParam, baseURL]);
     
@@ -80,11 +82,9 @@ function CadastroUsuarioCNPJ() {
           if (!idParam) {
             await axios.post(baseURL, data);
               mensagemSucesso(`Bem vindo ${nomeFantasia}!`);
-              navigate(`/listagem-eventos`);
           } else {
             await axios.put(`${baseURL}/${idParam}`, data);
               mensagemSucesso(`${nomeFantasia} seus dados foram alterados com sucesso!`);
-              navigate(`/listagem-eventos`);
           }
           navigate("/listagem-eventos");
         } catch (error) {
@@ -101,7 +101,7 @@ function CadastroUsuarioCNPJ() {
       })
       .then(function (response) {
         mensagemSucesso(`Usuário ${nomeFantasia} excluído com sucesso!`);
-        navigate(`/listagem-eventos`);
+        navigate(`/`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o usuário ${nomeFantasia}`);
@@ -166,7 +166,7 @@ function CadastroUsuarioCNPJ() {
             />
             <Grid item xs={12} justifyContent="flex-end">
                 <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
-                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
+                    <Button variant="outlined" onClick={() => navigate(navegacao)}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>

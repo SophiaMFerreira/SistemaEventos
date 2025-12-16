@@ -17,6 +17,7 @@ function CadastroAdministrador(){
       const [acao, setAcao] = useState("Cadastro");
       const [mensagem, setMensagem] = useState("Faça cadastro de novos");
       const [acaoButton, setAcaoButton] = useState("Criar");
+      const [navegacao, setNavegacao] = useState("/");
       
       const [id, setIdAdministrador] = useState("");
       const [nome, setNomeAdministrador] = useState("");
@@ -57,6 +58,7 @@ function CadastroAdministrador(){
         setAcao("Edição");
         setMensagem("Faça edição dos");
         setAcaoButton("Editar");
+        setNavegacao("/listagem-eventos");
       });
   }, [idParam, baseURL]);
 
@@ -71,11 +73,9 @@ function CadastroAdministrador(){
       if (!idParam) {
         await axios.post(baseURL, data);
           mensagemSucesso(`Novo administrador ${nome} criado com sucesso!`);
-          navigate(`/listagem-eventos`);
       } else {
         await axios.put(`${baseURL}/${idParam}`, data);
           mensagemSucesso(`Administrador ${nome} alterado com sucesso!`);
-          navigate(`/listagem-eventos`);
       }
       navigate("/listagem-eventos");
     } catch (error) {
@@ -92,7 +92,7 @@ function CadastroAdministrador(){
       })
       .then(function (response) {
         mensagemSucesso(`Admninistrador excluído com sucesso!`);
-        navigate(`/listagem-eventos`);
+        navigate(`/`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o admninistrador`);
@@ -136,7 +136,7 @@ function CadastroAdministrador(){
             />
             <Grid item xs={12} justifyContent="flex-end">
                 <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
-                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
+                    <Button variant="outlined" onClick={() => navigate(navegacao)}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton} conta de administrador</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>
