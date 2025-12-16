@@ -76,13 +76,13 @@ function CadastroUsuarioCPF() {
           if (!idParam) {
             await axios.post(baseURL, data);
               mensagemSucesso(`Bem vindo ${nome}!`);
-              navigate(`/tela-principal`);
+              navigate(`/listagem-eventos`);
           } else {
             await axios.put(`${baseURL}/${idParam}`, data);
               mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
-              navigate(`/tela-principal`);
+              navigate(`/listagem-eventos`);
           }
-          navigate("/tela-principal");
+          navigate("/listagem-eventos");
         } catch (error) {
           mensagemErro(error.response.data);
         }
@@ -97,7 +97,7 @@ function CadastroUsuarioCPF() {
       })
       .then(function (response) {
         mensagemSucesso(`Usuário ${nome} excluído com sucesso!`);
-        navigate(`/tela-principal`);
+        navigate(`/listagem-eventos`);
       })
       .catch(function (error) {
         mensagemErro(`Erro ao excluir o usuário ${nome}`);
@@ -105,27 +105,27 @@ function CadastroUsuarioCPF() {
   }
 
   return (
-      <Grid container direction="row" p={5} overflow="auto" fullWidth sx={{ position: "relative", justifyContent: "center"}}>
-        <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: "900px" }}>
+      <Grid container direction="column" sx={{ minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }} >
+        <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
           <Typography component="h1" variant="h3">{acao} de Usuários</Typography>
           <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem}</Typography>
 
           <FormControlLabel control={<Checkbox checked={false} disabled={idParam ? true : false} onClick={() => navigate("/cadastro-usuarioCNPJ")}/>} label="Sou CNPJ" />
 
-          <Grid container direction="row" component="form" onSubmit={save} noValidate sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
+          <Grid container component="form" onSubmit={save} noValidate spacing={2} sx={{ justifyContent: "center", alignItems: "stretch"}}>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Nome*</Typography>
-                <TextField name="nome" placeholder="Nome do usuário" value={nome} onChange={(e) => setNomeUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="nome" placeholder="Nome do usuário" value={nome} onChange={(e) => setNomeUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">CPF*</Typography>
-                <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCPFUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCPFUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                     <Grid size={6} spacing={2}>
                         <Typography variant="body1" className="label">Data de nascimento*</Typography>
-                        <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                        <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
                     </Grid>
                     <Grid size={6} spacing={2}>
                         <Typography variant="body1" className="label">Gênero</Typography>
@@ -140,11 +140,11 @@ function CadastroUsuarioCPF() {
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Email para contato*</Typography>
-                <TextField name="email" placeholder="usuario@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="email" placeholder="usuario@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <Grid size={10}>
                 <Typography variant="body1" className="label">Celular para contato*</Typography>
-                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
+                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
             </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                                                 logradouro={logradouro} setLogradouro={setLogradouro}
@@ -157,9 +157,9 @@ function CadastroUsuarioCPF() {
             <InputsSenha  senha={senha}  setSenha={setSenha}
                           confirmarSenha={confirmarSenha}  setConfirmarSenha={setConfirmarSenha}
             />
-            <Grid size={10}>
-                <Stack spacing={2} direction="row" sx={{ display: "flex", justifyContent: "flex-end"}}>
-                    <Button variant="outlined" onClick={() => navigate("/tela-principal")}>Voltar</Button>
+            <Grid item xs={12} justifyContent="flex-end">
+                <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
+                    <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
                     <Button variant="contained" type="submit">{acaoButton}</Button>
                     {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}
                 </Stack>
