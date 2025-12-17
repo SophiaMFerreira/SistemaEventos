@@ -73,21 +73,21 @@ function CadastroTipoEvento() {
   }
 
   return (
-        <Grid container direction="row" p={5} overflow="auto" fullWidth sx={{ minHeight: "100vh", width: "100%", justifyContent: "center", alignItems: "flex-start", mt: 8, boxSizing: "border-box", px: { xs: 1, sm: 3 }}}>        
-            <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, p: { xs: 2, sm: 4 }}}>
+        <Grid container direction="column" sx={{ mt: 6, minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }} >
+            <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
                   <Typography component="h1" variant="h3">{acao} de Tipo de Evento</Typography>
                   <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem} tipos de evento.</Typography>
-                  <Grid container component="form" onSubmit={save} noValidate spacing={3} justifyContent="center">
-                      <Grid size={10} spacing={2}>
+                  <Grid container component="form" onSubmit={save} noValidate spacing={2} >
+                       <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                           <Typography variant="body1" className="label">Nome*</Typography>
-                          <TextField name="nomeTipoEvento" placeholder="Nome do tipo de evento" required value={nomeTipoEvento} onChange={(e) => setNomeTipoEvento(e.target.value)} fullWidth sx={{ mb: 2, }}/>
+                          <TextField name="nomeTipoEvento" placeholder="Nome do tipo de evento" required value={nomeTipoEvento} onChange={(e) => setNomeTipoEvento(e.target.value)} fullWidth/>
                       </Grid>
-                      <Grid size={10}>
+                       <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                           <Typography variant="body1" className="label">Descrição</Typography>
-                          <TextField name="descricao" placeholder="Descreva o evento" multiline rows={4} value={descricao} onChange={(e) => setDescricaoTipoEvento(e.target.value)} fullWidth sx={{ mb: 2 }}/>
+                          <TextField name="descricao" placeholder="Descreva o evento" multiline rows={4} value={descricao} onChange={(e) => setDescricaoTipoEvento(e.target.value)} fullWidth/>
                       </Grid>
-                      <Grid item xs={12} md={10}>
-                  <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end">
+                      <Grid item xs={12} justifyContent="flex-end">
+                          <Stack spacing={2} direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" >
                               <Button variant="outlined" onClick={() => navigate("/listagem-eventos")}>Voltar</Button>
                               <Button variant="contained" type="submit" >{acaoButton} Tipo de Evento</Button>
                               {idParam ? <Button variant="outlined" color="error" onClick={exclude}>Excluir</Button> : false}

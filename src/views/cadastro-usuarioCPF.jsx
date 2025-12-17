@@ -110,41 +110,39 @@ function CadastroUsuarioCPF() {
           <Typography component="h1" variant="h3">{acao} de Usuários</Typography>
           <Typography variant="subtitle1" sx={{ mb: 3 }}>{mensagem}</Typography>
 
-          <FormControlLabel control={<Checkbox checked={false} disabled={idParam ? true : false} onClick={() => navigate("/cadastro-usuarioCNPJ")}/>} label="Sou CNPJ" />
+          <FormControlLabel control={<Checkbox checked={false} disabled={idParam ? true : false} onClick={() => navigate("/cadastro-usuarioCNPJ")}/>} label="Sou CNPJ"/>
 
-          <Grid container component="form" onSubmit={save} noValidate spacing={2} sx={{ justifyContent: "center", alignItems: "stretch"}}>
-            <Grid size={10}>
+          <Grid container component="form" onSubmit={save} noValidate spacing={2} >
+            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}} >
                 <Typography variant="body1" className="label">Nome*</Typography>
-                <TextField name="nome" placeholder="Nome do usuário" value={nome} onChange={(e) => setNomeUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
+                <TextField name="nome" placeholder="Nome do usuário" value={nome} onChange={(e) => setNomeUsuarioCPF(e.target.value)} required fullWidth />
             </Grid>
-            <Grid size={10}>
+            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">CPF*</Typography>
-                <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCPFUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
+                <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCPFUsuarioCPF(e.target.value)} required fullWidth/>
             </Grid>
-            <Grid size={10}>
-                <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                    <Grid size={6} spacing={2}>
-                        <Typography variant="body1" className="label">Data de nascimento*</Typography>
-                        <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
-                    </Grid>
-                    <Grid size={6} spacing={2}>
-                        <Typography variant="body1" className="label">Gênero</Typography>
-                        <Select name="genero" id="generoUsuario" value={genero} onChange={select} required fullWidth>
-                            <MenuItem value={"femenino"}>Femenino</MenuItem>
-                            <MenuItem value={"masculino"}>Masculino</MenuItem>
-                            <MenuItem value={"lgbtqia+"}>LGBTQIA+</MenuItem>
-                            <MenuItem value={"naoDeclarar"}>Prefiro não declarar</MenuItem>
-                        </Select>
-                    </Grid>
+            <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%", justifyContent: "space-between"}} direction={"row"}>
+                <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
+                    <Typography variant="body1" className="label">Data de nascimento*</Typography>
+                    <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth/>
+                </Grid>
+                <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
+                    <Typography variant="body1" className="label">Gênero</Typography>
+                    <Select name="genero" id="generoUsuario" value={genero} onChange={select} required fullWidth>
+                        <MenuItem value={"femenino"}>Femenino</MenuItem>
+                        <MenuItem value={"masculino"}>Masculino</MenuItem>
+                        <MenuItem value={"lgbtqia+"}>LGBTQIA+</MenuItem>
+                        <MenuItem value={"naoDeclarar"}>Prefiro não declarar</MenuItem>
+                    </Select>
                 </Grid>
             </Grid>
-            <Grid size={10}>
+            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">Email para contato*</Typography>
-                <TextField name="email" placeholder="usuario@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
+                <TextField name="email" placeholder="usuario@email.com" type="email" value={email} onChange={(e) => setEmailUsuarioCPF(e.target.value)} required fullWidth/>
             </Grid>
-            <Grid size={10}>
+            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">Celular para contato*</Typography>
-                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCPF(e.target.value)} required fullWidth sx={{ mb: 2, }}/>
+                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCPF(e.target.value)} required fullWidth/>
             </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                                                 logradouro={logradouro} setLogradouro={setLogradouro}
