@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import { mensagemSucesso } from '../components/toastr'; 
+import { mensagemErro, mensagemSucesso } from '../components/toastr'; 
 import { Typography, Stack, Button, Box, Modal, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
 import "../style/listagemDadosEvento.css"
@@ -69,7 +69,8 @@ function ListagemDadosEvento() {
   }
 
   async function realizarPagamento() {
-    const valorFinal = tipoIngresso === "meia"
+    try {
+        const valorFinal = tipoIngresso === "meia"
       ? evento.valorIngresso / 2
       : evento.valorIngresso;
 
@@ -82,6 +83,12 @@ function ListagemDadosEvento() {
     setIngresso({ ...ingresso, pago: true });
     setOpenModal(false);
     mensagemSucesso("Pagamento salvo com sucesso");
+
+    } catch(error) {
+    console.error(error);
+    mensagemErro("Não foi possível processar o pagamento. Tente novamente.");
+    }
+    
   }
 
   return (
