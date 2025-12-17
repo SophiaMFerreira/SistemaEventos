@@ -66,7 +66,7 @@ function Login() {
                     <Typography variant="body1"mt={2}>Senha*</Typography>
                         <TextField type="password" placeholder="********" required value={senha} onChange={(e) => setSenha(e.target.value)} error={validacao} helperText={validacao ? "Senha ou email incorretos" : ""} fullWidth />
                     <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>Entrar</Button>
-                    <a href="/tela-principal" className="linkEsqueciSenha" sx={{mt: 3}}>
+                    <a href="/cadastro-usuarioCPF" className="linkEsqueciSenha" sx={{mt: 3}}>
                         <Typography variant="body1">Você esqueceu a sua senha?</Typography>
                     </a>
                 
