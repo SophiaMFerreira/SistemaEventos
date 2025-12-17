@@ -28,10 +28,6 @@ function Navbar(props) {
           </ul>
 
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/listagem-participantes' label='Participantes' />
-          </ul>
-
-            <ul className='navbar-nav'>
             <NavbarItem render='true' href='/meus-eventos' label='Meus Eventos' />
           </ul>
 

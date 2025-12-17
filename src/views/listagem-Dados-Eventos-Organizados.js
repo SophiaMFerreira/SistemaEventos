@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Stack, Box, Typography } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { Stack, Button, Typography } from "@mui/material";
 import Card from "../components/card";
 import { BASE_URL, BASE_URL_S } from "../config/axios";
 import axios from "axios";
@@ -9,6 +9,7 @@ function DetalhesEventoOrganizador() {
   const { idParam } = useParams();
   const [evento, setEvento] = useState(null);
   const [ingressos, setIngressos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function carregarEvento() {
@@ -53,6 +54,10 @@ function DetalhesEventoOrganizador() {
             <Typography><strong>Cidade:</strong> {evento.cidade}</Typography>
             <Typography><strong>Estado:</strong> {evento.estado}</Typography>
           </Stack>
+        </Stack>
+        <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
+          <Button variant="outlined" onClick={() => navigate("/eventos-organizados")}>Voltar</Button>
+          <Button variant="contained" color="warning" onClick={() => navigate(`/listagem-participantes/${idParam}`)}>Ver participantes</Button>
         </Stack>
       </Card>
     </div>
