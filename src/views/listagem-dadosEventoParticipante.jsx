@@ -84,7 +84,7 @@ function ListagemParticipantes() {
                 {id && <Lista idEvento={id} sx={{ maxWidth: 1200, mx: "auto" }}/>}
             </Stack>
             <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
-                <Button variant="outlined" fullWidth={{ xs: true, sm: false }} onClick={() => navigate("/tela-principal")}>Voltar</Button>
+                <Button variant="outlined" fullWidth={{ xs: true, sm: false }} onClick={() => navigate("/eventos-organizados")}>Voltar</Button>
                 <Button variant="contained" fullWidth={{ xs: true, sm: false }} color="warning" onClick={cancel}>Cancelar evento</Button>
             </Stack>
         </Stack>  

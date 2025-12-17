@@ -10,46 +10,40 @@ function InputsEndereco({cep, setCep,
                         numero, setNumero,
                         complemento, setComplemento}) {
     return (
-    <Grid container direction="row" sx={{justifyContent: "center", alignItems: "center", mt: 2}}>
-        <Grid item size={10}>
-              <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                  <Grid item size={6}>
-                      <Typography variant="body1" className="label">CEP*</Typography>
-                      <TextField name="cep" placeholder="00000000" value={cep} onChange={(e) => setCep(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-                  <Grid item size={6}>
-                      <Typography variant="body1" className="label">Logradouro*</Typography>
-                      <TextField name="logradouro" placeholder="Rua/Avenida/Estrada dos Jaspes" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-              </Grid>
+     <Grid container size={12} sx={{width: "100%", pr: 2,}} direction={"column"}>
+        <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%"}} direction={"row"}>
+            <Grid size={6} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "50%", pr: 2,}}>
+                <Typography variant="body1" className="label">CEP*</Typography>
+                <TextField name="cep" placeholder="00000000" value={cep} onChange={(e) => setCep(e.target.value)} required fullWidth/>
+            </Grid>
+            <Grid size={6} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "50%", pr: 2,}}>
+                <Typography variant="body1" className="label">Logradouro*</Typography>
+                <TextField name="logradouro" placeholder="Rua/Avenida/Estrada dos Jaspes" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} required fullWidth />
+            </Grid>
         </Grid>
-        <Grid item size={10}>
-              <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                  <Grid item size={4}>
-                      <Typography variant="body1" className="label">Bairro*</Typography>
-                      <TextField name="bairro" placeholder="Centro" value={bairro} onChange={(e) => setBairro(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-                  <Grid item size={4}>
-                      <Typography variant="body1" className="label">Cidade*</Typography>
-                      <TextField name="cidade" placeholder="Juiz de Fora" value={cidade} onChange={(e) => setCidade(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-                  <Grid item size={4}>
-                      <Typography variant="body1" className="label">Estado*</Typography>
-                      <TextField name="estado" placeholder="Minas Gerais" value={estado} onChange={(e) => setEstado(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-              </Grid>
+        <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%"}} direction={"row"}>
+            <Grid size={4} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "33%", pr: 2,}}>
+                <Typography variant="body1" className="label">Bairro*</Typography>
+                <TextField name="bairro" placeholder="Centro" value={bairro} onChange={(e) => setBairro(e.target.value)} required fullWidth/>
+            </Grid>
+            <Grid size={4} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "33%", pr: 2,}}>
+                <Typography variant="body1" className="label">Cidade*</Typography>
+                <TextField name="cidade" placeholder="Juiz de Fora" value={cidade} onChange={(e) => setCidade(e.target.value)} required fullWidth/>
+            </Grid>
+            <Grid size={4} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "33%", pr: 2,}}>
+                <Typography variant="body1" className="label">Estado*</Typography>
+                <TextField name="estado" placeholder="Minas Gerais" value={estado} onChange={(e) => setEstado(e.target.value)} required fullWidth/>
+            </Grid>
         </Grid>
-        <Grid item size={10}>
-              <Grid container spacing={2} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                  <Grid item size={2}>
-                      <Typography variant="body1" className="label">Número*</Typography>
-                      <TextField name="numero" placeholder="180" value={numero} onChange={(e) => setNumero(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-                  <Grid item size={10}>
-                      <Typography variant="body1" className="label">Complemento</Typography>
-                      <TextField name="complemento" placeholder="Casa A" value={complemento} onChange={(e) => setComplemento(e.target.value)} required fullWidth sx={{ mb: 3, }}/>
-                  </Grid>
-              </Grid>
+        <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%"}} direction={"row"}>
+            <Grid size={2} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "20%", pr: 2,}}>
+                <Typography variant="body1" className="label">Número*</Typography>
+                <TextField name="numero" placeholder="180" value={numero} onChange={(e) => setNumero(e.target.value)} required fullWidth/>
+            </Grid>
+            <Grid size={6} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "80%", pr: 2,}}>
+                <Typography variant="body1" className="label">Complemento</Typography>
+                <TextField name="complemento" placeholder="Casa A" value={complemento} onChange={(e) => setComplemento(e.target.value)} required fullWidth/>
+            </Grid>
         </Grid>
     </Grid>
   );

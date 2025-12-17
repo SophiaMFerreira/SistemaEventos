@@ -11,6 +11,7 @@ import { BASE_URL_S } from '../config/axios';
 function Login() {
     const baseURLcpf = `${BASE_URL_S}/participanteCPF`;
     const baseURLcnpj = `${BASE_URL_S}/participanteCNPJ`;
+    const baseURLadmin = `${BASE_URL_S}/administrador`;
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -21,15 +22,20 @@ function Login() {
         e.preventDefault();
         setValidacao(false);
         try {
-            const [cpfRes, cnpjRes] = await Promise.all([
+            const [cpfRes, cnpjRes, adminRes] = await Promise.all([
                 axios.get(baseURLcpf),
-                axios.get(baseURLcnpj)
+                axios.get(baseURLcnpj),
+                axios.get(baseURLadmin)
             ]);
             let usuario = cpfRes.data.find((u) => u.email === email /*&& u.senha === senha*/);
             let tipoParticipante = "cpf";
             if (!usuario) {
                 usuario = cnpjRes.data.find((u) => u.email === email /*&& u.senha === senha*/);
                 tipoParticipante = "cnpj";
+            }
+            if (!usuario) {
+                usuario = adminRes.data.find((u) => u.email === email /*&& u.senha === senha*/);
+                tipoParticipante = "admin";
             }
             if (!usuario) {
                 setValidacao(true);
@@ -60,7 +66,7 @@ function Login() {
                     <Typography variant="body1"mt={2}>Senha*</Typography>
                         <TextField type="password" placeholder="********" required value={senha} onChange={(e) => setSenha(e.target.value)} error={validacao} helperText={validacao ? "Senha ou email incorretos" : ""} fullWidth />
                     <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>Entrar</Button>
-                    <a href="/tela-principal" className="linkEsqueciSenha" sx={{mt: 3}}>
+                    <a href="/cadastro-usuarioCPF" className="linkEsqueciSenha" sx={{mt: 3}}>
                         <Typography variant="body1">Você esqueceu a sua senha?</Typography>
                     </a>
                 
@@ -74,4 +80,4 @@ function Login() {
         </Grid>      
     );
 }
-export default Login;
+export default Login; 
