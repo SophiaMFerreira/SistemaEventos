@@ -1,10 +1,19 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
-import { mensagemErro, mensagemSucesso } from '../components/toastr'; 
-import { Typography, Stack, Button, Box, Modal, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { mensagemErro, mensagemSucesso } from "../components/toastr";
+import {
+  Typography,
+  Stack,
+  Button,
+  Box,
+  Modal,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
-import "../style/listagemDadosEvento.css"
-import imagemEventoBale from "../components/eventoBale.jpg"
+import "../style/listagemDadosEvento.css";
+import imagemEventoBale from "../components/eventoBale.jpg";
 
 import axios from 'axios';
 import { BASE_URL, BASE_URL_S } from '../config/axios';
@@ -74,11 +83,11 @@ function ListagemDadosEvento() {
       ? evento.valorIngresso / 2
       : evento.valorIngresso;
 
-    await axios.patch(`${baseURLingresso}/${ingresso.id}`, {
-      pago: true,
-      tipo: tipoIngresso,
-      valor: valorFinal
-    });
+      await axios.patch(`${baseURLingresso}/${ingresso.id}`, {
+        pago: true,
+        tipo: tipoIngresso,
+        valor: valorFinal
+      });
 
     setIngresso({ ...ingresso, pago: true });
     setOpenModal(false);
@@ -92,54 +101,168 @@ function ListagemDadosEvento() {
   }
 
   return (
-    <Stack spacing={4} p={4}>
-      <Typography variant="h4">Dados do evento</Typography>
+    <Stack
+      spacing={4}
+      sx={{
+        maxWidth: 1100,
+        margin: "0 auto",
+        padding: 4,
+      }}
+    >
+      <Typography variant="h4" fontWeight={600}>
+        Detalhes do evento
+      </Typography>
 
-      <BoxInfoEvento {...evento} statusPagamento={ingresso?.pago} />
+      <Box
+        sx={{
+          backgroundColor: "#fff",
+          borderRadius: 3,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+          padding: 4,
+        }}
+      >
+        <BoxInfoEvento
+          nomeEvento={evento.nomeEvento}
+          dataInicioEvento={evento.dataInicio}
+          horaInicioEvento={evento.horaInicio}
+          dataFimEvento={evento.dataFim}
+          horaFimEvento={evento.horaFim}
+          modalidade={evento.modalidade}
+          valorIngresso={evento.valorIngresso}
+          cep={evento.cep}
+          logradouro={evento.logradouro}
+          bairro={evento.bairro}
+          cidade={evento.cidade}
+          estado={evento.estado}
+          numero={evento.numero}
+          complemento={evento.complemento}
+          infoLateral="Dados evento"
+          statusPagamento={ingresso?.pago}
+        />
 
-      <Box component="img" src={imagemEventoBale} sx={{ maxWidth: 600, borderRadius: 2 }} />
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 3,
+            mt: 3,
+          }}
+        >
+          <Box sx={{ flex: 1, minWidth: 260 }}>
+            <Typography variant="body1">
+              <strong>Modalidade:</strong> {evento.modalidade}
+            </Typography>
 
-      <Typography>Descrição: {evento.descricao}</Typography>
+            <Typography variant="body1" mt={1}>
+              <strong>Valor do ingresso:</strong>{" "}
+              {evento.valorIngresso === 0
+                ? "Gratuito"
+                : `R$ ${evento.valorIngresso}`}
+            </Typography>
 
-      <Stack direction="row" spacing={2} justifyContent="flex-end">
-        <Button variant="outlined" onClick={() => navigate("/meus-eventos")}>
-          Voltar
-        </Button>
+          </Box>
 
-        {!inscrito && (
-          <Button variant="contained" onClick={inscrever}>
-            Inscrever-se
+          <Box sx={{ flex: 1, minWidth: 260 }}>
+            <Typography variant="body1" fontWeight={600}>
+              Descrição
+            </Typography>
+            <Typography variant="body1">
+              {evento.descricao}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          component="img"
+          src={imagemEventoBale}
+          sx={{
+            width: "100%",
+            maxHeight: 320,
+            objectFit: "cover",
+            borderRadius: 3,
+            mt: 4,
+          }}
+        />
+
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="flex-end"
+          mt={4}
+          sx={{
+            borderTop: "1px solid #eee",
+            pt: 3,
+          }}
+        >
+          <Button variant="outlined"  onClick={() => navigate("/meus-eventos")}>
+            Voltar
           </Button>
-        )}
 
-        {inscrito && ingresso && !ingresso.pago && (
-          <Button variant="contained" color="success" onClick={() => setOpenModal(true)}>
-            Realizar pagamento
-          </Button>
-        )}
+          {!inscrito && (
+            <Button variant="contained" onClick={inscrever}>
+              Inscrever-se
+            </Button>
+          )}
 
-        {ingresso?.pago && !ingresso.cancelado && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => navigate(`/meus-eventos/${evento.id}/ingresso`)}
-          >
-            Emitir ingresso
-          </Button>
-        )}
-      </Stack>
+          {inscrito && ingresso && !ingresso.pago && (
+            <Button variant="contained" color="success" onClick={() => setOpenModal(true)}>
+              Realizar pagamento
+            </Button>
+          )}
 
-      {/* MODAL PAGAMENTO */}
+          {ingresso?.pago && !ingresso.cancelado && (
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() =>
+                navigate(`/meus-eventos/${evento.id}/ingresso`)
+              }
+            >
+              Emitir ingresso
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box sx={{ background: "#fff", p: 4, borderRadius: 2, width: 300, mx: "auto", mt: "20%" }}>
-          <Typography variant="h6">Tipo de ingresso</Typography>
+        <Box
+          sx={{
+            background: "#fff",
+            p: 4,
+            borderRadius: 3,
+            width: 320,
+            mx: "auto",
+            mt: "15%",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          }}
+        >
+          <Typography variant="h6" fontWeight={600} mb={2}>
+            Forma de pagamento
+          </Typography>
 
-          <RadioGroup value={tipoIngresso} onChange={(e) => setTipoIngresso(e.target.value)}>
-            <FormControlLabel value="inteira" control={<Radio />} label="Inteira" />
-            <FormControlLabel value="meia" control={<Radio />} label="Meia" />
+          <RadioGroup
+            value={tipoIngresso}
+            onChange={(e) => setTipoIngresso(e.target.value)}
+          >
+            <FormControlLabel
+              value="inteira"
+              control={<Radio />}
+              label="Inteira"
+            />
+            <FormControlLabel
+              value="meia"
+              control={<Radio />}
+              label="Meia"
+            />
           </RadioGroup>
 
-          <Button fullWidth variant="contained" onClick={realizarPagamento}>
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{ mt: 2 }}
+            onClick={realizarPagamento}
+          >
             Confirmar pagamento
           </Button>
         </Box>
