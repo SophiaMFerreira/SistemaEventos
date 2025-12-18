@@ -43,8 +43,11 @@ const eventosFiltrados = dados.filter(ev => {
 
   return (
     <div className='container' style={{ marginTop: '120px' }}>
-  
-      <BuscarEvento
+      <Card title='Eventos'>
+        <div className='row'>
+          <div className='col-lg-12'>
+            <div className='bs-component'>
+               <BuscarEvento
         value={filtroNome}
         onChange={setFiltroNome}
         placeholder="Digite nome do evento"
@@ -66,10 +69,6 @@ const eventosFiltrados = dados.filter(ev => {
     {tipo.nomeTipoEvento}
   </button>
 ))}
-      <Card title='Eventos'>
-        <div className='row'>
-          <div className='col-lg-12'>
-            <div className='bs-component'>
               <table className='table table-hover'>
                 <thead>
                   <tr>
