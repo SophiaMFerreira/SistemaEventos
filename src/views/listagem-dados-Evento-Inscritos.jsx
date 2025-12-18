@@ -1,122 +1,274 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
-import { mensagemSucesso } from '../components/toastr'; 
-import { Typography, Stack, Button, Box } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { mensagemErro, mensagemSucesso } from "../components/toastr";
+import {
+  Typography,
+  Stack,
+  Button,
+  Box,
+  Modal,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
-import "../style/listagemDadosEvento.css"
-import imagemEventoBale from "../components/eventoBale.jpg"
+import "../style/listagemDadosEvento.css";
+import imagemEventoBale from "../components/eventoBale.jpg";
 
 import axios from 'axios';
 import { BASE_URL, BASE_URL_S } from '../config/axios';
 
 function ListagemDadosEvento() {
-    const baseURL = `${BASE_URL}/evento`;
-    const baseURLingresso = `${BASE_URL_S}/ingresso`;
-    const { idParam } = useParams();
-    const navigate = useNavigate();
-  
-    const infoLateral = "Dados evento";
-    const idParticipante = Number(localStorage.getItem("idUsuario"));
-    const tipoParticipante = localStorage.getItem("tipoParticipante");
+  const baseURL = `${BASE_URL}/evento`;
+  const baseURLingresso = `${BASE_URL_S}/ingresso`;
+  const { idParam } = useParams();
+  const navigate = useNavigate();
 
-    const [id, setIdEvento] = useState("");
-    const [nomeEvento, setNomeEvento] = useState("");
-    const [dataInicioEvento, setDataInicioEvento] = useState("");
-    const [horaInicioEvento, setHoraInicioEvento] = useState("");
-    const [dataFimEvento, setDataFimEvento] = useState("");
-    const [horaFimEvento, setHoraFimEvento] = useState("");
-    const [descricaoEvento, setDescricaoEvento] = useState(""); 
-    const [statusPagamento, setStatusPagamento] = useState(false); 
+  const idParticipante = Number(localStorage.getItem("idUsuario"));
+  const tipoParticipante = localStorage.getItem("tipoParticipante");
 
-    const [cep, setCep] = useState("");
-    const [logradouro, setLogradouro] = useState("");
-    const [numero, setNumero] = useState("");
-    const [complemento, setComplemento] = useState("");
-    const [bairro, setBairro] = useState("");
-    const [cidade, setCidade] = useState("");
-    const [estado, setEstado] = useState("");
+  const [evento, setEvento] = useState({});
+  const [ingresso, setIngresso] = useState(null);
+  const [inscrito, setInscrito] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [tipoIngresso, setTipoIngresso] = useState("inteira");
 
-    useEffect(() => {
-  if (!idParam) return;
-
+  useEffect(() => {
     async function carregarDados() {
-      try {
-          const eventoRes = await axios.get(`${baseURL}/${idParam}`);
-          const dados = eventoRes.data;
+      const eventoRes = await axios.get(`${baseURL}/${idParam}`);
+      setEvento(eventoRes.data);
 
-          setIdEvento(dados.id);
-          setNomeEvento(dados.nomeEvento);
-          setDataInicioEvento(dados.dataInicio);
-          setHoraInicioEvento(dados.horaInicio);
-          setDataFimEvento(dados.dataFim);
-          setHoraFimEvento(dados.horaFim);
-          setDescricaoEvento(dados.descricao);
+      const ingressosRes = await axios.get(baseURLingresso);
+      const ingressos = ingressosRes.data;
 
-          setCep(dados.cep);
-          setLogradouro(dados.logradouro);
-          setNumero(dados.numero);
-          setComplemento(dados.complemento);
-          setBairro(dados.bairro);
-          setCidade(dados.cidade);
-          setEstado(dados.estado);
+      const encontrado = ingressos.find(i =>
+        i.idEvento === Number(idParam) &&
+        (
+          (tipoParticipante === "cpf" && i.idParticipanteCPF === idParticipante) ||
+          (tipoParticipante === "cnpj" && i.idParticipanteCNPJ === idParticipante)
+        )
+      );
 
-          const ingressosRes = await axios.get(baseURLingresso);
-          const ingressos = ingressosRes.data;
-          let ingresso;
-
-          if (tipoParticipante === "cpf") {
-            ingresso = ingressos.find(
-              i => i.idEvento === Number(idParam) && i.idParticipanteCPF === idParticipante );
-          }
-          if (tipoParticipante === "cnpj") {
-            ingresso = ingressos.find( i => i.idEvento === Number(idParam) && i.idParticipanteCNPJ === idParticipante );
-          }
-          if (ingresso) {
-            setStatusPagamento(ingresso.pago);
-          }
-      } catch (error) {
-          console.error("Erro ao carregar dados:", error);
+      if (encontrado) {
+        setIngresso(encontrado);
+        setInscrito(true);
       }
-      }
-      carregarDados();
-      }, [idParam]);
-
-    async function cancel(e) {
-        
     }
+    carregarDados();
+  }, [idParam]);
 
-    return(
-        <Stack direction="column" p={{ xs: 2, sm: 3, md: 5 }} spacing={4} overflow="auto" sx={{ position: "relative" }}>
-            <Stack direction="column">
-                <Typography variant="h1" className="regiao" sx={{ mb: { xs: 3, md: 5 }, fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" } }}>Dados do evento</Typography>
-                <BoxInfoEvento  nomeEvento={nomeEvento}
-                                dataInicioEvento={dataInicioEvento}
-                                horaInicioEvento={horaInicioEvento}
-                                dataFimEvento={dataFimEvento}
-                                horaFimEvento={horaFimEvento}
-                                cep={cep}
-                                logradouro={logradouro}
-                                bairro={bairro}
-                                cidade={cidade}
-                                estado={estado}
-                                numero={numero}
-                                complemento={complemento}
-                                
-                                infoLateral={infoLateral}
-                                lotacaoMaxima={0}
-                                statusPagamento={statusPagamento}                                
-                sx={{ width: "100%" }} />
-                
-            </Stack>
-            <Box sx={{display: "flex", justifyContent: "center", width: "100%",}}>
-                <Box component="img" src={imagemEventoBale} alt="Dançarinas de balé em roupas brancas." sx={{ width: "100%", maxWidth: 700, height: "auto", borderRadius: 2 }} />
-            </Box>
-            <Typography variant="body1" sx={{ mb: 5, pl: 5}}>Descrição: {descricaoEvento}</Typography>
-            <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
-                <Button variant="outlined" onClick={() => navigate("/meus-eventos")}>Voltar</Button>
-                <Button variant="contained" color="warning" onClick={() => navigate(`/meus-eventos/${id}/ingresso`)}>Emitir ingresso</Button>
-            </Stack>
-        </Stack>   
-    );
+  async function inscrever() {
+    const novoIngresso = {
+      codigoIngresso: `ING-${Date.now()}`,
+      dataCompra: new Date().toLocaleDateString(),
+      horaCompra: new Date().toLocaleTimeString(),
+      valor: 0,
+      tipo: null,
+      idEvento: evento.id,
+      idParticipanteCPF: tipoParticipante === "cpf" ? idParticipante : null,
+      idParticipanteCNPJ: tipoParticipante === "cnpj" ? idParticipante : null,
+      cancelado: false,
+      pago: false
+    };
+
+    const res = await axios.post(baseURLingresso, novoIngresso);
+    setIngresso(res.data);
+    setInscrito(true);
+    mensagemSucesso("Inscrição realizada com sucesso");
+  }
+
+  async function realizarPagamento() {
+    try {
+        const valorFinal = tipoIngresso === "meia"
+      ? evento.valorIngresso / 2
+      : evento.valorIngresso;
+
+      await axios.patch(`${baseURLingresso}/${ingresso.id}`, {
+        pago: true,
+        tipo: tipoIngresso,
+        valor: valorFinal
+      });
+
+    setIngresso({ ...ingresso, pago: true });
+    setOpenModal(false);
+    mensagemSucesso("Pagamento salvo com sucesso");
+
+    } catch(error) {
+    console.error(error);
+    mensagemErro("Não foi possível processar o pagamento. Tente novamente.");
+    }
+    
+  }
+
+  return (
+    <Stack
+      spacing={4}
+      sx={{
+        maxWidth: 1100,
+        margin: "0 auto",
+        padding: 4,
+      }}
+    >
+      <Typography variant="h4" fontWeight={600}>
+        Detalhes do evento
+      </Typography>
+
+      <Box
+        sx={{
+          backgroundColor: "#fff",
+          borderRadius: 3,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+          padding: 4,
+        }}
+      >
+        <BoxInfoEvento
+          nomeEvento={evento.nomeEvento}
+          dataInicioEvento={evento.dataInicio}
+          horaInicioEvento={evento.horaInicio}
+          dataFimEvento={evento.dataFim}
+          horaFimEvento={evento.horaFim}
+          modalidade={evento.modalidade}
+          valorIngresso={evento.valorIngresso}
+          cep={evento.cep}
+          logradouro={evento.logradouro}
+          bairro={evento.bairro}
+          cidade={evento.cidade}
+          estado={evento.estado}
+          numero={evento.numero}
+          complemento={evento.complemento}
+          infoLateral="Dados evento"
+          statusPagamento={ingresso?.pago}
+        />
+
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 3,
+            mt: 3,
+          }}
+        >
+          <Box sx={{ flex: 1, minWidth: 260 }}>
+            <Typography variant="body1">
+              <strong>Modalidade:</strong> {evento.modalidade}
+            </Typography>
+
+            <Typography variant="body1" mt={1}>
+              <strong>Valor do ingresso:</strong>{" "}
+              {evento.valorIngresso === 0
+                ? "Gratuito"
+                : `R$ ${evento.valorIngresso}`}
+            </Typography>
+
+          </Box>
+
+          <Box sx={{ flex: 1, minWidth: 260 }}>
+            <Typography variant="body1" fontWeight={600}>
+              Descrição
+            </Typography>
+            <Typography variant="body1">
+              {evento.descricao}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          component="img"
+          src={imagemEventoBale}
+          sx={{
+            width: "100%",
+            maxHeight: 320,
+            objectFit: "cover",
+            borderRadius: 3,
+            mt: 4,
+          }}
+        />
+
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="flex-end"
+          mt={4}
+          sx={{
+            borderTop: "1px solid #eee",
+            pt: 3,
+          }}
+        >
+          <Button variant="outlined"  onClick={() => navigate("/meus-eventos")}>
+            Voltar
+          </Button>
+
+          {!inscrito && (
+            <Button variant="contained" onClick={inscrever}>
+              Inscrever-se
+            </Button>
+          )}
+
+          {inscrito && ingresso && !ingresso.pago && (
+            <Button variant="contained" color="success" onClick={() => setOpenModal(true)}>
+              Realizar pagamento
+            </Button>
+          )}
+
+          {ingresso?.pago && !ingresso.cancelado && (
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() =>
+                navigate(`/meus-eventos/${evento.id}/ingresso`)
+              }
+            >
+              Emitir ingresso
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Box
+          sx={{
+            background: "#fff",
+            p: 4,
+            borderRadius: 3,
+            width: 320,
+            mx: "auto",
+            mt: "15%",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          }}
+        >
+          <Typography variant="h6" fontWeight={600} mb={2}>
+            Forma de pagamento
+          </Typography>
+
+          <RadioGroup
+            value={tipoIngresso}
+            onChange={(e) => setTipoIngresso(e.target.value)}
+          >
+            <FormControlLabel
+              value="inteira"
+              control={<Radio />}
+              label="Inteira"
+            />
+            <FormControlLabel
+              value="meia"
+              control={<Radio />}
+              label="Meia"
+            />
+          </RadioGroup>
+
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{ mt: 2 }}
+            onClick={realizarPagamento}
+          >
+            Confirmar pagamento
+          </Button>
+        </Box>
+      </Modal>
+    </Stack>
+  );
 }
+
 export default ListagemDadosEvento;
