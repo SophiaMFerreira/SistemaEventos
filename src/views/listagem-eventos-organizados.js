@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import Card from '../components/card';
 import { mensagemSucesso, mensagemErro } from '../components/toastr';
@@ -12,13 +13,12 @@ import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-import axios from 'axios';
-import { BASE_URL, BASE_URL_S } from '../config/axios';
 import BuscarEvento from '../components/input-buscar-evento';
+import { BASE_URL } from '../config/axios';
 
 
-const baseURL = `${BASE_URL}/evento`;
-const baseURLIngresso = `${BASE_URL_S}/ingresso`;
+const baseURL = `${BASE_URL}/eventos`;
+const baseURLIngresso = `${BASE_URL}/ingressos`;
 
 function EventosOrganizados() {
   const navigate = useNavigate();
@@ -36,29 +36,31 @@ function EventosOrganizados() {
   const [filtro, setFiltro] = React.useState("");
   const [ingressos, setIngressos] = React.useState([]);
   const eventosNotificados = React.useRef(new Set());
+  const [idTipoEvento, setIdTipoEvento] = useState(0);
 
 
   const eventosFiltrados = dados
     ? dados.filter(ev =>
-        ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
+        ev.nome.toLowerCase().includes(filtro.toLowerCase())
       )
     : [];
 
   async function excluir(id) {
     let data = JSON.stringify({ id });
     let url = `${baseURL}/${id}`;
+    
 
-    await axios
-      .delete(url, data, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      .then(function () {
-        mensagemSucesso(`Evento excluído com sucesso!`);
-        setDados(dados.filter((dado) => dado.id !== id));
-      })
-      .catch(function () {
-        mensagemErro(`Erro ao excluir o evento`);
-      });
+try {
+  await axios.delete(url, {
+    data: { id },
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  mensagemSucesso('Evento excluído com sucesso!');
+  setDados(dados.filter((dado) => dado.id !== id));
+} catch (error) {
+  mensagemErro('Erro ao excluir o evento');
+}
   }
 
   React.useEffect(() => {
@@ -89,7 +91,7 @@ function EventosOrganizados() {
       inscritos >= dado.lotacaoMaxima &&
       !eventosNotificados.current.has(dado.id)
     ) {
-      mensagemErro(`Evento ${dado.nomeEvento} atingiu a lotação máxima!`);
+      mensagemErro(`Evento ${dado.nome} atingiu a lotação máxima!`);
       eventosNotificados.current.add(dado.id);
     }
   });
@@ -133,7 +135,7 @@ function EventosOrganizados() {
 
                 <tbody>
                   {eventosFiltrados.map((dado) => {
-                    const data = new Date(dado.dataInicio);
+                    const data = new Date(dado.dataHoraInicio);
                     const dia = data.getDate();
                     const mes = data.toLocaleString("pt-BR", { month: "long" });
                     const inscritos = ingressos.filter( ing => Number(ing.idEvento) === dado.id && !ing.cancelado && ing.pago).length;
@@ -141,10 +143,10 @@ function EventosOrganizados() {
 
                     return (
                       <tr key={dado.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/eventos-organizados/${dado.id}`)}>
-                        <td>{dado.nomeEvento}</td>
+                        <td>{dado.nome}</td>
                         <td>{dia}</td>
                         <td>{mes}</td>
-                        <td>{dado.cidade}</td>
+                        <td>{dado.endereco.cidade}</td>
                         <td>{vagas}</td>
                         <td>
                           <Stack spacing={1} padding={0} direction="row">
@@ -170,5 +172,4 @@ function EventosOrganizados() {
   );
   
 }
-
 export default EventosOrganizados;
