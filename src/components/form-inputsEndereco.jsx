@@ -1,6 +1,23 @@
-import Grid from '@mui/material/Grid';
-import Typography from "@mui/material/Typography";
-import TextField from '@mui/material/TextField';
+import React from 'react';
+import { IMaskInput } from 'react-imask'; 
+import { Grid, Typography, TextField } from '@mui/material'
+
+const TextMaskEstado = React.forwardRef(function TextMaskEstado(props, ref) {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="aa"
+      prepareChar={(str) => str.toUpperCase()}
+      definitions={{
+        'a': /[a-zA-Z]/,
+      }}
+      inputRef={ref}
+      onAccept={(value) => onChange?.({ target: { name: props.name, value } })}
+      overwrite
+    />
+  );
+});
 
 function InputsEndereco({cep, setCep,
                         logradouro, setLogradouro,
@@ -9,6 +26,7 @@ function InputsEndereco({cep, setCep,
                         estado, setEstado,
                         numero, setNumero,
                         complemento, setComplemento}) {
+
     return (
      <Grid container size={12} sx={{width: "100%", pr: 2,}} direction={"column"}>
         <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%"}} direction={"row"}>
@@ -32,7 +50,16 @@ function InputsEndereco({cep, setCep,
             </Grid>
             <Grid size={4} spacing={2} sx={{ width: "100%", boxSizing: "border-box", maxWidth: "33%", pr: 2,}}>
                 <Typography variant="body1" className="label">Estado*</Typography>
-                <TextField name="estado" placeholder="Minas Gerais" value={estado} onChange={(e) => setEstado(e.target.value)} required fullWidth/>
+                <TextField 
+                    name="estado" 
+                    placeholder="MG"
+                    onChange={(e) => setEstado(e.target.value)} 
+                    required 
+                    fullWidth
+                    InputProps={{
+                        inputComponent: TextMaskEstado,
+                    }}
+                />
             </Grid>
         </Grid>
         <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%"}} direction={"row"}>
@@ -45,7 +72,7 @@ function InputsEndereco({cep, setCep,
                 <TextField name="complemento" placeholder="Casa A" value={complemento} onChange={(e) => setComplemento(e.target.value)} required fullWidth/>
             </Grid>
         </Grid>
-    </Grid>
+     </Grid>
   );
 }
 
