@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Stack, Button, Typography } from "@mui/material";
 import Card from "../components/card";
-import { BASE_URL, BASE_URL_S } from "../config/axios";
+import { BASE_URL} from "../config/axios";
 import axios from "axios";
 
 function DetalhesEventoOrganizador() {
@@ -14,10 +14,10 @@ function DetalhesEventoOrganizador() {
   useEffect(() => {
     async function carregarEvento() {
       try {
-        const respEvento = await axios.get(`${BASE_URL}/evento/${idParam}`);
+        const respEvento = await axios.get(`${BASE_URL}/eventos/${idParam}`);
         setEvento(respEvento.data);
 
-        const respIngressos = await axios.get(`${BASE_URL_S}/ingresso`);
+        const respIngressos = await axios.get(`${BASE_URL}/ingressos`);
         const ingressosEvento = respIngressos.data.filter(
           (i) => Number(i.idEvento) === Number(idParam) && !i.cancelado && i.pago
         );
@@ -34,23 +34,33 @@ function DetalhesEventoOrganizador() {
 
   const vagasDisponiveis = evento.lotacaoMaxima - ingressos.length;
 
+ const formatarDataHora = (dataHora) => {
+  return new Date(dataHora).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
   return (
     <div className="container" style={{ marginTop: '120px' }}>
       <Card title={`Detalhes do Evento:`}>
         <Stack spacing={2} direction="row">
             <Stack spacing={1} sx={{ flex: 1 }}>
-            <Typography variant="h5">{evento.nomeEvento}</Typography>
-            <Typography><strong>Vagas:</strong>{ingressos.length}/{evento.lotacaoMaxima}</Typography>
-            <Typography><strong>Tipo de evento:</strong> {evento.tipoEvento}</Typography>
+            <Typography variant="h5">{evento.nome}</Typography>
+            <Typography><strong>Vagas:</strong> {ingressos.length}/{evento.lotacaoMaxima}</Typography>
+            <Typography><strong>Tipo de evento:</strong> {evento.nomeTipoEvento}</Typography>
             <Typography><strong>Modalidade:</strong> {evento.modalidade}</Typography>
-            <Typography><strong>Data/hora início:</strong> {evento.dataInicio} {evento.horaInicio}</Typography>
-            <Typography><strong>Data/hora fim:</strong> {evento.dataFim} {evento.horaFim}</Typography>
+            <Typography><strong>Data/hora início:</strong> {formatarDataHora(evento.dataHoraInicio)}</Typography>
+            <Typography><strong>Data/hora fim:</strong> {formatarDataHora(evento.dataHoraFim)}</Typography>
             <Typography><strong>Descrição:</strong> {evento.descricao}</Typography>
-            <Typography><strong>CEP:</strong> {evento.cep}</Typography>
-            <Typography><strong>Endereço:</strong> {`${evento.logradouro}, ${evento.numero} ${evento.complemento}`}</Typography>
-            <Typography><strong>Bairro:</strong> {evento.bairro}</Typography>
-            <Typography><strong>Cidade:</strong> {evento.cidade}</Typography>
-            <Typography><strong>Estado:</strong> {evento.estado}</Typography>
+            <Typography><strong>CEP:</strong> {evento.endereco.cep}</Typography>
+            <Typography><strong>Endereço:</strong> {`${evento.endereco.logradouro}, ${evento.endereco.numero} ${evento.endereco.complemento}`}</Typography>
+            <Typography><strong>Bairro:</strong> {evento.endereco.bairro}</Typography>
+            <Typography><strong>Cidade:</strong> {evento.endereco.cidade}</Typography>
+            <Typography><strong>Estado:</strong> {evento.endereco.estado}</Typography>
           </Stack>
         </Stack>
         <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
