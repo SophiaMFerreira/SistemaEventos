@@ -163,10 +163,9 @@ const celularFormatado = celular.replace(
 
       try {
         const senhaValida = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
-        const cpfValido = /^\d{11}$/;      // Aceita 11 números limpos
+        const cpfValido = /^\d{11}$/;      
         const celularValido = /^\d{11}$/;
         const celularCom9 = /^9/;
-          // Aceita 11 números limpos
 
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);

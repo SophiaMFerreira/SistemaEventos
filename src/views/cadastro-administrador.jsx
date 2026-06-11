@@ -7,10 +7,10 @@ import InputsSenha from "../components/form-inputsSenha";
 import "../style/cadastro.css";
 
 import axios from 'axios';
-import { BASE_URL_S } from '../config/axios';
+import { BASE_URL } from '../config/axios';
 
 function CadastroAdministrador(){
-      const baseURL = `${BASE_URL_S}/administrador`;
+      const baseURL = `${BASE_URL}/administrador`;
       const { idParam } = useParams();
       const navigate = useNavigate();
   

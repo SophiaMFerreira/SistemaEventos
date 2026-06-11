@@ -16,11 +16,11 @@ import "../style/listagemDadosEvento.css";
 import imagemEventoBale from "../components/eventoBale.jpg";
 
 import axios from 'axios';
-import { BASE_URL, BASE_URL_S } from '../config/axios';
+import { BASE_URL} from '../config/axios';
 
 function ListagemDadosEvento() {
-  const baseURL = `${BASE_URL}/evento`;
-  const baseURLingresso = `${BASE_URL_S}/ingresso`;
+  const baseURL = `${BASE_URL}/eventos`;
+  const baseURLingresso = `${BASE_URL}/ingressos`;
   const { idParam } = useParams();
   const navigate = useNavigate();
 
@@ -34,70 +34,109 @@ function ListagemDadosEvento() {
   const [tipoIngresso, setTipoIngresso] = useState("inteira");
 
   useEffect(() => {
-    async function carregarDados() {
+  async function carregarDados() {
+    try {
       const eventoRes = await axios.get(`${baseURL}/${idParam}`);
       setEvento(eventoRes.data);
 
       const ingressosRes = await axios.get(baseURLingresso);
       const ingressos = ingressosRes.data;
+      console.log("INGRESSOS:", ingressos);
+console.log("ID EVENTO:", idParam);
+console.log("ID PARTICIPANTE:", idParticipante);
 
-      const encontrado = ingressos.find(i =>
-        i.idEvento === Number(idParam) &&
-        (
-          (tipoParticipante === "cpf" && i.idParticipanteCPF === idParticipante) ||
-          (tipoParticipante === "cnpj" && i.idParticipanteCNPJ === idParticipante)
-        )
-      );
+      const encontrado = ingressos.find(
+  (i) =>
+    Number(i.idEvento) === Number(idParam) &&
+    Number(i.idParticipante) === idParticipante
+);
+console.log("INGRESSO ENCONTRADO:", encontrado);
 
       if (encontrado) {
         setIngresso(encontrado);
         setInscrito(true);
       }
+    } catch (error) {
+      console.error(error);
+      mensagemErro("Erro ao carregar evento");
     }
-    carregarDados();
-  }, [idParam]);
+  }
+
+  carregarDados();
+
+}, [idParam]);
+
+  const formatarData = (dataHora) => {
+  if (!dataHora) return "";
+
+  return new Date(dataHora).toLocaleDateString("pt-BR");
+};
+
+const formatarHora = (dataHora) => {
+  if (!dataHora) return "";
+
+  return new Date(dataHora).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
   async function inscrever() {
+  try {
+
     const novoIngresso = {
-      codigoIngresso: `ING-${Date.now()}`,
-      dataCompra: new Date().toLocaleDateString(),
-      horaCompra: new Date().toLocaleTimeString(),
+      status: "RESERVADO",
       valor: 0,
-      tipo: null,
-      idEvento: evento.id,
-      idParticipanteCPF: tipoParticipante === "cpf" ? idParticipante : null,
-      idParticipanteCNPJ: tipoParticipante === "cnpj" ? idParticipante : null,
-      cancelado: false,
-      pago: false
+      taxa: 0,
+      idParticipante: idParticipante,
+      idEvento: evento.id
     };
 
     const res = await axios.post(baseURLingresso, novoIngresso);
+
     setIngresso(res.data);
     setInscrito(true);
-    mensagemSucesso("Inscrição realizada com sucesso");
+
+    mensagemSucesso("Inscrição realizada com sucesso!");
+
+  } catch (error) {
+    console.error(error);
+
+    mensagemErro(
+      error.response?.data || "Erro ao realizar inscrição"
+    );
   }
+}
 
   async function realizarPagamento() {
     try {
-        const valorFinal = tipoIngresso === "meia"
-      ? evento.valorIngresso / 2
-      : evento.valorIngresso;
+      const valorDoEvento = Number(evento.valorIngresso) || 0;
+      const valorFinal = tipoIngresso === "meia"
+        ? valorDoEvento / 2
+        : valorDoEvento;
 
-      await axios.patch(`${baseURLingresso}/${ingresso.id}`, {
-        pago: true,
-        tipo: tipoIngresso,
-        valor: valorFinal
+      await axios.patch(
+        `${baseURLingresso}/${ingresso.id}/pagamento`,
+        {
+          valor: valorFinal,
+          tipoIngresso: tipoIngresso
+        }
+      );
+
+      setIngresso({
+        ...ingresso,
+        status: "PAGO",
+        valor: valorFinal,
+        tipoIngresso: tipoIngresso 
       });
-
-    setIngresso({ ...ingresso, pago: true });
-    setOpenModal(false);
-    mensagemSucesso("Pagamento salvo com sucesso");
+      
+      setOpenModal(false);
+      mensagemSucesso("Pagamento salvo com sucesso");
 
     } catch(error) {
-    console.error(error);
-    mensagemErro("Não foi possível processar o pagamento. Tente novamente.");
+      console.error("ERRO PAGAMENTO:", error);
+      mensagemErro("Não foi possível processar o pagamento. Tente novamente.");
     }
-    
   }
 
   return (
@@ -122,24 +161,20 @@ function ListagemDadosEvento() {
         }}
       >
         <BoxInfoEvento
-          nomeEvento={evento.nomeEvento}
-          dataInicioEvento={evento.dataInicio}
-          horaInicioEvento={evento.horaInicio}
-          dataFimEvento={evento.dataFim}
-          horaFimEvento={evento.horaFim}
-          modalidade={evento.modalidade}
-          valorIngresso={evento.valorIngresso}
-          cep={evento.cep}
-          logradouro={evento.logradouro}
-          bairro={evento.bairro}
-          cidade={evento.cidade}
-          estado={evento.estado}
-          numero={evento.numero}
-          complemento={evento.complemento}
-          infoLateral="Dados evento"
-          statusPagamento={ingresso?.pago}
-        />
+  nomeEvento={evento.nome}
+  dataInicioEvento={evento.dataHoraInicio}
+  dataFimEvento={evento.dataHoraFim}
+  cep={evento.endereco?.cep}
+  logradouro={evento.endereco?.logradouro}
+  bairro={evento.endereco?.bairro}
+  cidade={evento.endereco?.cidade}
+  estado={evento.endereco?.estado}
+  numero={evento.endereco?.numero}
+  complemento={evento.endereco?.complemento}
 
+  infoLateral="Dados evento"
+  statusPagamento={ingresso?.status === "PAGO"}
+/>
         <Box
           sx={{
             display: "flex",
@@ -152,13 +187,17 @@ function ListagemDadosEvento() {
             <Typography variant="body1">
               <strong>Modalidade:</strong> {evento.modalidade}
             </Typography>
-
             <Typography variant="body1" mt={1}>
-              <strong>Valor do ingresso:</strong>{" "}
-              {evento.valorIngresso === 0
-                ? "Gratuito"
-                : `R$ ${evento.valorIngresso}`}
-            </Typography>
+  <strong>Tipo do evento:</strong> {evento.nomeTipoEvento}
+</Typography>
+            <Typography variant="body1" mt={1}>
+  <strong>Valor do ingresso:</strong>{" "}
+  {evento.valorIngresso == null
+    ? "Não informado"
+    : evento.valorIngresso === 0
+      ? "Gratuito"
+      : `R$ ${Number(evento.valorIngresso).toFixed(2)}`}
+</Typography>
 
           </Box>
 
@@ -204,13 +243,13 @@ function ListagemDadosEvento() {
             </Button>
           )}
 
-          {inscrito && ingresso && !ingresso.pago && (
+          {inscrito && ingresso && ingresso.status !== "PAGO" && (
             <Button variant="contained" color="success" onClick={() => setOpenModal(true)}>
               Realizar pagamento
             </Button>
           )}
 
-          {ingresso?.pago && !ingresso.cancelado && (
+          {ingresso?.status === "PAGO" && ingresso.status !== "CANCELADO" && (
             <Button
               variant="contained"
               color="warning"
