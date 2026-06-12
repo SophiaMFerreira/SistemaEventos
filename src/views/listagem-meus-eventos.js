@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { BASE_URL, BASE_URL_S } from "../config/axios";
+import { BASE_URL} from "../config/axios";
 import BuscarEvento from "../components/input-buscar-evento";
 import Card from "../components/card";
 import { useNavigate } from "react-router-dom";
 
-const baseURL = `${BASE_URL}/evento`;
-const baseURLIngresso = `${BASE_URL_S}/ingresso`;
+const baseURL = `${BASE_URL}/eventos`;
+const baseURLIngresso = `${BASE_URL}/ingressos`;
 
 function MeusEventos() {
   const navigate = useNavigate();
@@ -14,8 +14,8 @@ function MeusEventos() {
   const [filtro, setFiltro] = React.useState("");
   
   const eventosFiltrados = eventosInscritos.filter(ev =>
-  ev.nomeEvento.toLowerCase().includes(filtro.toLowerCase())
-    );
+  ev.nome?.toLowerCase().includes(filtro.toLowerCase())
+);
 
 
   useEffect(() => {
@@ -26,15 +26,20 @@ function MeusEventos() {
 
       const resIngressos = await fetch(baseURLIngresso);
       const ingressos = await resIngressos.json();
+console.log("INGRESSOS:", ingressos);
 
-      const meusIngressos = ingressos.filter(i =>
-        Number(i.idParticipanteCPF) === idParticipante ||
-        Number(i.idParticipanteCNPJ) === idParticipante
-      );
+ const meusIngressos = ingressos.filter(
+  i => Number(i.idParticipante) === idParticipante
+);
 
-        const eventosDoParticipante = eventos.filter(ev =>
-        meusIngressos.some(i => Number(i.idEvento) === ev.id)
-      );
+console.log("MEUS INGRESSOS:", meusIngressos);
+
+ const eventosDoParticipante = eventos.filter(ev =>
+  meusIngressos.some(i => Number(i.idEvento) === ev.id)
+);
+
+console.log("EVENTOS:", eventos);
+console.log("EVENTOS DO PARTICIPANTE:", eventosDoParticipante);
 
       setEventosInscritos(eventosDoParticipante);
     } catch (err) {
@@ -78,11 +83,24 @@ function MeusEventos() {
                     onClick={() => navigate(`/meus-eventos/${ev.id}`)}
 
                     >
-                      <td>{ev.nomeEvento}</td>
-                      <td>{new Date(ev.dataInicio).toLocaleDateString('pt-BR')}</td>
-                      <td>{new Date(ev.dataFim).toLocaleDateString('pt-BR')}</td>
-                      <td>{ev.horaInicio}</td>
-                      <td>{ev.cidade}</td>
+                      <td>{ev.nome}</td>
+
+                  <td>
+                    {new Date(ev.dataHoraInicio).toLocaleDateString("pt-BR")}
+                  </td>
+
+                  <td>
+                    {new Date(ev.dataHoraFim).toLocaleDateString("pt-BR")}
+                  </td>
+
+                  <td>
+                    {new Date(ev.dataHoraInicio).toLocaleTimeString("pt-BR", {
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </td>
+
+                  <td>{ev.endereco?.cidade}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Stack, Button, Typography } from "@mui/material";
 import Card from "../components/card";
-import { BASE_URL} from "../config/axios";
+import { BASE_URL } from "../config/axios";
 import axios from "axios";
+
+const containerStyle = { marginTop: '120px' };
 
 function DetalhesEventoOrganizador() {
   const { idParam } = useParams();
@@ -19,7 +21,9 @@ function DetalhesEventoOrganizador() {
 
         const respIngressos = await axios.get(`${BASE_URL}/ingressos`);
         const ingressosEvento = respIngressos.data.filter(
-          (i) => Number(i.idEvento) === Number(idParam) && !i.cancelado && i.pago
+          (i) =>
+            Number(i.idEvento) === Number(idParam) &&
+            i.status === "PAGO"
         );
         setIngressos(ingressosEvento);
       } catch (err) {
@@ -32,23 +36,21 @@ function DetalhesEventoOrganizador() {
 
   if (!evento) return <p>Carregando detalhes do evento...</p>;
 
-  const vagasDisponiveis = evento.lotacaoMaxima - ingressos.length;
-
- const formatarDataHora = (dataHora) => {
-  return new Date(dataHora).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+  const formatarDataHora = (dataHora) => {
+    return new Date(dataHora).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
-    <div className="container" style={{ marginTop: '120px' }}>
-      <Card title={`Detalhes do Evento:`}>
+    <div className="container" style={containerStyle}>
+      <Card title="Detalhes do Evento:">
         <Stack spacing={2} direction="row">
-            <Stack spacing={1} sx={{ flex: 1 }}>
+          <Stack spacing={1} sx={{ flex: 1 }}>
             <Typography variant="h5">{evento.nome}</Typography>
             <Typography><strong>Vagas:</strong> {ingressos.length}/{evento.lotacaoMaxima}</Typography>
             <Typography><strong>Tipo de evento:</strong> {evento.nomeTipoEvento}</Typography>
@@ -63,7 +65,7 @@ function DetalhesEventoOrganizador() {
             <Typography><strong>Estado:</strong> {evento.endereco.estado}</Typography>
           </Stack>
         </Stack>
-        <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
+        <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end", mt: 2 }}>
           <Button variant="outlined" onClick={() => navigate("/eventos-organizados")}>Voltar</Button>
           <Button variant="contained" color="warning" onClick={() => navigate(`/listagem-participantes/${idParam}`)}>Ver participantes</Button>
         </Stack>

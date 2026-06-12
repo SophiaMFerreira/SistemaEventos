@@ -14,8 +14,6 @@ import { validarDados } from "../utils/validacoes";
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
-
-
 function CadastroAdministrador(){
       const baseURL = `${BASE_URL}/usuario`;
       const { idParam } = useParams();
