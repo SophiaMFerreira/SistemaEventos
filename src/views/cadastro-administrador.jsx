@@ -6,11 +6,18 @@ import InputsEndereco from "../components/form-inputsEndereco";
 import InputsSenha from "../components/form-inputsSenha";
 import "../style/cadastro.css";
 
+import { formatarCPF, TextMaskCPF } from "../utils/cpf";
+import { formatarCEP} from "../utils/endereco";
+import { formatarCelular, TextMaskCelular } from "../utils/celular";
+import { validarDados } from "../utils/validacoes";
+
 import axios from 'axios';
-import { BASE_URL_S } from '../config/axios';
+import { BASE_URL } from '../config/axios';
+
+
 
 function CadastroAdministrador(){
-      const baseURL = `${BASE_URL_S}/administrador`;
+      const baseURL = `${BASE_URL}/usuario`;
       const { idParam } = useParams();
       const navigate = useNavigate();
   
@@ -22,6 +29,8 @@ function CadastroAdministrador(){
       const [id, setIdAdministrador] = useState("");
       const [nome, setNomeAdministrador] = useState("");
       const [cpf, setCpfAdministrador] = useState("");
+      const [dataNascimento, setDataNascimentoUsuarioCPF] = useState("");
+      const [genero, setGeneroUsuarioCPF] = useState("placeholder");
       const [celular, setCelular] = useState("");
       const [email, setEmailAdministrador] = useState("");
 
@@ -44,17 +53,21 @@ function CadastroAdministrador(){
         setIdAdministrador(dados.id);
         setNomeAdministrador(dados.nome);
         setCpfAdministrador(dados.cpf);
+        setDataNascimentoUsuarioCPF(dados.data);
+        setGeneroUsuarioCPF(dados.genero);
         setCelular(dados.celular);
         setEmailAdministrador(dados.email);
         
-        setCep(dados.cep);
-        setLogradouro(dados.logradouro);
-        setNumero(dados.numero);
-        setComplemento(dados.complemento);
-        setBairro(dados.bairro);
-        setCidade(dados.cidade);
-        setEstado(dados.estado);
-
+        if (dados.endereco) {
+          setCep(dados.endereco.cep);
+          setLogradouro(dados.endereco.logradouro);
+          setNumero(dados.endereco.numero);
+          setComplemento(dados.endereco.complemento);
+          setBairro(dados.endereco.bairro);
+          setCidade(dados.endereco.cidade);
+          setEstado(dados.endereco.estado);
+        }
+        
         setAcao("Edição");
         setMensagem("Faça edição dos");
         setAcaoButton("Editar");
@@ -65,22 +78,53 @@ function CadastroAdministrador(){
   async function save(e) {
     e.preventDefault();
     if (senha !== confirmarSenha) {
+      mensagemErro("As senhas não coincidem");
       return;
     }
+
+    const cpfFormatado = formatarCPF(cpf);
+    const cepFormatado = formatarCEP(cep);
+    const celularFormatado = formatarCelular(celular);
+
+    const endereco = {
+      cep: cepFormatado,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado
+    };
      
-    const data = { id, nome, cpf, celular, cep, logradouro, numero, complemento, bairro, cidade, estado, email};
+    const data = {
+                  tipoUsuario: "PF",
+                  nome,
+                  cpf: cpfFormatado,
+                  data: dataNascimento,
+                  genero: genero === "placeholder" ? "" : genero,
+                  email,
+                  celular: celularFormatado,
+                  senha,
+                  endereco,
+                  perfis: ["ADMINISTRADOR"]
+    };
+
     try {
-      if (!idParam) {
-        await axios.post(baseURL, data);
-          mensagemSucesso(`Novo administrador ${nome} criado com sucesso!`);
-      } else {
-        await axios.put(`${baseURL}/${idParam}`, data);
-          mensagemSucesso(`Administrador ${nome} alterado com sucesso!`);
+      if(!validarDados({dataNascimento, cpf, celular, senha})){
+        return
       }
-      navigate("/listagem-eventos");
+
+      if (!idParam) {
+          await axios.post(baseURL, data);
+          mensagemSucesso(`Bem vindo ${nome}!`);
+        } else {
+          await axios.put(`${baseURL}/${id}`, data);
+          mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
+        }
     } catch (error) {
-      mensagemErro(error.response.data);
+      mensagemErro(error?.response?.data || "Erro ao salvar os dados.");
     }
+    navigate("/listagem-eventos");
   }
 
   async function exclude() {
@@ -111,15 +155,60 @@ function CadastroAdministrador(){
                   </Grid>
                   <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                       <Typography variant="body1" className="label">CPF*</Typography>
-                      <TextField name="cpf" placeholder="000.000.000-00" value={cpf} onChange={(e) => setCpfAdministrador(e.target.value)}  required fullWidth/>
+                      <TextField
+                        name="cpf"
+                        placeholder="000.000.000-00" 
+                        value={cpf}
+                        onChange={(e) => setCpfAdministrador(e.target.value)}
+                        required
+                        fullWidth
+                        InputProps={{
+                          inputComponent: TextMaskCPF,
+                        }}
+                      />
                   </Grid>
+                  <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%", justifyContent: "space-between"} } direction={"row"}>
+                <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
+                    <Typography variant="body1" className="label">Data de nascimento*</Typography>
+                    <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth/>
+                </Grid>
+                <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
+                    <Typography variant="body1" className="label">Gênero</Typography>
+                    <Select
+                          name="genero"
+                          id="generoUsuario"
+                          value={genero}
+                          onChange={select}
+                          required
+                          fullWidth
+                        >
+                            <MenuItem value="placeholder" disabled>
+                              Selecione um gênero
+                            </MenuItem>
+                            <MenuItem value={"femenino"}>Feminino</MenuItem>
+                            <MenuItem value={"masculino"}>Masculino</MenuItem>
+                            <MenuItem value={"lgbtqia+"}>LGBTQIA+</MenuItem>
+                            <MenuItem value={"naoDeclarar"}>Prefiro não declarar</MenuItem>
+                        </Select>
+                </Grid>
+            </Grid>
                   <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                       <Typography variant="body1" className="label">Email para contato*</Typography>
-                      <TextField name="email" placeholder="administrador@email.com" type="email" value={email} onChange={(e) => setEmailAdministrador(e.target.value)}  required fullWidth/>
+                      <TextField name="email" placeholder="administrador@email.com" type="email" value={email} onChange={(e) => setEmailAdministrador(e.target.value)} required fullWidth/>
                   </Grid>
                   <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                       <Typography variant="body1" className="label">Celular para contato*</Typography>
-                      <TextField name="celular" placeholder="55 (00) 00000-0000" value={celular} onChange={(e) => setCelular(e.target.value)}  required fullWidth/>
+                      <TextField
+                        name="celular"
+                        placeholder="(32)) 00000-0000"
+                        value={celular}
+                        onChange={(e) => setCelular(e.target.value)}
+                        required
+                        fullWidth
+                        InputProps={{
+                          inputComponent: TextMaskCelular,
+                        }}
+                      />
                   </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                             logradouro={logradouro} setLogradouro={setLogradouro}
