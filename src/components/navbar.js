@@ -52,6 +52,9 @@ function Navbar(props) {
           <ul className='navbar-nav'>
             <NavbarItem render={admin} href='/cadastro-tipoEvento' label='Novo tipo de evento' />
           </ul>
+          <ul className='navbar-nav'>
+            <NavbarItem render={admin} href='/cadastro-tipoAtividade' label='Novo tipo de atividade' />
+          </ul>
 
           <ul className='navbar-nav'>
             <NavbarItem render='true' href='/eventos-organizados' label='Sou organizador' />
