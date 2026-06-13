@@ -1,20 +1,8 @@
 import React from "react";
 import { IMaskInput } from 'react-imask';
 
-interface TextMaskCPFProps {
-  name?: string;
-  onChange?: (event: {
-    target: {
-      name?: string;
-      value: string;
-    };
-  }) => void;
-}
-
-export const TextMaskCPF = React.forwardRef<
-  HTMLInputElement,
-  TextMaskCPFProps
-  >(function TextMaskCPF(props, ref) {
+export const TextMaskCPF = React.forwardRef<HTMLInputElement>
+(function TextMaskCPF(props, ref) {
   const { onChange, ...other } = props;
   return (
     <IMaskInput
@@ -36,11 +24,11 @@ export const TextMaskCPF = React.forwardRef<
   );
 });
 
-export function formatarCPF(cpf : string) {
+export function formatarCPF(cpf) {
   const nros = cpf.replace(/\D/g, '');
-
+  
   return nros.replace(
             /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
             "$1.$2.$3-$4"
-    );
+  );
 }

@@ -1,20 +1,8 @@
 import React from "react";
 import { IMaskInput } from 'react-imask';
 
-interface TextMaskCelularProps {
-  name?: string;
-  onChange?: (event: {
-    target: {
-      name?: string;
-      value: string;
-    };
-  }) => void;
-}
-
-export const TextMaskCPF = React.forwardRef<
-  HTMLInputElement,
-  TextMaskCelularProps
-  >(function TextMaskCelular(props, ref) {
+export const TextMaskCelular = React.forwardRef<HTMLInputElement>
+(function TextMaskCelular(props, ref) {
   const { onChange, ...other } = props;
   return (
     <IMaskInput
@@ -35,7 +23,7 @@ export const TextMaskCPF = React.forwardRef<
   );
 });
 
-export function formatarCelular(celular : string){
+export function formatarCelular(celular){
   const cell = celular.replace(/\D/g, '');
 
   return cell.replace(

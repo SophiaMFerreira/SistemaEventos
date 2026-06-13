@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { mensagemSucesso, mensagemErro } from '../components/toastr';
-import { Grid, Paper, Typography, TextField, Stack, Button } from "@mui/material";
+import { Grid, Paper, Typography, TextField, Stack, Button, Select, MenuItem } from "@mui/material";
 import InputsEndereco from "../components/form-inputsEndereco";
 import InputsSenha from "../components/form-inputsSenha";
 import "../style/cadastro.css";
@@ -9,7 +9,7 @@ import "../style/cadastro.css";
 import { formatarCPF, TextMaskCPF } from "../utils/cpf";
 import { formatarCEP} from "../utils/endereco";
 import { formatarCelular, TextMaskCelular } from "../utils/celular";
-import { validarDados } from "../utils/validacoes";
+import validarDados from "../utils/validacoes";
 
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
@@ -20,16 +20,16 @@ function CadastroAdministrador(){
       const navigate = useNavigate();
   
       const [acao, setAcao] = useState("Cadastro");
-      const [mensagem, setMensagem] = useState("Faça cadastro de novos");
+      const [mensagem, setMensagem] = useState("Faça seu cadastro de ");
       const [acaoButton, setAcaoButton] = useState("Criar");
       const [navegacao, setNavegacao] = useState("/");
       
       const [id, setIdAdministrador] = useState("");
       const [nome, setNomeAdministrador] = useState("");
       const [cpf, setCpfAdministrador] = useState("");
-      const [dataNascimento, setDataNascimentoUsuarioCPF] = useState("");
-      const [genero, setGeneroUsuarioCPF] = useState("placeholder");
-      const [celular, setCelular] = useState("");
+      const [dataNascimento, setDataNascimentoAdministrador] = useState("");
+      const [genero, setGeneroAdministrador] = useState("placeholder");
+      const [celular, setCelularAdministrador] = useState("");
       const [email, setEmailAdministrador] = useState("");
 
       const [cep, setCep] = useState("");
@@ -51,9 +51,9 @@ function CadastroAdministrador(){
         setIdAdministrador(dados.id);
         setNomeAdministrador(dados.nome);
         setCpfAdministrador(dados.cpf);
-        setDataNascimentoUsuarioCPF(dados.data);
-        setGeneroUsuarioCPF(dados.genero);
-        setCelular(dados.celular);
+        setDataNascimentoAdministrador(dados.data);
+        setGeneroAdministrador(dados.genero);
+        setCelularAdministrador(dados.celular);
         setEmailAdministrador(dados.email);
         
         if (dados.endereco) {
@@ -73,13 +73,13 @@ function CadastroAdministrador(){
       });
   }, [idParam, baseURL]);
 
+  const select = (event) => {
+    setGeneroAdministrador(event.target.value);
+  };
+
   async function save(e) {
     e.preventDefault();
-    if (senha !== confirmarSenha) {
-      mensagemErro("As senhas não coincidem");
-      return;
-    }
-
+    
     const cpfFormatado = formatarCPF(cpf);
     const cepFormatado = formatarCEP(cep);
     const celularFormatado = formatarCelular(celular);
@@ -99,7 +99,7 @@ function CadastroAdministrador(){
                   nome,
                   cpf: cpfFormatado,
                   data: dataNascimento,
-                  genero: genero === "placeholder" ? "" : genero,
+                  genero: genero === "placeholder" ? "Prefiro não declarar" : genero,
                   email,
                   celular: celularFormatado,
                   senha,
@@ -108,8 +108,8 @@ function CadastroAdministrador(){
     };
 
     try {
-      if(!validarDados({dataNascimento, cpf, celular, senha})){
-        return
+      if(!validarDados(dataNascimento, cpfFormatado, celularFormatado, senha, confirmarSenha)){
+        return;
       }
 
       if (!idParam) {
@@ -145,7 +145,7 @@ function CadastroAdministrador(){
     <Grid container direction="column" sx={{ mt: 6, minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }} >
         <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
             <Typography component="h1" variant="h3">{acao} de Administrador</Typography>
-            <Typography variant="subtitle1" className="label" sx={{ mb: 3 }}>{mensagem} administradores.</Typography>
+            <Typography variant="subtitle1" className="label" sx={{ mb: 3 }}>{mensagem} administrador.</Typography>
              <Grid container component="form" onSubmit={save} noValidate spacing={2} >
                   <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                       <Typography variant="body1" className="label">Nome*</Typography>
@@ -168,7 +168,7 @@ function CadastroAdministrador(){
                   <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%", justifyContent: "space-between"} } direction={"row"}>
                 <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
                     <Typography variant="body1" className="label">Data de nascimento*</Typography>
-                    <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoUsuarioCPF(e.target.value)} required fullWidth/>
+                    <TextField name="dataNascimento" type="date" value={dataNascimento} onChange={(e) => setDataNascimentoAdministrador(e.target.value)} required fullWidth/>
                 </Grid>
                 <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "100%"}}>
                     <Typography variant="body1" className="label">Gênero</Typography>
@@ -198,9 +198,9 @@ function CadastroAdministrador(){
                       <Typography variant="body1" className="label">Celular para contato*</Typography>
                       <TextField
                         name="celular"
-                        placeholder="(32)) 00000-0000"
+                        placeholder="(32) 90000-0000"
                         value={celular}
-                        onChange={(e) => setCelular(e.target.value)}
+                        onChange={(e) => setCelularAdministrador(e.target.value)}
                         required
                         fullWidth
                         InputProps={{

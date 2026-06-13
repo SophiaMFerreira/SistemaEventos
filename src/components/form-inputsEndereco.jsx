@@ -63,7 +63,7 @@ function InputsEndereco({
           </Typography>
           <TextField
             name="cep"
-            placeholder="00000000"
+            placeholder="00000-000"
             value={cep}
             onChange={(e) => setCep(e.target.value)}
             required
