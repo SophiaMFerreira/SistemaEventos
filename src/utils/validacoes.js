@@ -35,3 +35,16 @@ export default function validarDados(dataNascimento, cpf, celular, senha, confir
       return;
     }
 }
+
+export function validarQuantidades(quantidadeMin, quantidadeMax){
+    if (quantidadeMin < 0) {
+      mensagemErro("Valores quantitativos mínimos negativos não são permitidos.");
+      return;
+    } else if (quantidadeMax < 1) {
+      mensagemErro("Valores quantitativos máximos menores que 1 não são permitidos.");
+      return;
+    } else if (quantidadeMin > quantidadeMax) {
+        mensagemErro("Quantidade máxima menor que o mínimo");
+        return;
+    }
+}
