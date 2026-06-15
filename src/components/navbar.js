@@ -2,32 +2,38 @@ import {useEffect, useState} from 'react';
 import 'bootswatch/dist/flatly/bootstrap.css';
 
 import NavbarItem from './navbarItem';
+import { BASE_URL } from '../config/axios';
 
-function Navbar(props) {
-    const [admin, setAdmin] = useState(false);
-    const [url, setUrl] = useState("/cadastro-administrador");
+function Navbar(props) {  
+    const baseURL = `${BASE_URL}/usuario`;
     const [id, setId] = useState(null);
+    const [ perfis, setPerfis] = useState([]);
+    const [url, setUrl] = useState("/cadastro-administrador");
 
     useEffect(() => {
         const idParticipante = Number(localStorage.getItem("idUsuario"));
-        const tipoParticipante = localStorage.getItem("tipoParticipante");
+        try {
+            const response = await axios.get(`${BASE_URL}/${idParticipante}`);
+            const dados = response.data;
+            setDados(dados);
+      
+            setId(dados.id);
+            setPerfis(dados.perfis)
 
-          if (!idParticipante || !tipoParticipante) return;
-          setId(idParticipante);
+            const admin = perfis.includes("ADMINISTRADOR") ? true : false;
+            const organizador = perfis.includes("ORGANIZADOR") ? true : false;
+            const mediador = perfis.includes("MEDIADOR") ? true : false;
+            const participante = id ? true : false;
 
-        if (tipoParticipante === "admin") {
-          setAdmin(true);
-          setUrl("/cadastro-administrador");
-          return;
-        }
-        if (tipoParticipante === "cpf") {
-          setUrl("/cadastro-usuarioCPF");
-        }
-        if (tipoParticipante === "cnpj") {
-          setUrl("/cadastro-usuarioCNPJ");
-        }
-      }, []); 
-
+            if(admin){
+              setUrl("/cadastro-administrador")
+            }
+            
+          } catch (error) {
+            mensagemErro('Erro ao buscar usuário');
+          }
+    }, []); 
+      
   return (
     <div className='navbar navbar-expand-lg fixed-top navbar-dark bg-primary'>
       <div className='container'>
@@ -57,19 +63,19 @@ function Navbar(props) {
           </ul>*/}
 
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/eventos-organizados' label='Sou organizador' />
+            <NavbarItem render={admin || mediador || organizador} href='/eventos-organizados' label='Sou organizador' />
           </ul>
 
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/meus-eventos' label='Meus Eventos' />
+            <NavbarItem render={participante} href='/meus-eventos' label='Meus Eventos' />
           </ul>
 
           <ul className='navbar-nav'>
-            <NavbarItem render={id !== null} href={`${url}/${id}`} label='Perfil' />
+            <NavbarItem render={participante} href={`${url}/${id}`} label='Perfil' />
           </ul>
 
           <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/' label='Sair' />
+            <NavbarItem render={participante} href='/' label='Sair' />
             </ul>
         </div>
       </div>
