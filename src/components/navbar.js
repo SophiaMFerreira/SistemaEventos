@@ -1,7 +1,9 @@
 import {useEffect, useState} from 'react';
 import 'bootswatch/dist/flatly/bootstrap.css';
-
 import NavbarItem from './navbarItem';
+import { mensagemErro } from '../components/toastr';
+
+import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
 function Navbar(props) {  
@@ -10,29 +12,44 @@ function Navbar(props) {
     const [ perfis, setPerfis] = useState([]);
     const [url, setUrl] = useState("/cadastro-administrador");
 
+    const [admin, setAdmin] = useState(false);
+    const [organizador, setOrganizador]=  useState(false);
+    const [mediador, setMediador] = useState(false);
+    const [participante, setParticipante] = useState(false);
+
     useEffect(() => {
-        const idParticipante = Number(localStorage.getItem("idUsuario"));
+      async function carregarUsuario() {
+        const idUsuario = Number(localStorage.getItem("idUsuario"));
+
+        if (!idUsuario) return;
         try {
-            const response = await axios.get(`${BASE_URL}/${idParticipante}`);
-            const dados = response.data;
-            setDados(dados);
-      
-            setId(dados.id);
-            setPerfis(dados.perfis)
-
-            const admin = perfis.includes("ADMINISTRADOR") ? true : false;
-            const organizador = perfis.includes("ORGANIZADOR") ? true : false;
-            const mediador = perfis.includes("MEDIADOR") ? true : false;
-            const participante = id ? true : false;
-
-            if(admin){
-              setUrl("/cadastro-administrador")
-            }
-            
-          } catch (error) {
-            mensagemErro('Erro ao buscar usuário');
+          const response = await axios.get(`${baseURL}/${idUsuario}`);
+          const dados = response.data;
+        
+          setId(dados.id);
+          setPerfis(dados.perfis);
+        
+          if(perfis.includes("ADMINISTRADOR")){
+            setAdmin(true);
+            setUrl("/cadastro-administrador");
+          } 
+          if(perfis.includes("ORGANIZADOR")){
+            setOrganizador(true);
           }
-    }, []); 
+          if(perfis.includes("MEDIADOR")){
+            setMediador(true);
+          }
+          if(id ){
+            setParticipante(true);
+          }
+        } catch (error) {
+          mensagemErro("Erro ao buscar usuário");
+        }
+      }
+    
+      carregarUsuario();
+    }, []);
+
       
   return (
     <div className='navbar navbar-expand-lg fixed-top navbar-dark bg-primary'>
