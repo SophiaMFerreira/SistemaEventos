@@ -196,6 +196,7 @@ const celularFormatado = celular.replace(
         if (!idParam) {
           await axios.post(baseURL, data);
           mensagemSucesso(`Bem vindo ${nome}!`);
+          navigate(`/`);
         } else {
           await axios.put(`${baseURL}/${id}`, data);
           mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
