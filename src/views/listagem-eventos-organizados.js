@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config/axios";
-import { mensagemSucesso, mensagemErro } from "../components/toastr";
+import { mensagemSucesso, mensagemErro, mensagemAlert } from "../components/toastr";
 import BuscarEvento from "../components/input-buscar-evento";
 import "../custom.css";
 import {
@@ -24,7 +24,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import imagemPadrao from "../assets/evento-default.jpg"; // Garanta que o caminho da imagem padrão está correto
+import imagemPadrao from "../assets/evento-default.jpg"; 
 
 const baseURL = `${BASE_URL}/eventos`;
 const baseURLIngresso = `${BASE_URL}/ingressos`;
@@ -36,7 +36,10 @@ function EventosOrganizados() {
   const [dados, setDados] = useState(null);
   const [filtro, setFiltro] = useState("");
   const [ingressos, setIngressos] = useState([]);
-  const eventosNotificados = useRef(new Set());
+
+  const eventosNotificados = useRef(new Set(
+    JSON.parse(localStorage.getItem(`notificados_${idOrganizador}`)) || []
+  ));
 
   const cadastrar = () => navigate(`/cadastro-eventos`);
   const editar = (id) => navigate(`/cadastro-eventos/${id}`);
@@ -78,6 +81,8 @@ function EventosOrganizados() {
   useEffect(() => {
     if (!dados || ingressos.length === 0) return;
 
+    let houveNovaNotificacao = false;
+
     dados.forEach((dado) => {
       const inscritos = ingressos.filter(
         (ing) => Number(ing.idEvento) === dado.id && ing.status === "PAGO",
@@ -87,11 +92,19 @@ function EventosOrganizados() {
         inscritos >= dado.lotacaoMaxima &&
         !eventosNotificados.current.has(dado.id)
       ) {
-        mensagemErro(`Evento ${dado.nome} atingiu a lotação máxima!`);
+        mensagemAlert(`Evento ${dado.nome} atingiu a lotação máxima!`);
         eventosNotificados.current.add(dado.id);
+        houveNovaNotificacao = true;
       }
     });
-  }, [dados, ingressos]);
+
+    if (houveNovaNotificacao) {
+      localStorage.setItem(
+        `notificados_${idOrganizador}`,
+        JSON.stringify(Array.from(eventosNotificados.current))
+      );
+    }
+  }, [dados, ingressos, idOrganizador]);
 
   const formatarMes = (data) => {
     if (!data) return "";
