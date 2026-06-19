@@ -13,10 +13,11 @@ import {
 } from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
 import "../style/listagemDadosEvento.css";
-import imagemEventoBale from "../components/eventoBale.jpg";
 
 import axios from 'axios';
 import { BASE_URL} from '../config/axios';
+import imagemPadrao from "../assets/evento-default.jpg";
+
 
 function ListagemDadosEvento() {
   const baseURL = `${BASE_URL}/eventos`;
@@ -25,7 +26,6 @@ function ListagemDadosEvento() {
   const navigate = useNavigate();
 
   const idParticipante = Number(localStorage.getItem("idUsuario"));
-  const tipoParticipante = localStorage.getItem("tipoParticipante");
 
   const [evento, setEvento] = useState({});
   const [ingresso, setIngresso] = useState(null);
@@ -66,20 +66,7 @@ console.log("INGRESSO ENCONTRADO:", encontrado);
 
 }, [idParam]);
 
-  const formatarData = (dataHora) => {
-  if (!dataHora) return "";
 
-  return new Date(dataHora).toLocaleDateString("pt-BR");
-};
-
-const formatarHora = (dataHora) => {
-  if (!dataHora) return "";
-
-  return new Date(dataHora).toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
   async function inscrever() {
   try {
@@ -144,14 +131,11 @@ const formatarHora = (dataHora) => {
       spacing={4}
       sx={{
         maxWidth: 1100,
-        margin: "0 auto",
+        margin: "80px auto",
         padding: 4,
       }}
     >
-      <Typography variant="h4" fontWeight={600}>
-        Detalhes do evento
-      </Typography>
-
+      
       <Box
         sx={{
           backgroundColor: "#fff",
@@ -213,7 +197,9 @@ const formatarHora = (dataHora) => {
 
         <Box
           component="img"
-          src={imagemEventoBale}
+          src={evento.imagem
+              ? `${BASE_URL}/eventos/imagem/${evento.imagem}`
+              : imagemPadrao}
           sx={{
             width: "100%",
             maxHeight: 320,
