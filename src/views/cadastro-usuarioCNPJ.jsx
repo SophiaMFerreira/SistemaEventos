@@ -7,10 +7,55 @@ import InputsSenha from "../components/form-inputsSenha";
 import "../style/cadastro.css";
 
 import axios from 'axios';
-import { BASE_URL_S } from '../config/axios';
+import { BASE_URL } from '../config/axios';
+
+import React from 'react';
+import { IMaskInput } from 'react-imask';
+
+const TextMaskCNPJ = React.forwardRef(function TextMaskCNPJ(props, ref) {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="00.000.000/0000-00"
+      definitions={{ '0': /[0-9]/ }}
+      inputRef={ref}
+      unmask="typed"
+      onAccept={(value, maskRef) =>
+        onChange?.({
+          target: {
+            name: props.name,
+            value: maskRef.unmaskedValue
+          }
+        })
+      }
+    />
+  );
+});
+
+const TextMaskCelular = React.forwardRef(function TextMaskCelular(props, ref) {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="(00) 00000-0000"
+      definitions={{ '0': /[0-9]/ }}
+      inputRef={ref}
+      unmask="typed"
+      onAccept={(value, maskRef) =>
+        onChange?.({
+          target: {
+            name: props.name,
+            value: maskRef.unmaskedValue
+          }
+        })
+      }
+    />
+  );
+});
 
 function CadastroUsuarioCNPJ() {
-    const baseURL = `${BASE_URL_S}/participanteCNPJ`;
+    const baseURL = `${BASE_URL}/usuario`;
     const { idParam } = useParams();
     const navigate = useNavigate();
 
@@ -25,9 +70,6 @@ function CadastroUsuarioCNPJ() {
     const [cnpj, setCNPJUsuarioCNPJ] = useState("");
     const [email, setEmailUsuarioCNPJ] = useState("");
     const [celular, setCelularUsuarioCNPJ] = useState("");
-    const [siteEmpresa, setSiteEmpresaUsuarioCNPJ] = useState("");
-    const [nomeResponsavelLegal, setNomeResponsavelLegalUsuarioCNPJ] = useState("");
-    const [cpfResponsavelLegal, setCpfResponsavelLegalUsuarioCNPJ] = useState("");
     const [inscricaoEstadualMunicipal, setInscricaoEstadualMunicipalUsuarioCNPJ] = useState("");
     
     const [cep, setCep] = useState("");
@@ -41,74 +83,125 @@ function CadastroUsuarioCNPJ() {
     const [confirmarSenha, setConfirmarSenha] = useState("");
  
     useEffect(() => {
-          if (!idParam) return;
-          axios.get(`${baseURL}/${idParam}`).then((response) => {
-            const dados = response.data;
-            if(dados)
+      if (!idParam) return;
+      axios.get(`${baseURL}/${idParam}`).then((response) => {
+        const dados = response.data;
+        setIdUsuarioCNPJ(dados.id);
+        setRazaoSocialUsuarioCNPJ(dados.razaoSocial);
+        setNomeFantasiaUsuarioCNPJ(dados.nomeFantasia);
+        setCNPJUsuarioCNPJ(dados.cnpj);
+        setEmailUsuarioCNPJ(dados.email);
+        setCelularUsuarioCNPJ(dados.celular);
+        setInscricaoEstadualMunicipalUsuarioCNPJ(dados.inscricaoEstadualMunicipal);
+        
+        if (dados.endereco) {
+          setCep(dados.endereco.cep);
+          setLogradouro(dados.endereco.logradouro);
+          setNumero(dados.endereco.numero);
+          setComplemento(dados.endereco.complemento);
+          setBairro(dados.endereco.bairro);
+          setCidade(dados.endereco.cidade);
+          setEstado(dados.endereco.estado);
+        }
 
-            setIdUsuarioCNPJ(dados.id);
-            setRazaoSocialUsuarioCNPJ(dados.razaoSocial);
-            setNomeFantasiaUsuarioCNPJ(dados.nomeFantasia);
-            setCNPJUsuarioCNPJ(dados.cnpj);
-            setEmailUsuarioCNPJ(dados.email);
-            setCelularUsuarioCNPJ(dados.celular);
-            setSiteEmpresaUsuarioCNPJ(dados.siteEmpresa);
-            setNomeResponsavelLegalUsuarioCNPJ(dados.nomeResponsavelLegal);
-            setCpfResponsavelLegalUsuarioCNPJ(dados.cpfResponsavelLegal);
-            setInscricaoEstadualMunicipalUsuarioCNPJ(dados.inscricaoEstadualMunicipal);
-            setCep(dados.cep);
-            setLogradouro(dados.logradouro);
-            setNumero(dados.numero);
-            setComplemento(dados.complemento);
-            setBairro(dados.bairro);
-            setCidade(dados.cidade);
-            setEstado(dados.estado);
+        setAcao("Edição");
+        setMensagem("Edite seus dados aqui.");
+        setAcaoButton("Editar");
+        setNavegacao("/listagem-eventos");
+      }).catch(() => mensagemErro("Erro ao carregar usuário"));
+    }, [idParam, baseURL]);
     
-            setAcao("Edição");
-            setMensagem("Edite seus dados aqui.");
-            setAcaoButton("Editar");
-            setNavegacao("/listagem-eventos");
-          });
-      }, [idParam, baseURL]);
-    
-      async function save(e) {
-        e.preventDefault();
-        if (senha !== confirmarSenha) {
-          return;
-        }
-         
-        const data = { id, razaoSocial, nomeFantasia, cnpj, email, celular, cep, logradouro, numero, complemento, bairro, cidade, estado, siteEmpresa, nomeResponsavelLegal, cpfResponsavelLegal, inscricaoEstadualMunicipal};
-        try {
-          if (!idParam) {
-            await axios.post(baseURL, data);
-              mensagemSucesso(`Bem vindo ${nomeFantasia}!`);
-          } else {
-            await axios.put(`${baseURL}/${idParam}`, data);
-              mensagemSucesso(`${nomeFantasia} seus dados foram alterados com sucesso!`);
-          }
-          navigate("/listagem-eventos");
-        } catch (error) {
-          mensagemErro(error.response.data);
-        }
+    async function save(e) {
+      e.preventDefault();
+      if (senha !== confirmarSenha) {
+        mensagemErro("As senhas não coincidem");
+        return;
+      }
+      
+      const senhaValida = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+      const cnpjValido = /^\d{14}$/;
+      const celularValido = /^\d{11}$/;
+      const celularCom9 = /^9/;
+
+      if (!cnpjValido.test(cnpj)) {
+        mensagemErro("CNPJ inválido ou incompleto.");
+        return;
       }
 
-  async function exclude() {
-    let data = JSON.stringify({ idParam });
-    let url = `${baseURL}/${idParam}`;
-    await axios
-      .delete(url, data, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      .then(function (response) {
-        mensagemSucesso(`Usuário ${nomeFantasia} excluído com sucesso!`);
-        navigate(`/`);
-      })
-      .catch(function (error) {
-        mensagemErro(`Erro ao excluir o usuário ${nomeFantasia}`);
-      });
-  }
+      if (!celularValido.test(celular) || !celularCom9.test(celular.substring(2))) {
+        mensagemErro("Celular inválido. Use um número móvel que comece com 9 após o DDD.");
+        return;
+      }
 
-  return (
+      if (!senhaValida.test(senha)) {
+        mensagemErro("Senha deve ter mínimo 6 caracteres e incluir número, maiúscula, minúscula e símbolo");
+        return;
+      }
+
+      const cnpjFormatado = cnpj.replace(
+        /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+        "$1.$2.$3/$4-$5"
+      );
+
+      const celularFormatado = celular.replace(
+        /^(\d{2})(\d{5})(\d{4})$/,
+        "($1) $2-$3"
+      );
+
+      const cepFormatado = cep.replace(
+        /^(\d{5})(\d{3})$/,
+        "$1-$2"
+      );
+
+      const data = {
+        tipoUsuario: "PJ",
+        razaoSocial,
+        nomeFantasia,
+        cnpj: cnpjFormatado,
+        inscricaoEstadualMunicipal,
+        email,
+        celular: celularFormatado,
+        senha,
+        endereco: {
+          cep: cepFormatado,
+          logradouro,
+          numero,
+          complemento,
+          bairro,
+          cidade,
+          estado
+        },
+        perfis: ["PARTICIPANTE"]
+      };
+
+      try {
+        if (!idParam) {
+          await axios.post(baseURL, data);
+          mensagemSucesso(`Bem vindo ${nomeFantasia}!`);
+        } else {
+          await axios.put(`${baseURL}/${id}`, data);
+          mensagemSucesso(`${nomeFantasia} seus dados foram alterados com sucesso!`);
+        }
+        navigate("/listagem-eventos");
+      } catch (error) {
+        mensagemErro(error?.response?.data?.message || "Erro ao salvar usuário");
+      }
+    }
+
+    async function exclude() {
+      let url = `${baseURL}/${id}`;
+      await axios
+        .delete(url)
+        .then(() => {
+          mensagemSucesso(`Usuário ${nomeFantasia} excluído com sucesso!`);
+          navigate(`/`);
+        })
+        .catch(() => {
+          mensagemErro(`Erro ao excluir o usuário ${nomeFantasia}`);
+        });
+    }
+
+    return (
       <Grid container direction="column" sx={{ minHeight: "100vh", width: "100%", overflow: "hidden", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }} >
         <Paper elevation={3} sx={{ width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", p: { xs: 2, sm: 4 }}}>
           <Typography component="h1" variant="h3">{acao} de Usuários</Typography>
@@ -127,7 +220,15 @@ function CadastroUsuarioCNPJ() {
             </Grid>
             <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">CNPJ*</Typography>
-                <TextField name="cnpj" placeholder="00.000.000/0001-00" value={cnpj} onChange={(e) => setCNPJUsuarioCNPJ(e.target.value)} required fullWidth/>
+                <TextField
+                  name="cnpj"
+                  placeholder="00.000.000/0001-00"
+                  value={cnpj}
+                  onChange={(e) => setCNPJUsuarioCNPJ(e.target.value)}
+                  required
+                  fullWidth
+                  InputProps={{ inputComponent: TextMaskCNPJ }}
+                />
             </Grid>
             <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">Email*</Typography>
@@ -135,11 +236,19 @@ function CadastroUsuarioCNPJ() {
             </Grid>
             <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
                 <Typography variant="body1" className="label">Celular*</Typography>
-                <TextField name="celular" placeholder="+00 (00) 00000-0000" value={celular} onChange={(e) => setCelularUsuarioCNPJ(e.target.value)} required fullWidth/>
+                <TextField
+                  name="celular"
+                  placeholder="(32) 99999-9999"
+                  value={celular}
+                  onChange={(e) => setCelularUsuarioCNPJ(e.target.value)}
+                  required
+                  fullWidth
+                  InputProps={{ inputComponent: TextMaskCelular }}
+                />
             </Grid>
             <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
-                <Typography variant="body1" className="label">Site oficial</Typography>
-                <TextField name="siteEmpresa" placeholder="www.minhaEmpresa.com" value={siteEmpresa} onChange={(e) => setSiteEmpresaUsuarioCNPJ(e.target.value)} required fullWidth/>
+                <Typography variant="body1" className="label">Inscrição Estadual/Municipal*</Typography>
+                <TextField name="inscricaoEstadualMunicipal" placeholder="000000000" value={inscricaoEstadualMunicipal} onChange={(e) => setInscricaoEstadualMunicipalUsuarioCNPJ(e.target.value)} required fullWidth/>
             </Grid>
             <InputsEndereco cep={cep} setCep={setCep}
                             logradouro={logradouro} setLogradouro={setLogradouro}
@@ -149,18 +258,6 @@ function CadastroUsuarioCNPJ() {
                             numero={numero} setNumero={setNumero}
                             complemento={complemento} setComplemento={setComplemento}
             />
-            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
-                <Typography variant="body1" className="label">Nome do responsável legal*</Typography>
-                <TextField name="nomeResponsavelLegal" placeholder="Nome completo do responsável legal" value={nomeResponsavelLegal} onChange={(e) => setNomeResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth/>
-            </Grid>
-            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
-                <Typography variant="body1" className="label">CPF do responsável legal*</Typography>
-                <TextField name="cpfResponsavelLegal" placeholder="000.000.000-00" value={cpfResponsavelLegal} onChange={(e) => setCpfResponsavelLegalUsuarioCNPJ(e.target.value)} required fullWidth/>
-            </Grid>
-            <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%"}}>
-                <Typography variant="body1" className="label">Inscrição Estatual/Municipal*</Typography>
-                <TextField name="inscricaoEstadualMunicipal" placeholder="000000000" value={inscricaoEstadualMunicipal} onChange={(e) => setInscricaoEstadualMunicipalUsuarioCNPJ(e.target.value)} required fullWidth/>
-            </Grid>
             <InputsSenha  senha={senha}  setSenha={setSenha}
                           confirmarSenha={confirmarSenha}  setConfirmarSenha={setConfirmarSenha}
             />
@@ -174,7 +271,7 @@ function CadastroUsuarioCNPJ() {
           </Grid>
         </Paper>
       </Grid>
-  );
+    );
 }
 
 export default CadastroUsuarioCNPJ;

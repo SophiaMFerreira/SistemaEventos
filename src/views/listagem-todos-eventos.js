@@ -7,7 +7,7 @@ import BuscarEvento from '../components/input-buscar-evento';
 import { useNavigate } from 'react-router-dom';
 
 
-const baseURL = `${BASE_URL}/evento`;
+const baseURL = `${BASE_URL}/eventos`;
 const baseTipoURL = `${BASE_URL}/tipoEvento`;
 
 function ListagemEventos() {
@@ -15,8 +15,7 @@ function ListagemEventos() {
   const [dados, setDados] = React.useState(null);
   const [tiposEvento, setTiposEvento] = React.useState([]);
   const [filtroNome, setFiltroNome] = React.useState('');
-  const [filtroTipo, setFiltroTipo] = React.useState('');
-
+const [filtroTipo, setFiltroTipo] = React.useState(null);
 
   React.useEffect(() => {
     axios.get(baseURL).then((response) => {
@@ -25,17 +24,25 @@ function ListagemEventos() {
   }, []);
 
   React.useEffect(() => {
-    axios.get(baseTipoURL).then((response) => {
-      setTiposEvento(response.data);
+  axios.get(baseTipoURL)
+    .then((response) => {
+      const res = response.data;
+      const tipos = Array.isArray(res) ? res : (res?.content || res?.items || []);
+      setTiposEvento(tipos);
+      console.log('Tipos evento carregados:', tipos);
+    })
+    .catch((err) => {
+      console.error('Erro ao carregar tipos de evento:', err);
+      setTiposEvento([]);
     });
-  }, []);
+}, []);
 
   if (!dados) return <p>Carregando eventos...</p>;
 
 
 
 const eventosFiltrados = dados.filter(ev => {
-  const matchNome = ev.nomeEvento.toLowerCase().includes(filtroNome.toLowerCase());
+  const matchNome = ev.nome.toLowerCase().includes(filtroNome.toLowerCase());
   const matchTipo = filtroTipo ? ev.idTipoEvento === filtroTipo : true;
   return matchNome && matchTipo;
 });
@@ -66,7 +73,7 @@ const eventosFiltrados = dados.filter(ev => {
     className={`btn ${filtroTipo === tipo.id ? 'btn-primary' : 'btn-secondary'} me-2`}
     onClick={() => setFiltroTipo(tipo.id)}
   >
-    {tipo.nomeTipoEvento}
+    {tipo.nome}
   </button>
 ))}
               <table className='table table-hover'>
@@ -85,11 +92,24 @@ const eventosFiltrados = dados.filter(ev => {
                     onClick={() => navigate(`/meus-eventos/${dado.id}`)}
                     style={{ cursor: 'pointer' }}   
                     >
-                      <td>{dado.nomeEvento}</td>
-                      <td>{new Date(dado.dataInicio).toLocaleDateString('pt-BR')}</td>
-                      <td>{new Date(dado.dataFim).toLocaleDateString('pt-BR')}</td>
-                      <td>{dado.horaInicio}</td>
-                      <td>{dado.cidade}</td>
+                      <td>{dado.nome}</td>
+                      
+                      <td>{dado.dataHoraInicio ? new Date(dado.dataHoraInicio).toLocaleDateString('pt-BR'): '-'}</td>
+
+                    <td>
+                      {dado.dataHoraFim
+                        ? new Date(dado.dataHoraFim).toLocaleDateString('pt-BR')
+                        : '-'}
+                    </td>
+                    <td>
+  {dado.dataHoraInicio
+    ? new Date(dado.dataHoraInicio).toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : '-'}
+</td>
+                      <td>{dado.endereco.cidade}</td>
                       </tr>
                   ))}
                 </tbody>

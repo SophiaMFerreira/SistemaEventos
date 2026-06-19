@@ -4,12 +4,15 @@ import Box from "@mui/material/Box";
 import InsertInvitationOutlinedIcon from "@mui/icons-material/InsertInvitationOutlined";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
 
+const flexRowStyle = {
+  display: "flex",
+  gap: 1,
+};
+
 function BoxInfoEvento({
   nomeEvento,
   dataInicioEvento,
-  horaInicioEvento,
   dataFimEvento,
-  horaFimEvento,
   cep,
   logradouro,
   bairro,
@@ -25,7 +28,7 @@ function BoxInfoEvento({
   let valor = "";
 
   if (infoLateral === "Participantes") {
-    mensagem = "Lotação máxima";
+    mensagem = "Capacidade máxima"; 
     valor = lotacaoMaxima;
   }
 
@@ -34,10 +37,17 @@ function BoxInfoEvento({
     valor = statusPagamento ? "Pago" : "A pagar";
   }
 
-  const formatarData = (data) => {
-    if (!data) return "";
-    const [ano, mes, dia] = data.split("-");
-    return `${dia}/${mes}/${ano}`;
+  const formatarData = (dataHora) => {
+    if (!dataHora) return "";
+    return new Date(dataHora).toLocaleDateString("pt-BR");
+  };
+
+  const formatarHora = (dataHora) => {
+    if (!dataHora) return "";
+    return new Date(dataHora).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -49,40 +59,23 @@ function BoxInfoEvento({
         mb: 3,
       }}
     >
-      <Typography
-        variant="h5"
-        fontWeight={600}
-        sx={{ mb: 2 }}
-      >
+      <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
         {nomeEvento}
       </Typography>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              mb: 2,
-            }}
-          >
+          <Box sx={{ ...flexRowStyle, alignItems: "center", mb: 2 }}>
             <InsertInvitationOutlinedIcon color="primary" />
             <Typography variant="body1">
               <strong>
-                {formatarData(dataInicioEvento)} {horaInicioEvento}
+                {formatarData(dataInicioEvento)} {formatarHora(dataInicioEvento)}
               </strong>{" "}
-              — {formatarData(dataFimEvento)} {horaFimEvento}
+              — {formatarData(dataFimEvento)} {formatarHora(dataFimEvento)}
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 1,
-            }}
-          >
+          <Box sx={{ ...flexRowStyle, alignItems: "flex-start" }}>
             <FmdGoodOutlinedIcon color="primary" />
             <Typography variant="body2" color="text.secondary">
               CEP {cep} — {logradouro}, {numero}
@@ -107,11 +100,7 @@ function BoxInfoEvento({
               justifyContent: "center",
             }}
           >
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 0.5 }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
               {mensagem}
             </Typography>
 
