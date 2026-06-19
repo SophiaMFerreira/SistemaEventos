@@ -1,56 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-
-import Card from "../components/card";
-import { mensagemSucesso, mensagemErro } from "../components/toastr";
-
-import "../custom.css";
-
 import { useNavigate } from "react-router-dom";
-
-import Stack from "@mui/material/Stack";
-import { IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-
-import BuscarEvento from "../components/input-buscar-evento";
 import { BASE_URL } from "../config/axios";
+import { mensagemSucesso, mensagemErro } from "../components/toastr";
+import BuscarEvento from "../components/input-buscar-evento";
+import "../custom.css";
+import {
+  Grid,
+  Button,
+  Box,
+  Typography,
+  Skeleton,
+  Card as MuiCard,
+  CardMedia,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Chip,
+} from "@mui/material";
+
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import imagemPadrao from "../assets/evento-default.jpg"; // Garanta que o caminho da imagem padrão está correto
 
 const baseURL = `${BASE_URL}/eventos`;
 const baseURLIngresso = `${BASE_URL}/ingressos`;
 
 function EventosOrganizados() {
   const navigate = useNavigate();
-
-  const cadastrar = () => {
-    navigate(`/cadastro-eventos`);
-  };
-
-  const editar = (id) => {
-    navigate(`/cadastro-eventos/${id}`);
-  };
-
   const idOrganizador = Number(localStorage.getItem("idUsuario"));
-  const [dados, setDados] = React.useState(null);
-  const [filtro, setFiltro] = React.useState("");
-  const [ingressos, setIngressos] = React.useState([]);
-  const eventosNotificados = React.useRef(new Set());
-  const [idTipoEvento, setIdTipoEvento] = useState(0);
 
-  const eventosFiltrados = dados
-    ? dados.filter((ev) => ev.nome.toLowerCase().includes(filtro.toLowerCase()))
-    : [];
+  const [dados, setDados] = useState(null);
+  const [filtro, setFiltro] = useState("");
+  const [ingressos, setIngressos] = useState([]);
+  const eventosNotificados = useRef(new Set());
+
+  const cadastrar = () => navigate(`/cadastro-eventos`);
+  const editar = (id) => navigate(`/cadastro-eventos/${id}`);
 
   async function excluir(id) {
-    let data = JSON.stringify({ id });
     let url = `${baseURL}/${id}`;
-
     try {
       await axios.delete(url, {
         data: { id },
         headers: { "Content-Type": "application/json" },
       });
-
       mensagemSucesso("Evento excluído com sucesso!");
       setDados(dados.filter((dado) => dado.id !== id));
     } catch (error) {
@@ -58,24 +55,27 @@ function EventosOrganizados() {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function buscarDados() {
-      const respEventos = await axios.get(baseURL);
-      const respIngressos = await axios.get(baseURLIngresso);
-      console.log("INGRESSOS:", JSON.stringify(respIngressos.data, null, 2));
+      try {
+        const respEventos = await axios.get(baseURL);
+        const respIngressos = await axios.get(baseURLIngresso);
 
-      const meusEventos = respEventos.data.filter(
-        (ev) => Number(ev.idOrganizador) === idOrganizador,
-      );
+        const meusEventos = respEventos.data.filter(
+          (ev) => Number(ev.idOrganizador) === idOrganizador,
+        );
 
-      setDados(meusEventos);
-      setIngressos(respIngressos.data);
+        setDados(meusEventos);
+        setIngressos(respIngressos.data);
+      } catch (error) {
+        console.error(error);
+        mensagemErro("Erro ao carregar os dados");
+      }
     }
-
     buscarDados();
   }, [idOrganizador]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!dados || ingressos.length === 0) return;
 
     dados.forEach((dado) => {
@@ -93,101 +93,294 @@ function EventosOrganizados() {
     });
   }, [dados, ingressos]);
 
-  if (!dados) return null;
+  const formatarMes = (data) => {
+    if (!data) return "";
+    return new Date(data)
+      .toLocaleString("pt-BR", { month: "short" })
+      .replace(".", "")
+      .toUpperCase();
+  };
+
+  const formatarDia = (data) => {
+    if (!data) return "";
+    return String(new Date(data).getDate()).padStart(2, "0");
+  };
+
+  const eventosFiltrados = dados
+    ? dados.filter((ev) => ev.nome.toLowerCase().includes(filtro.toLowerCase()))
+    : [];
+
+  if (!dados) {
+    return (
+      <div
+        className="container"
+        style={{ marginTop: "120px", marginBottom: "60px" }}
+      >
+        <Grid container spacing={4}>
+          {[1, 2, 3].map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item}>
+              <Skeleton
+                variant="rounded"
+                height={360}
+                sx={{ borderRadius: "18px" }}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+    );
+  }
 
   return (
-    <div className="container" style={{ marginTop: "120px" }}>
-      <Card title="Eventos Organizados">
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="bs-component">
-              <button
-                type="button"
-                className="btn btn-warning"
-                onClick={cadastrar}
+    <div
+      className="container"
+      style={{ marginTop: "120px", marginBottom: "60px" }}
+    >
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={cadastrar}>
+          Novo Evento
+        </Button>
+      </Box>
+
+      <Box sx={{ justifyContent: "center", display: "flex", mb: 4 }}>
+        <BuscarEvento
+          value={filtro}
+          onChange={setFiltro}
+          placeholder="Digite o nome do evento para buscar..."
+        />
+      </Box>
+
+      <Grid container spacing={4}>
+        {eventosFiltrados.map((evento) => {
+          const totalInscritos = ingressos.filter(
+            (ing) =>
+              Number(ing.idEvento) === Number(evento.id) &&
+              ing.status === "PAGO",
+          ).length;
+
+          const isLotado = totalInscritos >= (evento.lotacaoMaxima || 0);
+
+          return (
+            <Grid item xs={12} sm={6} md={4} key={evento.id}>
+              <MuiCard
+                onClick={() => navigate(`/eventos-organizados/${evento.id}`)}
+                sx={{
+                  cursor: "pointer",
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  height: "100%",
+                  backgroundColor: "#fff",
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  border: "1px solid #eee",
+                  transition: "all .3s ease",
+                  boxShadow: "0px 6px 20px rgba(0,0,0,0.03)",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    borderColor: "#1E66F5",
+                    boxShadow: "0px 15px 35px rgba(30, 102, 245, 0.1)",
+                  },
+                  "&:hover img": {
+                    transform: "scale(1.05)",
+                  },
+                  "&:hover .admin-btn": {
+                    opacity: 1,
+                  },
+                }}
               >
-                Novo Evento
-              </button>
+                <Box
+                  className="admin-btn"
+                  onClick={(e) => e.stopPropagation()}
+                  sx={{
+                    position: "absolute",
+                    top: 14,
+                    right: 14,
+                    zIndex: 10,
+                    display: "flex",
+                    gap: 1,
+                    opacity: { xs: 1, md: 0 },
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <Tooltip title="Editar Evento">
+                    <IconButton
+                      size="small"
+                      onClick={() => editar(evento.id)}
+                      sx={{
+                        backgroundColor: "rgba(255, 255, 255, 0.90)",
+                        backdropFilter: "blur(4px)",
+                        border: "1px solid #eee",
+                        color: "#1E66F5",
+                        "&:hover": {
+                          backgroundColor: "#1E66F5",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
 
-              <BuscarEvento
-                value={filtro}
-                onChange={setFiltro}
-                placeholder="Digite nome do evento"
-              />
+                  <Tooltip title="Excluir Evento">
+                    <IconButton
+                      size="small"
+                      onClick={() => excluir(evento.id)}
+                      sx={{
+                        backgroundColor: "rgba(255, 255, 255, 0.90)",
+                        backdropFilter: "blur(4px)",
+                        border: "1px solid #eee",
+                        color: "#d32f2f",
+                        "&:hover": {
+                          backgroundColor: "#d32f2f",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
 
-              <table className="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Dia</th>
-                    <th>Mês</th>
-                    <th>Cidade</th>
-                    <th>Quantidade de vagas</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
+                <Box sx={{ overflow: "hidden", height: 230 }}>
+                  <CardMedia
+                    component="img"
+                    height="230"
+                    image={
+                      evento.imagem
+                        ? `${BASE_URL}/eventos/imagem/${evento.imagem}`
+                        : imagemPadrao
+                    }
+                    alt={evento.nome}
+                    sx={{
+                      transition: "transform .4s ease",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
 
-                <tbody>
-                  {eventosFiltrados.map((dado) => {
-                    const data = new Date(dado.dataHoraInicio);
-                    const dia = data.getDate();
-                    const mes = data.toLocaleString("pt-BR", { month: "long" });
-                    const inscritos = ingressos.filter(
-                      (ing) =>
-                        Number(ing.idEvento) === Number(dado.id) &&
-                        ing.status === "PAGO",
-                    ).length;
-                    console.log("INSCRITOS PAGOS:", inscritos);
-                    const vagas =
-                      inscritos >= dado.lotacaoMaxima
-                        ? "Lotação Máxima"
-                        : `${inscritos}/${dado.lotacaoMaxima}`;
-                    return (
-                      <tr
-                        key={dado.id}
-                        style={{ cursor: "pointer" }}
-                        onClick={() =>
-                          navigate(`/eventos-organizados/${dado.id}`)
-                        }
+                <CardContent
+                  sx={{
+                    p: 2.5,
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", flexGrow: 1, mb: 2 }}>
+                    <Box sx={{ minWidth: 50, textAlign: "center", mr: 2 }}>
+                      <Typography
+                        sx={{ color: "#FF6B00", fontWeight: 700, fontSize: 13 }}
                       >
-                        <td>{dado.nome}</td>
-                        <td>{dia}</td>
-                        <td>{mes}</td>
-                        <td>{dado.endereco.cidade}</td>
-                        <td>{vagas}</td>
-                        <td>
-                          <Stack spacing={1} padding={0} direction="row">
-                            <IconButton
-                              aria-label="edit"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                editar(dado.id);
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
+                        {formatarMes(evento.dataHoraInicio)}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#0B3B91",
+                          fontWeight: 700,
+                          fontSize: 22,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {formatarDia(evento.dataHoraInicio)}
+                      </Typography>
+                    </Box>
 
-                            <IconButton
-                              aria-label="delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                excluir(dado.id);
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Stack>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </Card>
+                    <Box flex={1}>
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1.1rem",
+                          color: "#0B3B91",
+                          mb: 0.5,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {evento.nome}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          color: "#666",
+                          mb: 1,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {evento.dataHoraInicio
+                          ? `${new Date(evento.dataHoraInicio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}h`
+                          : "-"}
+                      </Typography>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
+                        <LocationOnIcon sx={{ fontSize: 16, color: "#888" }} />
+                        <Typography
+                          sx={{ fontSize: 13, color: "#888", fontWeight: 500 }}
+                        >
+                          {evento.endereco?.cidade || "Não informada"}
+                          {evento.endereco?.estado
+                            ? `, ${evento.endereco.estado}`
+                            : ""}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Box
+                    sx={{ mt: "auto", pt: 1, borderTop: "1px solid #f9f9f9" }}
+                  >
+                    {isLotado ? (
+                      <Chip
+                        label="LOTAÇÃO MÁXIMA"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#d32f2f",
+                          color: "#ffffff",
+                          fontWeight: 700,
+                          fontSize: "11px",
+                          borderRadius: "6px",
+                          px: 0.5,
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        icon={
+                          <PeopleAltOutlinedIcon
+                            style={{ fontSize: 14, color: "#666" }}
+                          />
+                        }
+                        label={`${totalInscritos} / ${evento.lotacaoMaxima || 0} vagas`}
+                        size="small"
+                        variant="outlined"
+                        sx={{
+                          borderColor: "#e0e0e0",
+                          color: "text.secondary",
+                          fontWeight: 600,
+                          fontSize: "12px",
+                          borderRadius: "6px",
+                          backgroundColor: "#fafafa",
+                        }}
+                      />
+                    )}
+                  </Box>
+                </CardContent>
+              </MuiCard>
+            </Grid>
+          );
+        })}
+      </Grid>
+
+      {eventosFiltrados.length === 0 && (
+        <Typography
+          sx={{ mt: 6, textAlign: "center", color: "text.secondary" }}
+        >
+          Nenhum evento organizado encontrado.
+        </Typography>
+      )}
     </div>
   );
 }
+
 export default EventosOrganizados;
