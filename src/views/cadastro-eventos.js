@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import Stack from '@mui/material/Stack';
-import Card from '../components/card';
-import FormGroup from '../components/form-group';
-import { mensagemSucesso, mensagemErro } from '../components/toastr';
+import Stack from "@mui/material/Stack";
+import Card from "../components/card";
+import FormGroup from "../components/form-group";
+import { mensagemSucesso, mensagemErro } from "../components/toastr";
 
-import '../custom.css';
-import axios from 'axios';
-import { BASE_URL } from '../config/axios';
+import "../custom.css";
+import axios from "axios";
+import { BASE_URL } from "../config/axios";
 
 function CadastroEvento() {
   const { idParam } = useParams();
@@ -16,51 +16,52 @@ function CadastroEvento() {
 
   const baseURL = `${BASE_URL}/eventos`;
 
-  const [id, setId] = useState('');
-  const [nome, setNome] = useState('');
-  const [modalidade, setModalidade] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [id, setId] = useState("");
+  const [nome, setNome] = useState("");
+  const [imagem, setImagem] = useState(null);
+  const [modalidade, setModalidade] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [valorIngresso, setValorIngresso] = useState(0);
   const [idadeMinima, setIdadeMinima] = useState(0);
   const [lotacaoMaxima, setLotacaoMaxima] = useState(0);
-  const [dataInicio, setDataInicio] = useState('');
-  const [horaInicio, setHoraInicio] = useState('');
-  const [dataFim, setDataFim] = useState('');
-  const [horaFim, setHoraFim] = useState('');
-  const [cep, setCep] = useState('');
-  const [logradouro, setLogradouro] = useState('');
-  const [numero, setNumero] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
+  const [dataInicio, setDataInicio] = useState("");
+  const [horaInicio, setHoraInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const [horaFim, setHoraFim] = useState("");
+  const [cep, setCep] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
   const [idTipoEvento, setIdTipoEvento] = useState(0);
   const [idPorteEvento, setIdPorteEvento] = useState(0);
 
   const [dados, setDados] = useState(null);
 
-  const idOrganizador = Number(localStorage.getItem('idUsuario') || 0);
+  const idOrganizador = Number(localStorage.getItem("idUsuario") || 0);
 
   function inicializar() {
     if (!idParam) {
-      setId('');
-      setNome('');
-      setModalidade('');
-      setDescricao('');
+      setId("");
+      setNome("");
+      setModalidade("");
+      setDescricao("");
       setValorIngresso(0);
       setIdadeMinima(0);
       setLotacaoMaxima(0);
-      setDataInicio('');
-      setHoraInicio('');
-      setDataFim('');
-      setHoraFim('');
-      setCep('');
-      setLogradouro('');
-      setNumero('');
-      setComplemento('');
-      setBairro('');
-      setCidade('');
-      setEstado('');
+      setDataInicio("");
+      setHoraInicio("");
+      setDataFim("");
+      setHoraFim("");
+      setCep("");
+      setLogradouro("");
+      setNumero("");
+      setComplemento("");
+      setBairro("");
+      setCidade("");
+      setEstado("");
       setIdTipoEvento(0);
       setIdPorteEvento(0);
     } else if (dados) {
@@ -91,14 +92,14 @@ function CadastroEvento() {
 
   async function salvar() {
     if (!idOrganizador) {
-      mensagemErro('Usuário não autenticado.');
+      mensagemErro("Usuário não autenticado.");
       return;
     }
 
-      if (idadeMinima < 0 || idadeMinima > 18) {
-  mensagemErro("A idade mínima deve ser maior ou igual a 18 anos.");
-  return;
-}
+    if (idadeMinima < 0 || idadeMinima > 18) {
+      mensagemErro("A idade mínima deve ser maior ou igual a 18 anos.");
+      return;
+    }
 
     const dataHoraInicio =
       dataInicio && horaInicio
@@ -128,27 +129,46 @@ function CadastroEvento() {
         complemento,
         bairro,
         cidade,
-        estado
+        estado,
       },
       idOrganizador,
       idTipoEvento: Number(idTipoEvento) || 0,
-      idPorteEvento: Number(idPorteEvento) || 0
+      idPorteEvento: Number(idPorteEvento) || 0,
     };
 
-    console.log("Payload enviado:", payload);
     try {
       console.log("Payload:", payload);
+      let eventoId = idParam;
+
       if (!idParam) {
-        await axios.post(baseURL, payload);
+        const response = await axios.post(baseURL, payload);
+        eventoId = response.data.id || response.data;
         mensagemSucesso(`Evento ${nome} cadastrado com sucesso!`);
       } else {
         await axios.put(`${baseURL}/${idParam}`, payload);
         mensagemSucesso(`Evento ${nome} alterado com sucesso!`);
       }
 
-      navigate('/eventos-organizados');
+      if (imagem && eventoId) {
+        const formData = new FormData();
+        formData.append("file", imagem);
+
+        await axios.post(
+          `${baseURL}/${eventoId}/upload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
+      navigate("/eventos-organizados");
     } catch (error) {
-      mensagemErro(error?.response?.data || error.message || 'Erro ao salvar evento');
+      mensagemErro(
+        error?.response?.data || error.message || "Erro ao salvar evento",
+      );
     }
   }
 
@@ -159,9 +179,9 @@ function CadastroEvento() {
       setDados(dados);
 
       setId(dados.id);
-      setNome(dados.nome || '');
-      setModalidade(dados.modalidade || '');
-      setDescricao(dados.descricao || '');
+      setNome(dados.nome || "");
+      setModalidade(dados.modalidade || "");
+      setDescricao(dados.descricao || "");
       setValorIngresso(dados.valorIngresso ?? 0);
       setIdadeMinima(dados.idadeMinima ?? 0);
       setLotacaoMaxima(dados.lotacaoMaxima ?? 0);
@@ -171,8 +191,8 @@ function CadastroEvento() {
         setDataInicio(di.toISOString().slice(0, 10));
         setHoraInicio(di.toTimeString().slice(0, 5));
       } else {
-        setDataInicio('');
-        setHoraInicio('');
+        setDataInicio("");
+        setHoraInicio("");
       }
 
       if (dados.dataHoraFim) {
@@ -180,50 +200,55 @@ function CadastroEvento() {
         setDataFim(df.toISOString().slice(0, 10));
         setHoraFim(df.toTimeString().slice(0, 5));
       } else {
-        setDataFim('');
-        setHoraFim('');
+        setDataFim("");
+        setHoraFim("");
       }
 
       if (dados.endereco) {
-        setCep(dados.endereco.cep || '');
-        setLogradouro(dados.endereco.logradouro || '');
-        setNumero(dados.endereco.numero || '');
-        setComplemento(dados.endereco.complemento || '');
-        setBairro(dados.endereco.bairro || '');
-        setCidade(dados.endereco.cidade || '');
-        setEstado(dados.endereco.estado || '');
+        setCep(dados.endereco.cep || "");
+        setLogradouro(dados.endereco.logradouro || "");
+        setNumero(dados.endereco.numero || "");
+        setComplemento(dados.endereco.complemento || "");
+        setBairro(dados.endereco.bairro || "");
+        setCidade(dados.endereco.cidade || "");
+        setEstado(dados.endereco.estado || "");
       }
 
       setIdTipoEvento(dados.idTipoEvento ?? 0);
       setIdPorteEvento(dados.idPorteEvento ?? 0);
-
     } catch (error) {
-      mensagemErro('Erro ao buscar evento');
+      mensagemErro("Erro ao buscar evento");
     }
   }
 
   useEffect(() => {
-  if (idParam) {
-    buscar();
-  }
-}, [idParam]);
+    if (idParam) {
+      buscar();
+    }
+  }, [idParam]);
 
   const [dadosTipoEvento, setDadosTipoEvento] = useState([]);
   const [dadosPorteEvento, setDadosPorteEvento] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/tipoEvento`)
+    axios
+      .get(`${BASE_URL}/tipoEvento`)
       .then((response) => {
         const res = response.data;
-        const tipos = Array.isArray(res) ? res : (res?.content || res?.items || []);
+        const tipos = Array.isArray(res)
+          ? res
+          : res?.content || res?.items || [];
         setDadosTipoEvento(tipos);
       })
       .catch(() => setDadosTipoEvento([]));
 
-    axios.get(`${BASE_URL}/porteEvento`)
+    axios
+      .get(`${BASE_URL}/porteEvento`)
       .then((response) => {
         const res = response.data;
-        const portes = Array.isArray(res) ? res : (res?.content || res?.items || []);
+        const portes = Array.isArray(res)
+          ? res
+          : res?.content || res?.items || [];
         setDadosPorteEvento(portes);
       })
       .catch(() => setDadosPorteEvento([]));
@@ -233,39 +258,47 @@ function CadastroEvento() {
   if (!dadosPorteEvento) return null;
 
   return (
-    <div className='container' style={{ marginTop: '120px' }}>
-      <Card title='Cadastro de Evento'>
-        <div className='row'>
-          <div className='col-lg-12'>
-            <div className='bs-component'>
-
-              <FormGroup label='Nome do Evento: *' htmlFor='inputNome'>
+    <div className="container" style={{ marginTop: "120px" }}>
+      <Card title="Cadastro de Evento">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="bs-component">
+              <FormGroup label="Nome do Evento: *" htmlFor="inputNome">
                 <input
-                  type='text'
-                  id='inputNome'
+                  type="text"
+                  id="inputNome"
                   value={nome}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setNome(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Modalidade: *' htmlFor='selectModalidade'>
+              <FormGroup label="Imagem do Evento:">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-control"
+                  onChange={(e) => setImagem(e.target.files[0])}
+                />
+              </FormGroup>
+
+              <FormGroup label="Modalidade: *" htmlFor="selectModalidade">
                 <select
-                  id='selectModalidade'
-                  className='form-select'
+                  id="selectModalidade"
+                  className="form-select"
                   value={modalidade}
                   onChange={(e) => setModalidade(e.target.value)}
                 >
-                  <option value=''>Selecione</option>
-                  <option value='PRESENCIAL'>Presencial</option>
-                  <option value='ONLINE'>Online</option>
-                  <option value='HIBRIDO'>Híbrido</option>
+                  <option value="">Selecione</option>
+                  <option value="PRESENCIAL">Presencial</option>
+                  <option value="ONLINE">Online</option>
+                  <option value="HIBRIDO">Híbrido</option>
                 </select>
               </FormGroup>
 
-              <FormGroup label='Tipo de Evento: *' htmlFor='selectTipoEvento'>
+              <FormGroup label="Tipo de Evento: *" htmlFor="selectTipoEvento">
                 <select
-                  className='form-select'
+                  className="form-select"
                   value={idTipoEvento}
                   onChange={(e) => setIdTipoEvento(Number(e.target.value))}
                 >
@@ -279,136 +312,171 @@ function CadastroEvento() {
                 </select>
               </FormGroup>
 
-              <FormGroup label='Descrição: *' htmlFor='inputDescricao'>
+              <FormGroup label="Descrição: *" htmlFor="inputDescricao">
                 <textarea
-                  id='inputDescricao'
+                  id="inputDescricao"
                   value={descricao}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setDescricao(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Valor do Ingresso: *'>
+              <FormGroup label="Valor do Ingresso: *">
                 <input
-                  type='number'
+                  type="number"
                   value={valorIngresso}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setValorIngresso(Number(e.target.value))}
                 />
               </FormGroup>
 
-              <FormGroup label='Idade Mínima: *'>
+              <FormGroup label="Idade Mínima: *">
                 <input
-                  type='number'
-                  min='18'
-                  max='120'
+                  type="number"
+                  min="18"
+                  max="120"
                   value={idadeMinima}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setIdadeMinima(Number(e.target.value))}
                 />
               </FormGroup>
 
-              <FormGroup label='Porte do Evento: *'>
-  <select
-    className='form-select'
-    value={idPorteEvento}
-    onChange={(e) => setIdPorteEvento(Number(e.target.value))}
-  >
-    <option value={0}>Selecione</option>
+              <FormGroup label="Porte do Evento: *">
+                <select
+                  className="form-select"
+                  value={idPorteEvento}
+                  onChange={(e) => setIdPorteEvento(Number(e.target.value))}
+                >
+                  <option value={0}>Selecione</option>
 
-    {dadosPorteEvento.map((dado) => (
-      <option key={dado.id} value={dado.id}>
-        {dado.nome}
-      </option>
-    ))}
-  </select>
-</FormGroup>
+                  {dadosPorteEvento.map((dado) => (
+                    <option key={dado.id} value={dado.id}>
+                      {dado.nome}
+                    </option>
+                  ))}
+                </select>
+              </FormGroup>
 
-              <FormGroup label='Lotação Máxima: *'>
+              <FormGroup label="Lotação Máxima: *">
                 <input
-                  type='number'
+                  type="number"
                   value={lotacaoMaxima}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setLotacaoMaxima(Number(e.target.value))}
                 />
               </FormGroup>
 
-              <FormGroup label='Data de Início: *'>
+              <FormGroup label="Data de Início: *">
                 <input
-                  type='date'
+                  type="date"
                   value={dataInicio}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setDataInicio(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Hora de Início: *'>
+              <FormGroup label="Hora de Início: *">
                 <input
-                  type='time'
+                  type="time"
                   value={horaInicio}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setHoraInicio(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Data de Fim: *'>
+              <FormGroup label="Data de Fim: *">
                 <input
-                  type='date'
+                  type="date"
                   value={dataFim}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setDataFim(e.target.value)}
                 />
               </FormGroup>
 
-              <FormGroup label='Hora de Fim: *'>
+              <FormGroup label="Hora de Fim: *">
                 <input
-                  type='time'
+                  type="time"
                   value={horaFim}
-                  className='form-control'
+                  className="form-control"
                   onChange={(e) => setHoraFim(e.target.value)}
                 />
               </FormGroup>
 
-              <h5 className='mt-4'>Endereço</h5>
+              <h5 className="mt-4">Endereço</h5>
 
-              <FormGroup label='CEP:'>
-                <input value={cep} className='form-control' onChange={(e) => setCep(e.target.value)} />
+              <FormGroup label="CEP:">
+                <input
+                  value={cep}
+                  className="form-control"
+                  onChange={(e) => setCep(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Logradouro:'>
-                <input value={logradouro} className='form-control' onChange={(e) => setLogradouro(e.target.value)} />
+              <FormGroup label="Logradouro:">
+                <input
+                  value={logradouro}
+                  className="form-control"
+                  onChange={(e) => setLogradouro(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Número:'>
-                <input value={numero} className='form-control' onChange={(e) => setNumero(e.target.value)} />
+              <FormGroup label="Número:">
+                <input
+                  value={numero}
+                  className="form-control"
+                  onChange={(e) => setNumero(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Complemento:'>
-                <input value={complemento} className='form-control' onChange={(e) => setComplemento(e.target.value)} />
+              <FormGroup label="Complemento:">
+                <input
+                  value={complemento}
+                  className="form-control"
+                  onChange={(e) => setComplemento(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Bairro:'>
-                <input value={bairro} className='form-control' onChange={(e) => setBairro(e.target.value)} />
+              <FormGroup label="Bairro:">
+                <input
+                  value={bairro}
+                  className="form-control"
+                  onChange={(e) => setBairro(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Cidade:'>
-                <input value={cidade} className='form-control' onChange={(e) => setCidade(e.target.value)} />
+              <FormGroup label="Cidade:">
+                <input
+                  value={cidade}
+                  className="form-control"
+                  onChange={(e) => setCidade(e.target.value)}
+                />
               </FormGroup>
 
-              <FormGroup label='Estado:'>
-                <input value={estado} className='form-control' onChange={(e) => setEstado(e.target.value)} />
+              <FormGroup label="Estado:">
+                <input
+                  value={estado}
+                  className="form-control"
+                  onChange={(e) => setEstado(e.target.value)}
+                />
               </FormGroup>
 
-              <Stack spacing={1} padding={1} direction='row'>
-                <button onClick={salvar} type='button' className='btn btn-success'>
+              <Stack spacing={1} padding={1} direction="row">
+                <button
+                  onClick={salvar}
+                  type="button"
+                  className="btn btn-success"
+                >
                   Salvar
                 </button>
 
-                <button onClick={inicializar} type='button' className='btn btn-danger'>
+                <button
+                  onClick={inicializar}
+                  type="button"
+                  className="btn btn-danger"
+                >
                   Cancelar
                 </button>
               </Stack>
-
             </div>
           </div>
         </div>

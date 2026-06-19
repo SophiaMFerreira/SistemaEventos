@@ -43,12 +43,17 @@ function BoxInfoEvento({
   };
 
   const formatarHora = (dataHora) => {
-    if (!dataHora) return "";
-    return new Date(dataHora).toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  if (!dataHora) return "";
+
+  const hora = new Date(dataHora).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const [h, m] = hora.split(":");
+
+  return `${parseInt(h, 10)}h${m}`;
+};
 
   return (
     <Box

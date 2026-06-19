@@ -9,7 +9,6 @@ import ListagemDadosEvento from './views/listagem-dados-Evento-Inscritos';
 import ListagemIngressos from './views/listagem-ingresso';
 import MeusEventos from './views/listagem-meus-eventos';
 import EventosOrganizados from './views/listagem-eventos-organizados';
-import DetalhesEventoOrganizador from './views/listagem-Dados-Eventos-Organizados';
 
 import CadastroTipoEvento from './views/cadastro-tipoEvento';
 import CadastroPorteEvento from './views/cadastro-porteEvento';
@@ -26,8 +25,7 @@ function Rotas(props) {
 
         <Route path='/listagem-eventos' element={<><Navbar /><ListagemEventos /></>} />
         <Route path="/eventos-organizados" element={<><Navbar /><EventosOrganizados /></>} />
-        <Route path="/eventos-organizados/:idParam" element={<><Navbar /><DetalhesEventoOrganizador /></>} />
-        <Route path='/listagem-participantes/:idParam' element={<><Navbar /><ListagemParticipantes /></>} />
+        <Route path="/eventos-organizados/:idParam" element={<><Navbar /><ListagemParticipantes /></>} />
         <Route path="/meus-eventos" element={<><Navbar /><MeusEventos /></>} />
         <Route path="/meus-eventos/:idParam" element={<><Navbar /><ListagemDadosEvento  /></>} />
         <Route path="/meus-eventos/:idParam/ingresso" element={<><Navbar /><ListagemIngressos /></>} />
@@ -36,7 +34,7 @@ function Rotas(props) {
         <Route path='/cadastro-porteEvento/:idParam?' element={<><Navbar /><CadastroPorteEvento /></>} />
         <Route path='/cadastro-eventos/:idParam?' element={<><Navbar /><CadastroEvento /></>} />
         <Route path='/cadastro-administrador/:idParam?' element={<><Navbar /><CadastroAdministrador /></>} />
-        <Route path='/cadastro-usuarioCPF/:idParam?' element={<CadastroUsuarioCPF />} />
+        <Route path='/cadastro-usuarioCPF/:idParam?' element={<><Navbar /><CadastroUsuarioCPF /></>} />
         <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<CadastroUsuarioCNPJ />} />
       </Routes>
     </BrowserRouter>
