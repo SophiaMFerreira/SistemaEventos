@@ -38,15 +38,18 @@ function CadastroTipoEvento() {
 
   async function save(e) {
     e.preventDefault();
-    const data = { id, nome, descricao };
+    const payload = {
+            nome: nome, 
+            descricao: descricao 
+    };
 
     try {
       if (!idParam) {      
-        await axios.post(baseURL, data);
+        await axios.post(baseURL, payload);
           mensagemSucesso(`Novo tipo ${nome} criado com sucesso!`);
           navigate(`/listagem-eventos`);
       } else {
-        await axios.put(`${baseURL}/${idParam}`, data);
+        await axios.put(`${baseURL}/${idParam}`, payload);
           mensagemSucesso(`Tipo ${nome} alterado com sucesso!`);
           navigate(`/listagem-eventos`);
       }
