@@ -159,6 +159,7 @@ function InputsEndereco({
           <TextField
             name="estado"
             placeholder="MG"
+            value={estado}
             onChange={(e) => setEstado(e.target.value)}
             required
             fullWidth

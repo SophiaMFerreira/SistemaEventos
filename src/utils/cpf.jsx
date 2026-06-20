@@ -1,8 +1,10 @@
 import React from "react";
 import { IMaskInput } from 'react-imask';
 
-export const TextMaskCPF = React.forwardRef<HTMLInputElement>
-(function TextMaskCPF(props, ref) {
+export const TextMaskCPF = React.forwardRef(function TextMaskCPF(
+  props,
+  ref
+) {
   const { onChange, ...other } = props;
   return (
     <IMaskInput

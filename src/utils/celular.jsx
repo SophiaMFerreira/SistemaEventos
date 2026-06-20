@@ -1,8 +1,10 @@
 import React from "react";
 import { IMaskInput } from 'react-imask';
 
-export const TextMaskCelular = React.forwardRef<HTMLInputElement>
-(function TextMaskCelular(props, ref) {
+export const TextMaskCelular = React.forwardRef(function TextMaskCelular(
+  props,
+  ref
+) {
   const { onChange, ...other } = props;
   return (
     <IMaskInput
