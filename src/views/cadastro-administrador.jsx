@@ -94,7 +94,7 @@ function CadastroAdministrador(){
       estado
     };
      
-    const data = {
+    const payload = {
                   tipoUsuario: "PF",
                   nome,
                   cpf: cpfFormatado,
@@ -106,17 +106,18 @@ function CadastroAdministrador(){
                   endereco,
                   perfis: ["ADMINISTRADOR"]
     };
-
+    
     try {
       if(!validarDados(dataNascimento, cpfFormatado, celularFormatado, senha, confirmarSenha)){
         return;
       }
 
       if (!idParam) {
-          await axios.post(baseURL, data);
+          await axios.post(baseURL, payload);
           mensagemSucesso(`Bem vindo ${nome}!`);
         } else {
-          await axios.put(`${baseURL}/${id}`, data);
+          
+          await axios.put(`${baseURL}/${id}`, payload);
           mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
         }
     } catch (error) {

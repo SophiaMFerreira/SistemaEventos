@@ -34,6 +34,8 @@ export default function validarDados(dataNascimento, cpf, celular, senha, confir
       mensagemErro("A data de nascimento deve ser menor que a data de hoje.");
       return;
     }
+
+    return true;
 }
 
 export function validarQuantidades(quantidadeMin, quantidadeMax){
@@ -47,4 +49,5 @@ export function validarQuantidades(quantidadeMin, quantidadeMax){
         mensagemErro("Quantidade máxima menor que o mínimo");
         return;
     }
+    return true;
 }
