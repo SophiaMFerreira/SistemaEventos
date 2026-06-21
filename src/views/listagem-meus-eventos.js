@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { BASE_URL} from "../config/axios";
-import BuscarEvento from "../components/input-buscar-evento";
-import Card from "../components/card";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../config/axios";
+import BuscarEvento from "../components/input-buscar-evento";
+import CardEvento from "../components/card-evento";
+
+import { Box, Grid, Typography, Skeleton } from "@mui/material";
 
 const baseURL = `${BASE_URL}/eventos`;
 const baseURLIngresso = `${BASE_URL}/ingressos`;
@@ -10,108 +12,96 @@ const baseURLIngresso = `${BASE_URL}/ingressos`;
 function MeusEventos() {
   const navigate = useNavigate();
   const idParticipante = Number(localStorage.getItem("idUsuario"));
-  const [eventosInscritos, setEventosInscritos] = useState([]);
-  const [filtro, setFiltro] = React.useState("");
   
-  const eventosFiltrados = eventosInscritos.filter(ev =>
-  ev.nome?.toLowerCase().includes(filtro.toLowerCase())
-);
-
-
+  const [eventosInscritos, setEventosInscritos] = useState(null); 
+  const [filtro, setFiltro] = useState("");
+  
   useEffect(() => {
-  async function carregarEventos() {
-    try {
-      const resEventos = await fetch(baseURL);
-      const eventos = await resEventos.json();
+    async function carregarEventos() {
+      try {
+        const resEventos = await fetch(baseURL);
+        const eventos = await resEventos.json();
 
-      const resIngressos = await fetch(baseURLIngresso);
-      const ingressos = await resIngressos.json();
-console.log("INGRESSOS:", ingressos);
+        const resIngressos = await fetch(baseURLIngresso);
+        const ingressos = await resIngressos.json();
 
- const meusIngressos = ingressos.filter(
-  i => Number(i.idParticipante) === idParticipante
-);
+        const meusIngressos = ingressos.filter(
+          (i) => Number(i.idParticipante) === idParticipante
+        );
 
-console.log("MEUS INGRESSOS:", meusIngressos);
+        const eventosDoParticipante = eventos.filter((ev) =>
+          meusIngressos.some((i) => Number(i.idEvento) === ev.id)
+        );
 
- const eventosDoParticipante = eventos.filter(ev =>
-  meusIngressos.some(i => Number(i.idEvento) === ev.id)
-);
-
-console.log("EVENTOS:", eventos);
-console.log("EVENTOS DO PARTICIPANTE:", eventosDoParticipante);
-
-      setEventosInscritos(eventosDoParticipante);
-    } catch (err) {
-      console.error("Erro ao buscar eventos inscritos:", err);
+        setEventosInscritos(eventosDoParticipante);
+      } catch (err) {
+        console.error("Erro ao buscar eventos inscritos:", err);
+        setEventosInscritos([]); 
+      }
     }
+
+    carregarEventos();
+  }, [idParticipante]);
+
+  const eventosFiltrados = eventosInscritos
+    ? eventosInscritos.filter((ev) =>
+        ev.nome?.toLowerCase().includes(filtro.toLowerCase())
+      )
+    : [];
+
+  if (eventosInscritos === null) {
+    return (
+      <div className="container" style={{ marginTop: "120px", marginBottom: "60px" }}>
+        <Grid container spacing={4}>
+          {[1, 2, 3].map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item}>
+              <Skeleton variant="rounded" height={350} sx={{ borderRadius: "16px" }} />
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+    );
   }
 
-  carregarEventos();
-}, [idParticipante, baseURL, baseURLIngresso]);
-
-
   return (
-  <div className='container' style={{ marginTop: '120px' }}>
-    <Card title='Meus Eventos'>
-      <BuscarEvento
-        value={filtro}
-        onChange={setFiltro}
-        placeholder="Digite nome do evento"
-      />
+    <div className="container" style={{ marginTop: "120px", marginBottom: "60px" }}>
+        
+        <Box sx={{ justifyContent: "center", display: "flex", mb: 4 }}>
+          <BuscarEvento
+            value={filtro}
+            onChange={setFiltro}
+            placeholder="Digite o nome do evento para buscar..."
+          />
+        </Box>
 
-      {eventosFiltrados.length === 0 ? (
-        <p>Você ainda não está inscrito em nenhum evento.</p>
-      ) : (
-        <div className='row'>
-          <div className='col-lg-12'>
-            <div className='bs-component'>
-              <table className='table table-hover'>
-                <thead>
-                  <tr>
-                    <th scope='col'>Nome</th>
-                    <th scope='col'>Data Início</th>
-                    <th scope='col'>Data Fim</th>
-                    <th scope='col'>Hora</th>
-                    <th scope='col'>Cidade</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eventosFiltrados.map((ev) => (
-                    <tr key={ev.id}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/meus-eventos/${ev.id}`)}
-
-                    >
-                      <td>{ev.nome}</td>
-
-                  <td>
-                    {new Date(ev.dataHoraInicio).toLocaleDateString("pt-BR")}
-                  </td>
-
-                  <td>
-                    {new Date(ev.dataHoraFim).toLocaleDateString("pt-BR")}
-                  </td>
-
-                  <td>
-                    {new Date(ev.dataHoraInicio).toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    })}
-                  </td>
-
-                  <td>{ev.endereco?.cidade}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-    </Card>
-  </div>
-);
+        {eventosFiltrados.length === 0 ? (
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              mt: 6, 
+              textAlign: "center", 
+              color: "text.secondary",
+              fontWeight: 500 
+            }}
+          >
+            {filtro 
+              ? "Nenhum evento corresponde à sua busca." 
+              : "Você ainda não está inscrito em nenhum evento."}
+          </Typography>
+        ) : (
+          <Grid container spacing={4}>
+            {eventosFiltrados.map((evento) => (
+              <Grid item xs={12} sm={6} md={4} key={evento.id}>
+                <CardEvento
+                  dado={evento}
+                  onClick={() => navigate(`/meus-eventos/${evento.id}`)}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+    </div>
+  );
 }
 
 export default MeusEventos;

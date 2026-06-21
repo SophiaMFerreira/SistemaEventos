@@ -178,6 +178,7 @@ function CadastroUsuarioCNPJ() {
         if (!idParam) {
           await axios.post(baseURL, data);
           mensagemSucesso(`Bem vindo ${nomeFantasia}!`);
+          navigate(`/`);
         } else {
           await axios.put(`${baseURL}/${id}`, data);
           mensagemSucesso(`${nomeFantasia} seus dados foram alterados com sucesso!`);
