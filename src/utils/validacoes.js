@@ -13,26 +13,26 @@ export default function validarDados(dataNascimento, cpf, celular, senha, confir
 
     if (!cpfValido.test(cpf)) {
       mensagemErro("CPF inválido ou incompleto.");
-      return;
+      return false;
     }
     if (!celularValido.test(celular)) {
         mensagemErro("Celular inválido. Use um número móvel que comece com 9 após o DDD.");
-        return;
+        return false;
     }
 
     if (!senhaValida.test(senha)) {
       mensagemErro("A senha deve conter letra maiúscula, minúscula, número e caractere especial.");
-      return;
+      return false;
     }
 
     if (senha !== confirmarSenha) {
           mensagemErro("As senhas não coincidem");
-          return;
+          return false;
     }
         
     if (nascimento >= hoje) {
       mensagemErro("A data de nascimento deve ser menor que a data de hoje.");
-      return;
+      return false;
     }
 
     return true;
@@ -41,13 +41,13 @@ export default function validarDados(dataNascimento, cpf, celular, senha, confir
 export function validarQuantidades(quantidadeMin, quantidadeMax){
     if (quantidadeMin < 0) {
       mensagemErro("Valores quantitativos mínimos negativos não são permitidos.");
-      return;
+      return false;
     } else if (quantidadeMax < 1) {
       mensagemErro("Valores quantitativos máximos menores que 1 não são permitidos.");
-      return;
+      return false;
     } else if (quantidadeMin > quantidadeMax) {
         mensagemErro("Quantidade máxima menor que o mínimo");
-        return;
+        return false;
     }
     return true;
 }
