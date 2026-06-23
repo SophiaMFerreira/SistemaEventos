@@ -8,13 +8,11 @@ import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
 function Login() {
-  const baseURL = `${BASE_URL}/usuario`;
+  const baseURL = `${BASE_URL}/auth`;
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [validacao, setValidacao] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   async function fazerLogin(e) {
     e.preventDefault();
@@ -28,24 +26,10 @@ function Login() {
       return;
     }
 
-    setLoading(true);
     try {
       const response = await axios.get(baseURL);
-      const usuarios = response.data || [];
 
       console.log("Resposta API:", response.data);
-console.log("Email digitado:", emailTrim);
-console.log("Senha digitada:", senhaTrim);
-
-      const usuario = usuarios.find(
-  (u) => (u.email || "").toLowerCase() === emailTrim
-);
-
-      if (!usuario) {
-        setValidacao(true);
-        setLoading(false);
-        return;
-      }
 
       const tipoParticipante = usuario.tipoUsuario || (
         usuario.perfis?.includes("ADMINISTRADOR")
@@ -65,8 +49,6 @@ console.log("Senha digitada:", senhaTrim);
       navigate(`/listagem-eventos`, { replace: true });
     } catch (error) {
       mensagemErro(error?.response?.data?.message || "Erro ao conectar com o servidor");
-    } finally {
-      setLoading(false);
     }
   }
 
