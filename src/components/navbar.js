@@ -1,73 +1,144 @@
-import {useEffect, useState} from 'react';
-import 'bootswatch/dist/flatly/bootstrap.css';
+import { useEffect, useState } from "react";
+import "bootswatch/dist/flatly/bootstrap.css";
+import NavbarItem from "./navbarItem";
+import { mensagemErro } from "../components/toastr";
 
-import NavbarItem from './navbarItem';
+import axios from "axios";
+import { BASE_URL } from "../config/axios";
 
-function Navbar(props) {
-    const [admin, setAdmin] = useState(false);
-    const [url, setUrl] = useState("/cadastro-administrador");
-    const [id, setId] = useState(null);
+function Navbar() {
+  const baseURL = `${BASE_URL}/usuario`;
 
-    useEffect(() => {
-        const idParticipante = Number(localStorage.getItem("idUsuario"));
-        const tipoParticipante = localStorage.getItem("tipoParticipante");
+  const [usuario, setUsuario] = useState(null);
+  const [admin, setAdmin] = useState(false);
+  const [participante, setParticipante] = useState(false);
 
-          if (!idParticipante || !tipoParticipante) return;
-          setId(idParticipante);
+  useEffect(() => {
+    async function carregarUsuario() {
+      const idUsuario = Number(localStorage.getItem("idUsuario"));
 
-        if (tipoParticipante === "admin") {
+      if (!idUsuario) return;
+
+      try {
+        const response = await axios.get(`${baseURL}/${idUsuario}`);
+        const dados = response.data;
+
+        setUsuario(dados);
+
+        if (dados.perfis?.includes("ADMINISTRADOR")) {
           setAdmin(true);
-          setUrl("/cadastro-administrador");
-          return;
         }
-        if (tipoParticipante === "cpf") {
-          setUrl("/cadastro-usuarioCPF");
-        }
-        if (tipoParticipante === "cnpj") {
-          setUrl("/cadastro-usuarioCNPJ");
-        }
-      }, []); 
+
+        setParticipante(true);
+      } catch (error) {
+        mensagemErro("Erro ao buscar usuário");
+      }
+    }
+
+    carregarUsuario();
+  }, []);
+
+  const obterUrlPerfil = () => {
+    if (!usuario) return "#";
+
+    if (usuario.perfis?.includes("ADMINISTRADOR")) {
+      return `/cadastro-administrador/${usuario.id}`;
+    }
+
+    if (usuario.tipoUsuario === "PF") {
+      return `/cadastro-usuarioCPF/${usuario.id}`;
+    }
+
+    if (usuario.tipoUsuario === "PJ") {
+      return `/cadastro-usuarioCNPJ/${usuario.id}`;
+    }
+
+    return "#";
+  };
+
+  const logout = () => {
+    localStorage.removeItem("idUsuario");
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
 
   return (
-    <div className='navbar navbar-expand-lg fixed-top navbar-dark bg-primary'>
-      <div className='container'>
-        <a href='/listagem-eventos' className='navbar-brand'>
+    <div className="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <div className="container">
+        <a href="/listagem-eventos" className="navbar-brand">
           EVENT +
         </a>
+
         <button
-          className='navbar-toggler'
-          type='button'
-          data-toggle='collapse'
-          data-target='#navbarResponsive'
-          aria-controls='navbarResponsive'
-          aria-expanded='false'
-          aria-label='Toggle navigation'
+          className="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarResponsive"
+          aria-controls="navbarResponsive"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
-          <span className='navbar-toggler-icon'></span>
+          <span className="navbar-toggler-icon"></span>
         </button>
-        <div className='collapse navbar-collapse' id='navbarResponsive'>
-          <ul className='navbar-nav'>
-            <NavbarItem render={admin} href='/cadastro-porteEvento' label='Novo porte de evento' />
-          </ul>
-          <ul className='navbar-nav'>
-            <NavbarItem render={admin} href='/cadastro-tipoEvento' label='Novo tipo de evento' />
+
+        <div className="collapse navbar-collapse" id="navbarResponsive">
+
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={admin}
+              href="/cadastro-porteEvento"
+              label="Novo porte de evento"
+            />
           </ul>
 
-          <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/eventos-organizados' label='Sou organizador' />
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={admin}
+              href="/cadastro-tipoEvento"
+              label="Novo tipo de evento"
+            />
           </ul>
 
-          <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/meus-eventos' label='Meus Eventos' />
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={participante}
+              href="/eventos-organizados"
+              label="Sou organizador"
+            />
           </ul>
 
-          <ul className='navbar-nav'>
-            <NavbarItem render={id !== null} href={`${url}/${id}`} label='Perfil' />
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={participante}
+              href="/meus-eventos"
+              label="Meus Eventos"
+            />
           </ul>
 
-          <ul className='navbar-nav'>
-            <NavbarItem render='true' href='/' label='Sair' />
-            </ul>
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={participante}
+              href={obterUrlPerfil()}
+              label="Perfil"
+            />
+          </ul>
+
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <button
+                onClick={logout}
+                className="btn btn-link nav-link"
+                style={{
+                  color: "white",
+                  textDecoration: "none",
+                  border: "none",
+                }}
+              >
+                Sair
+              </button>
+            </li>
+          </ul>
+
         </div>
       </div>
     </div>

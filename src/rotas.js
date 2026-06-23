@@ -36,6 +36,8 @@ function Rotas(props) {
         <Route path='/cadastro-administrador/:idParam?' element={<><Navbar /><CadastroAdministrador /></>} />
         <Route path='/cadastro-usuarioCPF/:idParam?' element={<><Navbar /><CadastroUsuarioCPF /></>} />
         <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<CadastroUsuarioCNPJ />} />
+        <Route path='/cadastro-usuarioCPF/:idParam?' element={<><Navbar /><CadastroUsuarioCPF /></>} />
+        <Route path='/cadastro-usuarioCNPJ/:idParam?' element={<><Navbar /><CadastroUsuarioCNPJ /></>} />
       </Routes>
     </BrowserRouter>
   );
