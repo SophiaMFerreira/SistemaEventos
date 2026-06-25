@@ -8,47 +8,37 @@ import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
 function Login() {
-  const baseURL = `${BASE_URL}/auth`;
+  const baseURL = `${BASE_URL}/usuario/auth`;
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
+  const [token, setToken] = useState("");
 
   async function fazerLogin(e) {
     e.preventDefault();
-    setValidacao(false);
-
-    const emailTrim = email.trim().toLowerCase();
+    
+    const emailTrim = email.trim();
     const senhaTrim = senha.trim();
 
     if (!emailTrim || !senhaTrim) {
-      setValidacao(true);
       return;
     }
 
+    const payload = {
+                  email : emailTrim,
+                  senha: senhaTrim
+    };
+
     try {
-      const response = await axios.get(baseURL);
+      const response = await axios.post(baseURL);
+      localStorage.setItem("login", response.data.login)
+      localStorage.setItem("token", response.data.TokenDTO)
 
-      console.log("Resposta API:", response.data);
-
-      const tipoParticipante = usuario.tipoUsuario || (
-        usuario.perfis?.includes("ADMINISTRADOR")
-          ? "admin"
-          : usuario.perfis?.includes("PARTICIPANTE")
-            ? "participante"
-            : "usuario"
-      );
-
-      const nomeUsuario = usuario.nome || usuario.nomeFantasia || usuario.razaoSocial || "";
-
-      localStorage.setItem("idUsuario", usuario.id);
-      localStorage.setItem("tipoParticipante", tipoParticipante);
-      localStorage.setItem("nomeUsuario", nomeUsuario);
-      localStorage.setItem("isAuthenticated", "true");
-
-      navigate(`/listagem-eventos`, { replace: true });
+      navigate("/listagem-eventos");
     } catch (error) {
-      mensagemErro(error?.response?.data?.message || "Erro ao conectar com o servidor");
+      mensagemErro("Login ou senha incorretos.");
     }
   }
 
