@@ -11,9 +11,7 @@ function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
-  const [token, setToken] = useState("");
 
   const [validacao, setValidacao] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,10 +33,9 @@ function Login() {
                   email : emailTrim,
                   senha: senhaTrim
     };
-
     setLoading(true)
     try {
-      const response = await api.post(baseURL);
+      const response = await api.post(baseURL, payload);
       localStorage.setItem("login", response.data.login)
       localStorage.setItem("token", response.data.TokenDTO)
 
