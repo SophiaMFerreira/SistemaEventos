@@ -7,14 +7,13 @@ import FormGroup from "../components/form-group";
 import { mensagemSucesso, mensagemErro } from "../components/toastr";
 
 import "../custom.css";
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 
 function CadastroEvento() {
   const { idParam } = useParams();
   const navigate = useNavigate();
 
-  const baseURL = `${BASE_URL}/eventos`;
+  const baseURL = '/eventos';
 
   const [id, setId] = useState("");
   const [nome, setNome] = useState("");
@@ -141,11 +140,11 @@ function CadastroEvento() {
       let eventoId = idParam;
 
       if (!idParam) {
-        const response = await axios.post(baseURL, payload);
+        const response = await api.post(baseURL, payload);
         eventoId = response.data.id || response.data;
         mensagemSucesso(`Evento ${nome} cadastrado com sucesso!`);
       } else {
-        await axios.put(`${baseURL}/${idParam}`, payload);
+        await api.put(`${baseURL}/${idParam}`, payload);
         mensagemSucesso(`Evento ${nome} alterado com sucesso!`);
       }
 
@@ -153,7 +152,7 @@ function CadastroEvento() {
         const formData = new FormData();
         formData.append("file", imagem);
 
-        await axios.post(
+        await api.post(
           `${baseURL}/${eventoId}/upload`,
           formData,
           {
@@ -174,7 +173,7 @@ function CadastroEvento() {
 
   async function buscar() {
     try {
-      const response = await axios.get(`${baseURL}/${idParam}`);
+      const response = await api.get(`${baseURL}/${idParam}`);
       const dados = response.data;
       setDados(dados);
 
@@ -231,8 +230,8 @@ function CadastroEvento() {
   const [dadosPorteEvento, setDadosPorteEvento] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/tipoEvento`)
+    api
+      .get('/tipoEvento')
       .then((response) => {
         const res = response.data;
         const tipos = Array.isArray(res)
@@ -242,8 +241,8 @@ function CadastroEvento() {
       })
       .catch(() => setDadosTipoEvento([]));
 
-    axios
-      .get(`${BASE_URL}/porteEvento`)
+    api
+      .get('/porteEvento')
       .then((response) => {
         const res = response.data;
         const portes = Array.isArray(res)

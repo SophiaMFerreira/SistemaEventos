@@ -5,8 +5,8 @@ import { Grid, Paper, Typography, TextField, Stack, Button, FormControlLabel, Ch
 import InputsEndereco from "../components/form-inputsEndereco";
 import InputsSenha from "../components/form-inputsSenha";
 import "../style/cadastro.css";
+import {api} from '../config/axios';
 
-import axios from 'axios';
 import { BASE_URL } from '../config/axios';
 
 import React from 'react';
@@ -56,7 +56,7 @@ const TextMaskCelular = React.forwardRef(function TextMaskCelular(props, ref) {
 });
 
 function CadastroUsuarioCPF() {
-    const baseURL = `${BASE_URL}/usuario`;
+    const baseURL = '/usuario';
     const { idParam } = useParams();
     const navigate = useNavigate();
 
@@ -89,7 +89,7 @@ function CadastroUsuarioCPF() {
 
     useEffect(() => {
       if (!idParam) return;
-      axios.get(`${baseURL}/${idParam}`).then((response) => {
+      api.get(`${baseURL}/${idParam}`).then((response) => {
         const dados = response.data;
         setIdUsuarioCPF(dados.id);
         setNomeUsuarioCPF(dados.nome);
@@ -194,11 +194,11 @@ const celularFormatado = celular.replace(
         }
 
         if (!idParam) {
-          await axios.post(baseURL, data);
+          await api.post(baseURL, data);
           mensagemSucesso(`Bem vindo ${nome}!`);
           navigate(`/`);
         } else {
-          await axios.put(`${baseURL}/${id}`, data);
+          await api.put(`${baseURL}/${id}`, data);
           mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
         }
       } catch (error) {
@@ -208,7 +208,7 @@ const celularFormatado = celular.replace(
 
     async function exclude() {
       let url = `${baseURL}/${id}`;
-      await axios
+      await api
         .delete(url)
         .then(() => {
           mensagemSucesso(`Usuário ${nome} excluído com sucesso!`);

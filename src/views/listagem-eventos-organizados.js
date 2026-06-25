@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 import { mensagemSucesso, mensagemErro, mensagemAlert } from "../components/toastr";
 import BuscarEvento from "../components/input-buscar-evento";
 import "../custom.css";
@@ -26,8 +25,8 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import imagemPadrao from "../assets/evento-default.jpg"; 
 
-const baseURL = `${BASE_URL}/eventos`;
-const baseURLIngresso = `${BASE_URL}/ingressos`;
+const baseURL = '/eventos';
+const baseURLIngresso = '/ingressos';
 
 function EventosOrganizados() {
   const navigate = useNavigate();
@@ -47,7 +46,7 @@ function EventosOrganizados() {
   async function excluir(id) {
     let url = `${baseURL}/${id}`;
     try {
-      await axios.delete(url, {
+      await api.delete(url, {
         data: { id },
         headers: { "Content-Type": "application/json" },
       });
@@ -61,8 +60,8 @@ function EventosOrganizados() {
   useEffect(() => {
     async function buscarDados() {
       try {
-        const respEventos = await axios.get(baseURL);
-        const respIngressos = await axios.get(baseURLIngresso);
+        const respEventos = await api.get(baseURL);
+        const respIngressos = await api.get(baseURLIngresso);
 
         const meusEventos = respEventos.data.filter(
           (ev) => Number(ev.idOrganizador) === idOrganizador,
@@ -261,7 +260,7 @@ function EventosOrganizados() {
                     height="230"
                     image={
                       evento.imagem
-                        ? `${BASE_URL}/eventos/imagem/${evento.imagem}`
+                        ? `/eventos/imagem/${evento.imagem}`
                         : imagemPadrao
                     }
                     alt={evento.nome}

@@ -14,14 +14,13 @@ import {
 import BoxInfoEvento from "../components/box-info-evento";
 import "../style/listagemDadosEvento.css";
 
-import axios from 'axios';
-import { BASE_URL} from '../config/axios';
+import {api} from '../config/axios';
 import imagemPadrao from "../assets/evento-default.jpg";
 
 
 function ListagemDadosEvento() {
-  const baseURL = `${BASE_URL}/eventos`;
-  const baseURLingresso = `${BASE_URL}/ingressos`;
+  const baseURL = '/eventos';
+  const baseURLingresso = '/ingressos';
   const { idParam } = useParams();
   const navigate = useNavigate();
 
@@ -36,10 +35,10 @@ function ListagemDadosEvento() {
   useEffect(() => {
   async function carregarDados() {
     try {
-      const eventoRes = await axios.get(`${baseURL}/${idParam}`);
+      const eventoRes = await api.get(`${baseURL}/${idParam}`);
       setEvento(eventoRes.data);
 
-      const ingressosRes = await axios.get(baseURLingresso);
+      const ingressosRes = await api.get(baseURLingresso);
       const ingressos = ingressosRes.data;
       console.log("INGRESSOS:", ingressos);
 console.log("ID EVENTO:", idParam);
@@ -79,7 +78,7 @@ console.log("INGRESSO ENCONTRADO:", encontrado);
       idEvento: evento.id
     };
 
-    const res = await axios.post(baseURLingresso, novoIngresso);
+    const res = await api.post(baseURLingresso, novoIngresso);
 
     setIngresso(res.data);
     setInscrito(true);
@@ -102,7 +101,7 @@ console.log("INGRESSO ENCONTRADO:", encontrado);
         ? valorDoEvento / 2
         : valorDoEvento;
 
-      await axios.patch(
+      await api.patch(
         `${baseURLingresso}/${ingresso.id}/pagamento`,
         {
           valor: valorFinal,
@@ -198,7 +197,7 @@ console.log("INGRESSO ENCONTRADO:", encontrado);
         <Box
           component="img"
           src={evento.imagem
-              ? `${BASE_URL}/eventos/imagem/${evento.imagem}`
+              ? `/eventos/imagem/${evento.imagem}`
               : imagemPadrao}
           sx={{
             width: "100%",

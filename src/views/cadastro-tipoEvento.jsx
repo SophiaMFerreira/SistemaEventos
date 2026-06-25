@@ -5,11 +5,10 @@ import { mensagemSucesso, mensagemErro } from '../components/toastr';
 import { Grid, Paper, Typography, TextField, Stack, Button } from "@mui/material";
 import "../style/cadastro.css";
 
-import axios from 'axios';
-import { BASE_URL } from '../config/axios';
+import {api} from '../config/axios';
 
 function CadastroTipoEvento() {
-  const baseURL = `${BASE_URL}/tipoEvento`;
+  const baseURL = '/tipoEvento';
   const { idParam } = useParams();
   const navigate = useNavigate();
   
@@ -24,7 +23,7 @@ function CadastroTipoEvento() {
   useEffect(() => {
     if (!idParam) return;
 
-    axios.get(`${baseURL}/${idParam}`).then((response) => {
+    api.get(`${baseURL}/${idParam}`).then((response) => {
       const dados = response.data;
       setId(dados.id);
       setNome(dados.nome);
@@ -34,7 +33,7 @@ function CadastroTipoEvento() {
       setMensagem("Faça edição dos");
       setAcaoButton("Editar");
     });
-  }, [idParam, baseURL]);
+  }, [idParam]);
 
   async function save(e) {
     e.preventDefault();
@@ -45,11 +44,11 @@ function CadastroTipoEvento() {
 
     try {
       if (!idParam) {      
-        await axios.post(baseURL, payload);
+        await api.post(baseURL, payload);
           mensagemSucesso(`Novo tipo ${nome} criado com sucesso!`);
           navigate(`/listagem-eventos`);
       } else {
-        await axios.put(`${baseURL}/${idParam}`, payload);
+        await api.put(`${baseURL}/${idParam}`, payload);
           mensagemSucesso(`Tipo ${nome} alterado com sucesso!`);
           navigate(`/listagem-eventos`);
       }
@@ -62,7 +61,7 @@ function CadastroTipoEvento() {
   async function exclude() {
       let data = JSON.stringify({ idParam });
       let url = `${baseURL}/${idParam}`;
-      await axios
+      await api
           .delete(url, data, {
               headers: { 'Content-Type': 'application/json' },
           })

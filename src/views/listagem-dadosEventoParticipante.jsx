@@ -4,8 +4,7 @@ import { Stack, Button, Box } from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
 import Lista from "../components/lista";
 import "../style/listagemDadosEvento.css";
-import axios from 'axios';
-import { BASE_URL } from '../config/axios';
+import {api} from '../config/axios';
 
 const mainStackStyle = { 
   maxWidth: 1100,
@@ -16,7 +15,7 @@ const mainStackStyle = {
 };
 
 function ListagemParticipantes() {
-    const baseURL = `${BASE_URL}/eventos`;
+    const baseURL = '/eventos';
     const { idParam } = useParams();
     const navigate = useNavigate();
 
@@ -39,7 +38,7 @@ function ListagemParticipantes() {
     useEffect(() => {
       if (!idParam) return;
 
-      axios.get(`${baseURL}/${idParam}`).then((response) => {
+      api.get(`${baseURL}/${idParam}`).then((response) => {
         const dados = response.data;
         setIdEvento(dados.id);
         setNome(dados.nome);
@@ -56,7 +55,7 @@ function ListagemParticipantes() {
         setCidade(dados.endereco?.cidade || "");
         setEstado(dados.endereco?.estado || "");   
       });
-    }, [idParam, baseURL]);
+    }, [idParam]);
 
     async function cancel(e) {
     }

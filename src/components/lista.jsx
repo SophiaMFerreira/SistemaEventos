@@ -9,16 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 
 function Lista({ idEvento }) {
-  const baseURL = `${BASE_URL}/ingressos`;
+  const baseURL = '/ingressos';
   const [ingressos, setIngressos] = useState([]);
   const [ordenacao, setOrdenacao] = useState("nome");
 
   useEffect(() => {
-    axios.get(baseURL).then((response) => {
+    api.get(baseURL).then((response) => {
       setIngressos(response.data || []);
     });
   }, [baseURL]);

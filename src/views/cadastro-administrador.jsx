@@ -20,11 +20,10 @@ import { formatarCEP } from "../utils/endereco";
 import { formatarCelular, TextMaskCelular } from "../utils/celular";
 import validarDados from "../utils/validacoes";
 
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 
 function CadastroAdministrador() {
-  const baseURL = `${BASE_URL}/usuario`;
+  const baseURL = '/usuario';
   const { idParam } = useParams();
   const navigate = useNavigate();
 
@@ -55,7 +54,7 @@ function CadastroAdministrador() {
   useEffect(() => {
     if (!idParam) return;
 
-    axios.get(`${baseURL}/${idParam}`).then((response) => {
+    api.get(`${baseURL}/${idParam}`).then((response) => {
       const dados = response.data;
       setIdAdministrador(dados.id);
       setNomeAdministrador(dados.nome);
@@ -80,7 +79,7 @@ function CadastroAdministrador() {
       setAcaoButton("Editar");
       setNavegacao("/listagem-eventos");
     });
-  }, [idParam, baseURL]);
+  }, [idParam]);
 
   const select = (event) => {
     setGeneroAdministrador(event.target.value);
@@ -92,8 +91,6 @@ function CadastroAdministrador() {
     const cpfFormatado = formatarCPF(cpf);
     const cepFormatado = formatarCEP(cep);
     const celularFormatado = formatarCelular(celular);
-
-    console.log("2 - Formatou dados");
 
     const endereco = {
       cep: cepFormatado,
@@ -132,11 +129,11 @@ function CadastroAdministrador() {
       }
 
       if (!idParam) {
-          await axios.post(baseURL, payload);
+          await api.post(baseURL, payload);
           mensagemSucesso("Administrador criado");
           navigate(`/`);
         } else {
-          await axios.put(`${baseURL}/${id}`, payload);
+          await api.put(`${baseURL}/${id}`, payload);
           mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
           navigate("/listagem-eventos");
         }
@@ -147,7 +144,7 @@ function CadastroAdministrador() {
   async function exclude() {
     let data = JSON.stringify({ idParam });
     let url = `${baseURL}/${idParam}`;
-    await axios
+    await api
       .delete(url, data, {
         headers: { "Content-Type": "application/json" },
       })

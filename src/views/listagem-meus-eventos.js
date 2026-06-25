@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 import BuscarEvento from "../components/input-buscar-evento";
 import CardEvento from "../components/card-evento";
 
 import { Box, Grid, Typography, Skeleton } from "@mui/material";
 
-const baseURL = `${BASE_URL}/eventos`;
-const baseURLIngresso = `${BASE_URL}/ingressos`;
+const baseURL = '/eventos';
+const baseURLIngresso = '/ingressos';
 
 function MeusEventos() {
   const navigate = useNavigate();

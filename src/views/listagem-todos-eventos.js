@@ -1,7 +1,6 @@
 import React from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 import BuscarEvento from "../components/input-buscar-evento";
 import CardEvento from "../components/card-evento"; 
 import "../custom.css";
@@ -9,8 +8,8 @@ import "../custom.css";
 import Skeleton from "@mui/material/Skeleton";
 import { Grid, Button, Stack, Box, Typography } from "@mui/material";
 
-const baseURL = `${BASE_URL}/eventos`;
-const baseTipoURL = `${BASE_URL}/tipoEvento`;
+const baseURL =  '/eventos';
+const baseTipoURL = '/tipoEvento';
 
 function ListagemEventos() {
   const navigate = useNavigate();
@@ -20,13 +19,13 @@ function ListagemEventos() {
   const [filtroTipo, setFiltroTipo] = React.useState(null);
 
   React.useEffect(() => {
-    axios.get(baseURL).then((response) => {
+    api.get(baseURL).then((response) => {
       setDados(response.data);
     });
   }, []);
 
   React.useEffect(() => {
-    axios
+    api
       .get(baseTipoURL)
       .then((response) => {
         const res = response.data;

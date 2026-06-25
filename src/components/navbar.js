@@ -3,11 +3,10 @@ import "bootswatch/dist/flatly/bootstrap.css";
 import NavbarItem from "./navbarItem";
 import { mensagemErro } from "../components/toastr";
 
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 
 function Navbar() {
-  const baseURL = `${BASE_URL}/usuario`;
+  const baseURL = '/usuario';
 
   const [usuario, setUsuario] = useState(null);
   const [admin, setAdmin] = useState(false);
@@ -20,7 +19,7 @@ function Navbar() {
       if (!idUsuario) return;
 
       try {
-        const response = await axios.get(`${baseURL}/${idUsuario}`);
+        const response = await api.get(`${baseURL}/${idUsuario}`);
         const dados = response.data;
 
         setUsuario(dados);

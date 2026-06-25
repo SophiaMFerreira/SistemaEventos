@@ -11,12 +11,11 @@ import {
 } from "@mui/material";
 import "../style/cadastro.css";
 
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 import { validarQuantidades } from "../utils/validacoes";
 
 function CadastroPorteEvento() {
-  const baseURL = `${BASE_URL}/porteEvento`;
+  const baseURL = '/porteEvento';
   const { idParam } = useParams();
   const navigate = useNavigate();
 
@@ -34,7 +33,7 @@ function CadastroPorteEvento() {
   useEffect(() => {
     if (!idParam) return;
 
-    axios.get(`${baseURL}/${idParam}`).then((response) => {
+    api.get(`${baseURL}/${idParam}`).then((response) => {
       const dados = response.data;
 
       setId(dados.id);
@@ -97,11 +96,11 @@ function CadastroPorteEvento() {
           return;
         }
 
-        await axios.post(baseURL, data);
+        await api.post(baseURL, data);
         mensagemSucesso(`Novo porte ${nome} criado com sucesso!`);
         navigate(`/listagem-eventos`);
       } else {
-        await axios.put(`${baseURL}/${idParam}`, data);
+        await api.put(`${baseURL}/${idParam}`, data);
         mensagemSucesso(`Porte ${nome} alterado com sucesso!`);
         navigate(`/listagem-eventos`);
       }
@@ -114,7 +113,7 @@ function CadastroPorteEvento() {
   async function exclude() {
     let data = JSON.stringify({ idParam });
     let url = `${baseURL}/${idParam}`;
-    await axios
+    await api
       .delete(url, data, {
         headers: { "Content-Type": "application/json" },
       })

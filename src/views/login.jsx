@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Grid, Typography, TextField, Button, Card, Box, CircularProgress } from "@mui/material";
 import { mensagemErro } from "../components/toastr";
 import imagemBaloes from "../components/baloesLogin.png";
-import axios from 'axios';
-import { BASE_URL } from '../config/axios';
+import {api} from '../config/axios';
 
 function Login() {
-  const baseURL = `${BASE_URL}/usuario/auth`;
+  const baseURL = '/usuario/auth';
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -16,13 +15,19 @@ function Login() {
   const [senha, setSenha] = useState("");
   const [token, setToken] = useState("");
 
+  const [validacao, setValidacao] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   async function fazerLogin(e) {
     e.preventDefault();
+    setValidacao(false)
+
     
     const emailTrim = email.trim();
     const senhaTrim = senha.trim();
 
     if (!emailTrim || !senhaTrim) {
+      setValidacao(true)
       return;
     }
 
@@ -31,14 +36,16 @@ function Login() {
                   senha: senhaTrim
     };
 
+    setLoading(true)
     try {
-      const response = await axios.post(baseURL);
+      const response = await api.post(baseURL);
       localStorage.setItem("login", response.data.login)
       localStorage.setItem("token", response.data.TokenDTO)
 
       navigate("/listagem-eventos");
     } catch (error) {
-      mensagemErro("Login ou senha incorretos.");
+      setValidacao(true)
+      setLoading(false)
     }
   }
 

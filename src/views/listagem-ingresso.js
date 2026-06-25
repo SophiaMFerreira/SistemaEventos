@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Card from "../components/card";
 import "../custom.css";
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import {api} from "../config/axios";
 import { Box, Button } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -16,8 +15,8 @@ import PaidIcon from "@mui/icons-material/Paid";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-const baseURLEventos = `${BASE_URL}/eventos`;
-const baseURLIngressos = `${BASE_URL}/ingressos`;
+const baseURLEventos = '/eventos';
+const baseURLIngressos = '/ingressos';
 
 const itemRowStyle = {
   marginBottom: "10px",
@@ -34,8 +33,8 @@ function ListagemIngressos() {
     async function carregarIngressos() {
       try {
         const [resEventos, resIngressos] = await Promise.all([
-          axios.get(baseURLEventos),
-          axios.get(baseURLIngressos),
+          api.get(baseURLEventos),
+          api.get(baseURLIngressos),
         ]);
 
         const eventos = resEventos.data;
