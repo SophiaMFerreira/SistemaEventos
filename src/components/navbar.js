@@ -10,23 +10,30 @@ function Navbar() {
 
   const [usuario, setUsuario] = useState(null);
   const [admin, setAdmin] = useState(false);
-  const [participante, setParticipante] = useState(false);
+  const [participante, setParticipante] = useState(true);
 
   useEffect(() => {
     async function carregarUsuario() {
-      const idUsuario = Number(localStorage.getItem("idUsuario"));
+      const login = localStorage.getItem("login");
 
-      if (!idUsuario) return;
+      if (!login) return;
 
       try {
-        const response = await api.get(`${baseURL}/${idUsuario}`);
+        const response = await api.get(`${baseURL}`);
         const dados = response.data;
+        const user = dados.find(usuario => usuario.email === login)
+        
+        if (!user){
+          return;
+        }
+        localStorage.setItem("idUsuario", user.id);
+        setUsuario(user);
 
-        setUsuario(dados);
-
-        if (dados.perfis?.includes("ADMINISTRADOR")) {
+        if (user?.perfis?.includes("ADMINISTRADOR")) {
           setAdmin(true);
         }
+        console.log(user?.perfis)
+        console.log(admin)
 
         setParticipante(true);
       } catch (error) {
@@ -56,8 +63,9 @@ function Navbar() {
   };
 
   const logout = () => {
-    localStorage.removeItem("idUsuario");
+    localStorage.removeItem("login");
     localStorage.removeItem("token");
+    localStorage.removeItem("idUsuario");
     window.location.href = "/";
   };
 
