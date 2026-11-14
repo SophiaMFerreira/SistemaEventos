@@ -16,59 +16,55 @@ function Login() {
   const [validacao, setValidacao] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function fazerLogin(e) {
-    e.preventDefault();
-    setValidacao(false);
+  
+async function fazerLogin(e) {
+  e.preventDefault();
+  setValidacao(false);
 
-    const emailTrim = email.trim().toLowerCase();
-    const senhaTrim = senha.trim();
+  const emailTrim = email.trim().toLowerCase();
 
-    if (!emailTrim || !senhaTrim) {
-      setValidacao(true);
+  if (!emailTrim || !senha) {
+    setValidacao(true);
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await axios.post(`${baseURL}/auth`, {
+      email: emailTrim,
+      senha: senha
+    });
+
+    const token = response.data.TokenDTO;
+    const login = response.data.login;
+
+    if (!token) {
+      mensagemErro("O servidor não retornou o token de autenticação.");
       return;
     }
 
-    setLoading(true);
-    try {
-      const response = await axios.get(baseURL);
-      const usuarios = response.data || [];
+    // Armazena os dados da autenticação
+    localStorage.setItem("token", token);
+    localStorage.setItem("login", login);
+    localStorage.setItem("isAuthenticated", "true");
 
-      console.log("Resposta API:", response.data);
-console.log("Email digitado:", emailTrim);
-console.log("Senha digitada:", senhaTrim);
+    navigate("/listagem-eventos", { replace: true });
 
-      const usuario = usuarios.find(
-  (u) => (u.email || "").toLowerCase() === emailTrim
-);
-
-      if (!usuario) {
-        setValidacao(true);
-        setLoading(false);
-        return;
-      }
-
-      const tipoParticipante = usuario.tipoUsuario || (
-        usuario.perfis?.includes("ADMINISTRADOR")
-          ? "admin"
-          : usuario.perfis?.includes("PARTICIPANTE")
-            ? "participante"
-            : "usuario"
+  } catch (error) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      setValidacao(true);
+    } else {
+      mensagemErro(
+        error.response?.data?.message ||
+        "Erro ao conectar com o servidor."
       );
-
-      const nomeUsuario = usuario.nome || usuario.nomeFantasia || usuario.razaoSocial || "";
-
-      localStorage.setItem("idUsuario", usuario.id);
-      localStorage.setItem("tipoParticipante", tipoParticipante);
-      localStorage.setItem("nomeUsuario", nomeUsuario);
-      localStorage.setItem("isAuthenticated", "true");
-
-      navigate(`/listagem-eventos`, { replace: true });
-    } catch (error) {
-      mensagemErro(error?.response?.data?.message || "Erro ao conectar com o servidor");
-    } finally {
-      setLoading(false);
     }
+  } finally {
+    setLoading(false);
   }
+}
+
 
   return (
     <Grid container sx={{position: "relative", height: "100vh", width: "100vw"}}>
