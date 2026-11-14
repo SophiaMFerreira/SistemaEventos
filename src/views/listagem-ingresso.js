@@ -26,60 +26,63 @@ const itemRowStyle = {
 function ListagemIngressos() {
   const { idParam } = useParams();
 
-  const idParticipante = Number(localStorage.getItem("idUsuario"));
+const [idParticipante, setIdParticipante] = useState(null);
 
   const [ingressosExibidos, setIngressosExibidos] = useState([]);
 
   useEffect(() => {
-    async function carregarIngressos() {
-      try {
-        const [resEventos, resIngressos] = await Promise.all([
-          axios.get(baseURLEventos),
-          axios.get(baseURLIngressos),
-        ]);
+  async function carregarIngressos() {
+    try {
+      const usuarioRes = await axios.get(`${BASE_URL}/usuario/me`);
+      const idUsuario = usuarioRes.data.id;
 
-        const eventos = resEventos.data;
-        const ingressos = resIngressos.data;
+      setIdParticipante(idUsuario);
 
-        const meusIngressos = ingressos.filter(
-          (i) =>
-            Number(i.idEvento) === Number(idParam) &&
-            Number(i.idParticipante) === idParticipante &&
-            i.status === "PAGO",
+      const [resEventos, resIngressos] = await Promise.all([
+        axios.get(baseURLEventos),
+        axios.get(baseURLIngressos),
+      ]);
+
+      const eventos = resEventos.data;
+      const ingressos = resIngressos.data;
+
+      const meusIngressos = ingressos.filter(
+        (i) =>
+          Number(i.idEvento) === Number(idParam) &&
+          Number(i.idParticipante) === Number(idUsuario) &&
+          i.status === "PAGO",
+      );
+
+      const ingressosCompletos = meusIngressos.map((ing) => {
+        const evento = eventos.find(
+          (ev) => Number(ev.id) === Number(ing.idEvento),
         );
 
-        const ingressosCompletos = meusIngressos.map((ing) => {
-          const evento = eventos.find(
-            (ev) => Number(ev.id) === Number(ing.idEvento),
-          );
+        const tipoFormatado = ing.tipoIngresso
+          ? ing.tipoIngresso.charAt(0).toUpperCase() +
+            ing.tipoIngresso.slice(1).toLowerCase()
+          : "Inteira";
 
-          const tipoFormatado = ing.tipoIngresso
-            ? ing.tipoIngresso.charAt(0).toUpperCase() +
-              ing.tipoIngresso.slice(1).toLowerCase()
-            : "Inteira";
+        return {
+          id: ing.id,
+          nomeParticipante: ing.nomeParticipante,
+          nomeEvento: evento?.nome,
+          dataEvento: evento?.dataHoraInicio,
+          localEvento: `${evento?.endereco?.cidade} - ${evento?.endereco?.estado}`,
+          valor: Number(ing.valor),
+          tipoIngresso: tipoFormatado,
+          status: ing.status,
+        };
+      });
 
-          return {
-            id: ing.id,
-            nomeParticipante: ing.nomeParticipante,
-            nomeEvento: evento?.nome,
-            dataEvento: evento?.dataHoraInicio,
-            localEvento: `${evento?.endereco?.cidade} - ${evento?.endereco?.estado}`,
-
-            valor: Number(ing.valor),
-
-            tipoIngresso: tipoFormatado,
-            status: ing.status,
-          };
-        });
-
-        setIngressosExibidos(ingressosCompletos);
-      } catch (err) {
-        console.error("Erro ao carregar ingressos:", err);
-      }
+      setIngressosExibidos(ingressosCompletos);
+    } catch (err) {
+      console.error("Erro ao carregar ingressos:", err);
     }
+  }
 
-    carregarIngressos();
-  }, [idParticipante, idParam]);
+  carregarIngressos();
+}, [idParam]);
 
   const gerarPDF = async () => {
     const ingresso = document.getElementById("ingresso-pdf");
