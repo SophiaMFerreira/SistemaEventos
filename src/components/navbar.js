@@ -3,8 +3,7 @@ import "bootswatch/dist/flatly/bootstrap.css";
 import NavbarItem from "./navbarItem";
 import { mensagemErro } from "../components/toastr";
 
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import axios, { BASE_URL } from "../config/axios";
 
 function Navbar() {
   const baseURL = `${BASE_URL}/usuario`;
@@ -15,23 +14,20 @@ function Navbar() {
 
   useEffect(() => {
     async function carregarUsuario() {
-      const idUsuario = Number(localStorage.getItem("idUsuario"));
+      const token = localStorage.getItem("token");
 
-      if (!idUsuario) return;
+      if (!token) return;
 
       try {
-        const response = await axios.get(`${baseURL}/${idUsuario}`);
+        const response = await axios.get(`${BASE_URL}/usuario/me`);
+
         const dados = response.data;
 
         setUsuario(dados);
-
-        if (dados.perfis?.includes("ADMINISTRADOR")) {
-          setAdmin(true);
-        }
-
+        setAdmin(dados.perfis?.includes("ADMINISTRADOR") ?? false);
         setParticipante(true);
       } catch (error) {
-        mensagemErro("Erro ao buscar usuário");
+        mensagemErro("Erro ao buscar usuário autenticado");
       }
     }
 
@@ -59,6 +55,9 @@ function Navbar() {
   const logout = () => {
     localStorage.removeItem("idUsuario");
     localStorage.removeItem("token");
+    localStorage.removeItem("login");
+    localStorage.removeItem("isAuthenticated");
+
     window.location.href = "/";
   };
 
@@ -82,7 +81,6 @@ function Navbar() {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarResponsive">
-
           <ul className="navbar-nav">
             <NavbarItem
               render={admin}
@@ -118,6 +116,14 @@ function Navbar() {
           <ul className="navbar-nav">
             <NavbarItem
               render={participante}
+              href="/minha-carteira"
+              label="Minha carteira"
+            />
+          </ul>
+
+          <ul className="navbar-nav">
+            <NavbarItem
+              render={participante}
               href={obterUrlPerfil()}
               label="Perfil"
             />
@@ -138,7 +144,6 @@ function Navbar() {
               </button>
             </li>
           </ul>
-
         </div>
       </div>
     </div>
