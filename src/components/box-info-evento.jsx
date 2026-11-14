@@ -23,6 +23,7 @@ function BoxInfoEvento({
   infoLateral,
   lotacaoMaxima,
   statusPagamento,
+  eventoCancelado
 }) {
   let mensagem = "";
   let valor = "";
@@ -33,9 +34,14 @@ function BoxInfoEvento({
   }
 
   if (infoLateral === "Dados evento") {
-    mensagem = "Status do pagamento";
-    valor = statusPagamento ? "Pago" : "A pagar";
-  }
+  mensagem = "Status do pagamento";
+
+  valor = eventoCancelado
+    ? "Evento cancelado"
+    : statusPagamento
+    ? "Pago"
+    : "A pagar";
+}
 
   const formatarData = (dataHora) => {
     if (!dataHora) return "";
@@ -113,12 +119,14 @@ function BoxInfoEvento({
               variant="h6"
               fontWeight={600}
               color={
-                valor === "Pago"
-                  ? "success.main"
-                  : valor === "A pagar"
-                  ? "warning.main"
-                  : "text.primary"
-              }
+  valor === "Pago"
+    ? "success.main"
+    : valor === "A pagar"
+    ? "warning.main"
+    : valor === "Evento cancelado"
+    ? "error.main"
+    : "text.primary"
+}
             >
               {valor}
             </Typography>

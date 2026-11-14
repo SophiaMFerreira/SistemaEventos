@@ -1,11 +1,66 @@
 import React from "react";
-import { Card as MuiCard, CardMedia, CardContent, Typography, Box } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { BASE_URL } from "../config/axios";
 import imagemPadrao from "../assets/evento-default.jpg";
+import axios, { BASE_URL } from "../config/axios";
+import {
+  Card as MuiCard,
+  CardMedia,
+  CardContent,
+  Typography,
+  Box,
+  Chip,
+} from "@mui/material";
 
 function CardEvento({ dado, onClick }) {
+  const [imagemUrl, setImagemUrl] = React.useState(imagemPadrao);
+
+React.useEffect(() => {
+  let cancelado = false;
+  let urlTemporaria = null;
+
+  async function carregarImagem() {
+    if (!dado.imagem) {
+      setImagemUrl(imagemPadrao);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/eventos/imagem/${encodeURIComponent(dado.imagem)}`,
+        { responseType: "blob" }
+      );
+
+      if (!cancelado) {
+        urlTemporaria = URL.createObjectURL(response.data);
+        setImagemUrl(urlTemporaria);
+      }
+    } catch (error) {
+  if (error.response?.status !== 404) {
+    console.error(
+      `Erro ao carregar imagem do evento ${dado.id}:`,
+      error
+    );
+  }
+
+  if (!cancelado) {
+    setImagemUrl(imagemPadrao);
+  }
+}
+  }
+
+  carregarImagem();
+
+  return () => {
+    cancelado = true;
+
+    if (urlTemporaria) {
+      URL.revokeObjectURL(urlTemporaria);
+    }
+  };
+}, [dado.id, dado.imagem]);
+
+
   const formatarMes = (data) => {
     if (!data) return "";
     return new Date(data)
@@ -43,22 +98,40 @@ function CardEvento({ dado, onClick }) {
         },
       }}
     >
-      <Box sx={{ overflow: "hidden", height: 220 }}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={
-            dado.imagem
-              ? `${BASE_URL}/eventos/imagem/${dado.imagem}`
-              : imagemPadrao
-          }
-          alt={dado.nome}
-          sx={{
-            transition: "transform .4s ease",
-            objectFit: "cover",
-          }}
-        />
-      </Box>
+      <Box
+  sx={{
+    overflow: "hidden",
+    height: 220,
+    position: "relative",
+  }}
+>
+  <CardMedia
+    component="img"
+    height="220"
+    image={imagemUrl}
+    alt={dado.nome}
+    sx={{
+      transition: "transform .4s ease",
+      objectFit: "cover",
+    }}
+  />
+
+  {dado.cancelado && (
+    <Chip
+      label="CANCELADO"
+      size="small"
+      color="error"
+      sx={{
+        position: "absolute",
+        top: 14,
+        left: 14,
+        zIndex: 2,
+        fontWeight: 700,
+        borderRadius: "6px",
+      }}
+    />
+  )}
+</Box>
 
       <CardContent
         sx={{
