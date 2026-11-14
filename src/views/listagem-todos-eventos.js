@@ -62,11 +62,13 @@ function ListagemEventos() {
     );
   }
 
-  const eventosFiltrados = dados.filter((ev) => {
-    const matchNome = ev.nome.toLowerCase().includes(filtroNome.toLowerCase());
-    const matchTipo = filtroTipo ? ev.idTipoEvento === filtroTipo : true;
-    return matchNome && matchTipo;
-  });
+ const eventosFiltrados = dados.filter((ev) => {
+  const matchNome = ev.nome.toLowerCase().includes(filtroNome.toLowerCase());
+  const matchTipo = filtroTipo ? ev.idTipoEvento === filtroTipo : true;
+  const eventoAtivo = !ev.cancelado;
+
+  return matchNome && matchTipo && eventoAtivo;
+});
 
   return (
     <div
