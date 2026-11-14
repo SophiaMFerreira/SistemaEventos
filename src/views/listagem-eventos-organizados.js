@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config/axios";
-import { mensagemSucesso, mensagemErro, mensagemAlert } from "../components/toastr";
+import {
+  mensagemSucesso,
+  mensagemErro,
+  mensagemAlert,
+} from "../components/toastr";
 import BuscarEvento from "../components/input-buscar-evento";
 import "../custom.css";
 import {
@@ -24,7 +28,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import imagemPadrao from "../assets/evento-default.jpg"; 
+import imagemPadrao from "../assets/evento-default.jpg";
 
 const baseURL = `${BASE_URL}/eventos`;
 const baseURLIngresso = `${BASE_URL}/ingressos`;
@@ -33,13 +37,16 @@ function EventosOrganizados() {
   const navigate = useNavigate();
   const idOrganizador = Number(localStorage.getItem("idUsuario"));
 
+  const [imagens, setImagens] = useState({});
   const [dados, setDados] = useState(null);
   const [filtro, setFiltro] = useState("");
   const [ingressos, setIngressos] = useState([]);
 
-  const eventosNotificados = useRef(new Set(
-    JSON.parse(localStorage.getItem(`notificados_${idOrganizador}`)) || []
-  ));
+  const eventosNotificados = useRef(
+    new Set(
+      JSON.parse(localStorage.getItem(`notificados_${idOrganizador}`)) || [],
+    ),
+  );
 
   const cadastrar = () => navigate(`/cadastro-eventos`);
   const editar = (id) => navigate(`/cadastro-eventos/${id}`);
@@ -51,8 +58,15 @@ function EventosOrganizados() {
         data: { id },
         headers: { "Content-Type": "application/json" },
       });
-      mensagemSucesso("Evento excluído com sucesso!");
-      setDados(dados.filter((dado) => dado.id !== id));
+      mensagemSucesso("Evento cancelado com sucesso!");
+
+setDados((dadosAnteriores) =>
+    dadosAnteriores.map((dado) =>
+        dado.id === id
+            ? { ...dado, cancelado: true }
+            : dado
+    )
+);
     } catch (error) {
       mensagemErro("Erro ao excluir o evento");
     }
@@ -61,14 +75,42 @@ function EventosOrganizados() {
   useEffect(() => {
     async function buscarDados() {
       try {
+        const respUsuario = await axios.get(`${BASE_URL}/usuario/me`);
+        const idOrganizador = respUsuario.data.id;
+
         const respEventos = await axios.get(baseURL);
         const respIngressos = await axios.get(baseURLIngresso);
 
         const meusEventos = respEventos.data.filter(
-          (ev) => Number(ev.idOrganizador) === idOrganizador,
-        );
+    (ev) => Number(ev.idOrganizador) === Number(idOrganizador)
+);
 
         setDados(meusEventos);
+        const imagensCarregadas = {};
+
+        await Promise.all(
+          meusEventos.map(async (evento) => {
+            if (evento.imagem) {
+              try {
+                const response = await axios.get(
+                  `${baseURL}/imagem/${evento.imagem}`,
+                  { responseType: "blob" },
+                );
+
+                imagensCarregadas[evento.id] = URL.createObjectURL(
+                  response.data,
+                );
+              } catch (error) {
+                console.error(
+                  `Erro ao carregar imagem do evento ${evento.id}:`,
+                  error,
+                );
+              }
+            }
+          }),
+        );
+
+        setImagens(imagensCarregadas);
         setIngressos(respIngressos.data);
       } catch (error) {
         console.error(error);
@@ -77,6 +119,14 @@ function EventosOrganizados() {
     }
     buscarDados();
   }, [idOrganizador]);
+
+  useEffect(() => {
+  return () => {
+    Object.values(imagens).forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+  };
+}, [imagens]);
 
   useEffect(() => {
     if (!dados || ingressos.length === 0) return;
@@ -101,7 +151,7 @@ function EventosOrganizados() {
     if (houveNovaNotificacao) {
       localStorage.setItem(
         `notificados_${idOrganizador}`,
-        JSON.stringify(Array.from(eventosNotificados.current))
+        JSON.stringify(Array.from(eventosNotificados.current)),
       );
     }
   }, [dados, ingressos, idOrganizador]);
@@ -255,22 +305,40 @@ function EventosOrganizados() {
                   </Tooltip>
                 </Box>
 
-                <Box sx={{ overflow: "hidden", height: 230 }}>
-                  <CardMedia
-                    component="img"
-                    height="230"
-                    image={
-                      evento.imagem
-                        ? `${BASE_URL}/eventos/imagem/${evento.imagem}`
-                        : imagemPadrao
-                    }
-                    alt={evento.nome}
-                    sx={{
-                      transition: "transform .4s ease",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
+                <Box
+  sx={{
+    overflow: "hidden",
+    height: 230,
+    position: "relative",
+  }}
+>
+  <CardMedia
+    component="img"
+    height="230"
+    image={imagens[evento.id] || imagemPadrao}
+    alt={evento.nome}
+    sx={{
+      transition: "transform .4s ease",
+      objectFit: "cover",
+    }}
+  />
+
+  {evento.cancelado && (
+    <Chip
+      label="CANCELADO"
+      size="small"
+      color="error"
+      sx={{
+        position: "absolute",
+        top: 14,
+        left: 14,
+        zIndex: 2,
+        fontWeight: 700,
+        borderRadius: "6px",
+      }}
+    />
+  )}
+</Box>
 
                 <CardContent
                   sx={{
