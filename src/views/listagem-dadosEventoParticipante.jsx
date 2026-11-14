@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Stack, Button, Box } from "@mui/material";
+import { Stack, Button, Box, Alert } from "@mui/material";
 import BoxInfoEvento from "../components/box-info-evento";
 import Lista from "../components/lista";
 import "../style/listagemDadosEvento.css";
@@ -23,6 +23,7 @@ function ListagemParticipantes() {
     const infoLateral = "Participantes";
   
     const [id, setIdEvento] = useState("");
+    const [cancelado, setCancelado] = useState(false);
     const [nome, setNome] = useState("");
     const [dataInicioEvento, setDataInicioEvento] = useState("");
     const [dataFimEvento, setDataFimEvento] = useState("");
@@ -42,12 +43,11 @@ function ListagemParticipantes() {
       axios.get(`${baseURL}/${idParam}`).then((response) => {
         const dados = response.data;
         setIdEvento(dados.id);
+        setCancelado(dados.cancelado);
         setNome(dados.nome);
         setDataInicioEvento(dados.dataHoraInicio);
         setDataFimEvento(dados.dataHoraFim);
-        
         setLotacaoMaximaEvento(dados.lotacaoMaxima || 0);
-
         setCep(dados.endereco?.cep || "");
         setLogradouro(dados.endereco?.logradouro || "");
         setNumero(dados.endereco?.numero || "");
@@ -85,6 +85,11 @@ function ListagemParticipantes() {
               }}
             >
               <Stack direction="column">
+                {cancelado && (
+    <Alert severity="error" sx={{ mb: 3 }}>
+        Este evento foi cancelado pelo organizador.
+    </Alert>
+)}
                                     
                   <BoxInfoEvento  
                       nomeEvento={nome}

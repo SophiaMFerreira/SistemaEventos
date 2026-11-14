@@ -1,47 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "../config/axios";
+import axios, { BASE_URL } from "../config/axios";
 import BuscarEvento from "../components/input-buscar-evento";
 import CardEvento from "../components/card-evento";
-
-import { Box, Grid, Typography, Skeleton } from "@mui/material";
-
+import { Grid, Typography, Box, Skeleton } from "@mui/material";
 const baseURL = `${BASE_URL}/eventos`;
 const baseURLIngresso = `${BASE_URL}/ingressos`;
 
 function MeusEventos() {
   const navigate = useNavigate();
-  const idParticipante = Number(localStorage.getItem("idUsuario"));
+  
   
   const [eventosInscritos, setEventosInscritos] = useState(null); 
   const [filtro, setFiltro] = useState("");
   
   useEffect(() => {
-    async function carregarEventos() {
-      try {
-        const resEventos = await fetch(baseURL);
-        const eventos = await resEventos.json();
+  async function carregarEventos() {
+    try {
+      // Busca o usuário autenticado
+      const usuarioRes = await axios.get(`${BASE_URL}/usuario/me`);
+      const idUsuario = usuarioRes.data.id;
 
-        const resIngressos = await fetch(baseURLIngresso);
-        const ingressos = await resIngressos.json();
+      // Busca eventos e ingressos
+      const [resEventos, resIngressos] = await Promise.all([
+        axios.get(baseURL),
+        axios.get(baseURLIngresso),
+      ]);
 
-        const meusIngressos = ingressos.filter(
-          (i) => Number(i.idParticipante) === idParticipante
-        );
+      const eventos = resEventos.data;
+      const ingressos = resIngressos.data;
 
-        const eventosDoParticipante = eventos.filter((ev) =>
-          meusIngressos.some((i) => Number(i.idEvento) === ev.id)
-        );
+      const meusIngressos = ingressos.filter(
+  (i) => Number(i.idParticipante) === Number(idUsuario)
+);
 
-        setEventosInscritos(eventosDoParticipante);
-      } catch (err) {
-        console.error("Erro ao buscar eventos inscritos:", err);
-        setEventosInscritos([]); 
-      }
+// Busca os eventos correspondentes aos ingressos,
+// incluindo os eventos cancelados.
+const eventosDoParticipante = eventos.filter(
+  (ev) =>
+    meusIngressos.some(
+      (i) => Number(i.idEvento) === Number(ev.id)
+    )
+);
+
+      setEventosInscritos(eventosDoParticipante);
+
+    } catch (err) {
+      console.error("Erro ao buscar eventos inscritos:", err);
+      setEventosInscritos([]);
     }
+  }
 
-    carregarEventos();
-  }, [idParticipante]);
+  carregarEventos();
+}, []);
 
   const eventosFiltrados = eventosInscritos
     ? eventosInscritos.filter((ev) =>
