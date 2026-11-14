@@ -7,8 +7,7 @@ import FormGroup from "../components/form-group";
 import { mensagemSucesso, mensagemErro } from "../components/toastr";
 
 import "../custom.css";
-import axios from "axios";
-import { BASE_URL } from "../config/axios";
+import axios , { BASE_URL } from "../config/axios";
 
 function CadastroEvento() {
   const { idParam } = useParams();
@@ -39,8 +38,7 @@ function CadastroEvento() {
   const [idPorteEvento, setIdPorteEvento] = useState(0);
 
   const [dados, setDados] = useState(null);
-
-  const idOrganizador = Number(localStorage.getItem("idUsuario") || 0);
+const [idOrganizador, setIdOrganizador] = useState(null);
 
   function inicializar() {
     if (!idParam) {
@@ -90,9 +88,22 @@ function CadastroEvento() {
     }
   }
 
+  useEffect(() => {
+  async function buscarUsuarioAutenticado() {
+    try {
+      const response = await axios.get(`${BASE_URL}/usuario/me`);
+      setIdOrganizador(response.data.id);
+    } catch (error) {
+      mensagemErro("Não foi possível identificar o usuário autenticado.");
+    }
+  }
+
+  buscarUsuarioAutenticado();
+}, []);
+
   async function salvar() {
     if (!idOrganizador) {
-      mensagemErro("Usuário não autenticado.");
+      mensagemErro("Aguarde a identificação do usuário autenticado.");
       return;
     }
 
