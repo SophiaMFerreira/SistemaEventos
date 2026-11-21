@@ -123,6 +123,14 @@ function Navbar() {
 
           <ul className="navbar-nav">
             <NavbarItem
+              render={admin}
+              href="/cadastro-administrador"
+              label="Cadastrar administrador"
+            />
+          </ul>
+
+          <ul className="navbar-nav">
+            <NavbarItem
               render={participante}
               href={obterUrlPerfil()}
               label="Perfil"

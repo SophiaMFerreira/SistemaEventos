@@ -107,7 +107,7 @@ const [idOrganizador, setIdOrganizador] = useState(null);
       return;
     }
 
-    if (idadeMinima < 0 || idadeMinima > 18) {
+    if ( idadeMinima < 18) {
       mensagemErro("A idade mínima deve ser maior ou igual a 18 anos.");
       return;
     }

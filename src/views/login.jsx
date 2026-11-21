@@ -31,6 +31,10 @@ async function fazerLogin(e) {
   setLoading(true);
 
   try {
+    console.log("Dados enviados para login:", {
+  email: emailTrim,
+  senha: senha ? "SENHA PREENCHIDA" : "SENHA VAZIA"
+});
     const response = await axios.post(`${baseURL}/auth`, {
       email: emailTrim,
       senha: senha

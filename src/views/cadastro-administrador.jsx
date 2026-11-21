@@ -51,6 +51,7 @@ function CadastroAdministrador() {
 
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [emailOriginal, setEmailOriginal] = useState("");
 
   useEffect(() => {
     if (!idParam) return;
@@ -64,6 +65,7 @@ function CadastroAdministrador() {
       setGeneroAdministrador(dados.genero);
       setCelularAdministrador(dados.celular);
       setEmailAdministrador(dados.email);
+      setEmailOriginal(dados.email);
 
       if (dados.endereco) {
         setCep(dados.endereco.cep);
@@ -104,20 +106,26 @@ function CadastroAdministrador() {
       cidade,
       estado,
     };
-     
+
     const payload = {
-                  tipoUsuario: "PF",
-                  nome,
-                  cpf: cpfFormatado,
-                  data: dataNascimento,
-                  genero: genero === "placeholder" ? "Prefiro não declarar" : genero,
-                  email,
-                  celular: celularFormatado,
-                  senha,
-                  endereco,
-                  perfis: ["ADMINISTRADOR"]
+      tipoUsuario: "PF",
+      nome,
+      cpf: cpfFormatado,
+      data: dataNascimento,
+      genero: genero === "placeholder" ? "Prefiro não declarar" : genero,
+      email,
+      celular: celularFormatado,
+      senha,
+      endereco,
+      perfis: ["ADMINISTRADOR"],
     };
-    
+
+    const emailLogado = localStorage.getItem("login");
+
+    const alterouProprioEmail =
+      emailLogado?.toLowerCase() === emailOriginal.toLowerCase() &&
+      email.trim().toLowerCase() !== emailOriginal.toLowerCase();
+
     try {
       const valido = validarDados(
         dataNascimento,
@@ -125,6 +133,7 @@ function CadastroAdministrador() {
         celularFormatado,
         senha,
         confirmarSenha,
+        !idParam,
       );
 
       if (!valido) {
@@ -132,14 +141,30 @@ function CadastroAdministrador() {
       }
 
       if (!idParam) {
-          await axios.post(baseURL, payload);
-          mensagemSucesso("Administrador criado");
-          navigate(`/`);
-        } else {
-          await axios.put(`${baseURL}/${id}`, payload);
-          mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
-          navigate("/listagem-eventos");
+        await axios.post(`${baseURL}/admin`, payload);
+        mensagemSucesso("Administrador criado");
+        navigate(`/listagem-eventos`);
+      } else {
+        console.log("Senha enviada na edição:", senha === "" ? "VAZIA" : "NOVA SENHA");
+        await axios.put(`${baseURL}/${id}`, payload);
+
+        mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
+
+        console.log("E-mail armazenado:", emailLogado);
+        console.log("E-mail original:", emailOriginal);
+        console.log("E-mail informado:", email);
+        console.log("Alterou o próprio e-mail:", alterouProprioEmail);
+        if (alterouProprioEmail) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("login");
+          localStorage.removeItem("isAuthenticated");
+
+          navigate("/", { replace: true });
+          return;
         }
+
+        navigate("/listagem-eventos");
+      }
     } catch (error) {
       mensagemErro(error?.response?.data || "Erro ao salvar administrador.");
     }

@@ -80,6 +80,7 @@ function CadastroUsuarioCNPJ() {
   const [nomeFantasia, setNomeFantasiaUsuarioCNPJ] = useState("");
   const [cnpj, setCNPJUsuarioCNPJ] = useState("");
   const [email, setEmailUsuarioCNPJ] = useState("");
+  const [emailOriginal, setEmailOriginal] = useState("");
   const [celular, setCelularUsuarioCNPJ] = useState("");
   const [inscricaoEstadualMunicipal, setInscricaoEstadualMunicipalUsuarioCNPJ] =
     useState("");
@@ -100,13 +101,14 @@ function CadastroUsuarioCNPJ() {
       .get(`${baseURL}/${idParam}`)
       .then((response) => {
         const dados = response.data;
+        console.log("CNPJ retornado pelo backend:", dados.cnpj);
         setIdUsuarioCNPJ(dados.id);
         setRazaoSocialUsuarioCNPJ(dados.razaoSocial);
         setNomeFantasiaUsuarioCNPJ(dados.nomeFantasia);
-        setCNPJUsuarioCNPJ(dados.cnpj);
+        setCNPJUsuarioCNPJ(dados.cnpj?.replace(/\D/g, "") || "");
         setEmailUsuarioCNPJ(dados.email);
-        setCelularUsuarioCNPJ(dados.celular);
-        setInscricaoEstadualMunicipalUsuarioCNPJ(
+        setEmailOriginal(dados.email);
+setCelularUsuarioCNPJ(dados.celular?.replace(/\D/g, "") || "");        setInscricaoEstadualMunicipalUsuarioCNPJ(
           dados.inscricaoEstadualMunicipal,
         );
 
@@ -197,6 +199,12 @@ function CadastroUsuarioCNPJ() {
       perfis: ["PARTICIPANTE"],
     };
 
+    const emailLogado = localStorage.getItem("login");
+
+    const alterouProprioEmail =
+      emailLogado?.toLowerCase() === emailOriginal.toLowerCase() &&
+      email.trim().toLowerCase() !== emailOriginal.toLowerCase();
+
     try {
       if (!idParam) {
         await axios.post(baseURL, data);
@@ -204,11 +212,20 @@ function CadastroUsuarioCNPJ() {
         navigate(`/`);
       } else {
         await axios.put(`${baseURL}/${id}`, data);
+
         mensagemSucesso(
           `${nomeFantasia} seus dados foram alterados com sucesso!`,
         );
+
+        if (alterouProprioEmail) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("login");
+          localStorage.removeItem("isAuthenticated");
+
+          navigate("/", { replace: true });
+          return;
+        }
       }
-      navigate("/listagem-eventos");
     } catch (error) {
       const resposta = error?.response?.data;
 
