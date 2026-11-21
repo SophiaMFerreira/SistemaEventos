@@ -83,6 +83,7 @@ function CadastroUsuarioCPF() {
   const [genero, setGeneroUsuarioCPF] = useState("placeholder");
   const [celular, setCelularUsuarioCPF] = useState("");
   const [email, setEmailUsuarioCPF] = useState("");
+  const [emailOriginal, setEmailOriginal] = useState("");
 
   const [cep, setCep] = useState("");
   const [logradouro, setLogradouro] = useState("");
@@ -111,6 +112,7 @@ function CadastroUsuarioCPF() {
         setGeneroUsuarioCPF(dados.genero || "placeholder");
         setCelularUsuarioCPF(dados.celular);
         setEmailUsuarioCPF(dados.email);
+        setEmailOriginal(dados.email);
 
         if (dados.endereco) {
           setCep(dados.endereco.cep);
@@ -170,6 +172,11 @@ function CadastroUsuarioCPF() {
       endereco,
       perfis: ["PARTICIPANTE"],
     };
+    const emailLogado = localStorage.getItem("login");
+
+    const alterouProprioEmail =
+      emailLogado?.toLowerCase() === emailOriginal.toLowerCase() &&
+      email.trim().toLowerCase() !== emailOriginal.toLowerCase();
 
     try {
       const senhaValida = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
@@ -218,7 +225,17 @@ function CadastroUsuarioCPF() {
         navigate(`/`);
       } else {
         await axios.put(`${baseURL}/${id}`, data);
+
         mensagemSucesso(`${nome} seus dados foram alterados com sucesso!`);
+
+        if (alterouProprioEmail) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("login");
+          localStorage.removeItem("isAuthenticated");
+
+          navigate("/", { replace: true });
+          return;
+        }
       }
     } catch (error) {
       mensagemErro(error?.response?.data || "Erro ao salvar os dados.");

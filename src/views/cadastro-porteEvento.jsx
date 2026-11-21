@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { mensagemSucesso, mensagemErro } from "../components/toastr";
-import {
-  Grid,
-  Paper,
-  Typography,
-  TextField,
-  Stack,
-  Button,
-} from "@mui/material";
+import { Grid, Paper, Typography, TextField, Stack, Button } from "@mui/material";
 import "../style/cadastro.css";
 
 import axios from "axios";
@@ -33,17 +26,14 @@ function CadastroPorteEvento() {
 
   useEffect(() => {
     if (!idParam) return;
-
     axios.get(`${baseURL}/${idParam}`).then((response) => {
       const dados = response.data;
-
       setId(dados.id);
       setNome(dados.nome);
       setMinParticipantes(dados.minParticipantes);
       setMaxParticipantes(dados.maxParticipantes);
       setTempoMinimoCancelamento(dados.tempoMinimoCancelamento);
       setDescricao(dados.descricao);
-
       setAcao("Edição");
       setMensagem("Faça edição dos");
       setAcaoButton("Editar");
@@ -52,39 +42,35 @@ function CadastroPorteEvento() {
 
   async function save(e) {
     e.preventDefault();
+
+    if (!descricao || descricao.trim() === "") {
+      mensagemErro("O campo Descrição é obrigatório. Por favor, preencha a descrição do porte de evento.");
+      return;
+    }
+
     const intMinParticipantes = parseInt(minParticipantes, 10);
     const intMaxParticipantes = parseInt(maxParticipantes, 10);
     const intTempoMinimoCancelamento = parseInt(tempoMinimoCancelamento, 10);
 
-    if (
-      isNaN(intMinParticipantes) ||
-      isNaN(intMaxParticipantes) ||
-      isNaN(intTempoMinimoCancelamento)
-    ) {
+    if (isNaN(intMinParticipantes) || isNaN(intMaxParticipantes) || isNaN(intTempoMinimoCancelamento)) {
       mensagemErro("Preencha todos os campos numéricos.");
       return;
     }
-
     if (intMaxParticipantes > 10000) {
       mensagemErro("O máximo permitido é 10000 participantes.");
       return;
     }
-
     if (intMinParticipantes > intMaxParticipantes) {
       mensagemErro("A quantidade mínima não pode ser maior que a máxima.");
       return;
     }
-
     if (intTempoMinimoCancelamento < 1 || intTempoMinimoCancelamento > 17568) {
-      mensagemErro(
-        "Tempo mínimo de cancelamento deve estar entre 1 e 17568 horas.",
-      );
+      mensagemErro("Tempo mínimo de cancelamento deve estar entre 1 e 17568 horas.");
       return;
     }
 
     const data = {
-      id,
-      nome,
+      id, nome,
       minParticipantes: intMinParticipantes,
       maxParticipantes: intMaxParticipantes,
       tempoMinimoCancelamento: intTempoMinimoCancelamento,
@@ -93,17 +79,12 @@ function CadastroPorteEvento() {
 
     try {
       if (!idParam) {
-        if (!validarQuantidades(intMinParticipantes, intMaxParticipantes)) {
-          return;
-        }
-
+        if (!validarQuantidades(intMinParticipantes, intMaxParticipantes)) return;
         await axios.post(baseURL, data);
         mensagemSucesso(`Novo porte ${nome} criado com sucesso!`);
-        navigate(`/listagem-eventos`);
       } else {
         await axios.put(`${baseURL}/${idParam}`, data);
         mensagemSucesso(`Porte ${nome} alterado com sucesso!`);
-        navigate(`/listagem-eventos`);
       }
       navigate("/listagem-eventos");
     } catch (error) {
@@ -112,117 +93,44 @@ function CadastroPorteEvento() {
   }
 
   async function exclude() {
-    let data = JSON.stringify({ idParam });
-    let url = `${baseURL}/${idParam}`;
     await axios
-      .delete(url, data, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(function (response) {
-        mensagemSucesso(`Porte de evento ${nome} excluído com sucesso!`);
-        navigate(`/listagem-eventos`);
-      })
-      .catch(function (error) {
-        mensagemErro(`Erro ao excluir ${nome}`);
-      });
+      .delete(`${baseURL}/${idParam}`, JSON.stringify({ idParam }), { headers: { "Content-Type": "application/json" } })
+      .then(() => { mensagemSucesso(`Porte de evento ${nome} excluído com sucesso!`); navigate(`/listagem-eventos`); })
+      .catch(() => { mensagemErro(`Erro ao excluir ${nome}`); });
   }
 
   return (
     <Grid
-      container
-      direction="column"
-      sx={{
-        mt: 6,
-        minHeight: "100vh",
-        width: "100%",
-        overflow: "hidden",
-        justifyContent: "center",
-        alignItems: "center",
-        px: { xs: 1, sm: 3 },
-      }}
+      container direction="column"
+      sx={{ mt: 10, mb: 6, width: "100%", justifyContent: "center", alignItems: "center", px: { xs: 1, sm: 3 } }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          width: "100%",
-          maxWidth: 900,
-          maxHeight: "90vh",
-          overflowY: "auto",
-          p: { xs: 2, sm: 4 },
-        }}
-      >
-        <Typography component="h1" variant="h3">
+      <Paper elevation={2} sx={{ width: "100%", maxWidth: 900, p: { xs: 2, sm: 4 } }}>
+        <Typography component="h1" variant="h5" fontWeight={600} sx={{ mb: 0.5 }}>
           {acao} de Porte de Evento
         </Typography>
-        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {mensagem} portes de evento.
         </Typography>
+
         <Grid container component="form" onSubmit={save} noValidate spacing={2}>
           <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%" }}>
-            <Typography variant="body1" className="label">
-              Nome*
-            </Typography>
-            <TextField
-              name="nome"
-              placeholder="Nome do porte de evento"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-              fullWidth
-            />
+            <Typography variant="body1" className="label">Nome*</Typography>
+            <TextField name="nome" placeholder="Nome do porte de evento" value={nome} onChange={(e) => setNome(e.target.value)} required fullWidth />
           </Grid>
-          <Grid
-            container
-            size={12}
-            sx={{
-              mb: 2,
-              mx: 2,
-              width: "100%",
-              justifyContent: "space-between",
-            }}
-            direction={"row"}
-          >
-            <Grid
-              size={6}
-              sx={{ width: "48%", boxSizing: "border-box", maxWidth: "50%" }}
-            >
-              <Typography variant="body1" className="label">
-                Número mínimo de participantes*
-              </Typography>
-              <TextField
-                name="minParticipantes"
-                placeholder="0"
-                min="0"
-                type="number"
-                value={minParticipantes}
-                onChange={(e) => setMinParticipantes(e.target.value)}
-                required
-                fullWidth
-              />
+
+          <Grid container size={12} sx={{ mb: 2, mx: 2, width: "100%", justifyContent: "space-between" }} direction="row">
+            <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "50%" }}>
+              <Typography variant="body1" className="label">Número mínimo de participantes*</Typography>
+              <TextField name="minParticipantes" placeholder="0" min="0" type="number" value={minParticipantes} onChange={(e) => setMinParticipantes(e.target.value)} required fullWidth />
             </Grid>
-            <Grid
-              size={6}
-              sx={{ width: "48%", boxSizing: "border-box", maxWidth: "50%" }}
-            >
-              <Typography variant="body1" className="label">
-                Número máximo de participantes*
-              </Typography>
-              <TextField
-                name="maxParticipantes"
-                placeholder="0"
-                min="1"
-                type="number"
-                value={maxParticipantes}
-                onChange={(e) => setMaxParticipantes(e.target.value)}
-                required
-                fullWidth
-              />
+            <Grid size={6} sx={{ width: "48%", boxSizing: "border-box", maxWidth: "50%" }}>
+              <Typography variant="body1" className="label">Número máximo de participantes*</Typography>
+              <TextField name="maxParticipantes" placeholder="0" min="1" type="number" value={maxParticipantes} onChange={(e) => setMaxParticipantes(e.target.value)} required fullWidth />
             </Grid>
           </Grid>
+
           <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%" }}>
-            <Typography variant="body1" className="label">
-              Tempo minimo de cancelamento*
-            </Typography>
+            <Typography variant="body1" className="label">Tempo mínimo de cancelamento*</Typography>
             <TextField
               name="tempoMinimoCancelamento"
               placeholder="Tempo mínimo de cancelamento em horas"
@@ -230,29 +138,39 @@ function CadastroPorteEvento() {
               inputProps={{ min: 1, max: 17568 }}
               value={tempoMinimoCancelamento}
               onChange={(e) => setTempoMinimoCancelamento(e.target.value)}
-              required
-              fullWidth
+              required fullWidth
             />
           </Grid>
+
           <Grid size={12} sx={{ mb: 2, mx: 2, width: "100%" }}>
-            <Typography variant="body1" className="label">
-              Descrição
-            </Typography>
+            <Typography variant="body1" className="label">Descrição*</Typography>
             <TextField
               name="descricao"
               placeholder="Descreva o porte do evento"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
-              multiline
-              rows={4}
+              multiline rows={4}
               fullWidth
+              helperText={!descricao ? "Campo obrigatório" : ""}
+              error={descricao !== undefined && descricao.trim() === ""}
             />
           </Grid>
-          <Grid item xs={12} justifyContent="flex-end">
+
+          {/* Botões alinhados à direita */}
+          <Grid
+            size={12}
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-end",
+              mt: 2,
+            }}
+          >
             <Stack
               spacing={2}
               direction={{ xs: "column", sm: "row" }}
               justifyContent="flex-end"
+              alignItems="flex-end"
             >
               <Button
                 variant="outlined"
@@ -260,15 +178,15 @@ function CadastroPorteEvento() {
               >
                 Voltar
               </Button>
+
               <Button variant="contained" type="submit">
                 {acaoButton} Porte de Evento
               </Button>
-              {idParam ? (
+
+              {idParam && (
                 <Button variant="outlined" color="error" onClick={exclude}>
                   Excluir
                 </Button>
-              ) : (
-                false
               )}
             </Stack>
           </Grid>

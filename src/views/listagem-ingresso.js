@@ -157,15 +157,12 @@ const [idParticipante, setIdParticipante] = useState(null);
                         </h5>
                       </Box>
 
-                      <div
-                        style={{
-                          marginTop: 12,
-                          fontSize: 24,
-                          fontWeight: 700,
-                          textAlign: "center",
-                        }}
-                      >
+                      {/* Nome do evento + tipo do ingresso lado a lado no cabeçalho do PDF */}
+                      <div style={{ marginTop: 12, fontSize: 20, fontWeight: 700, textAlign: "center" }}>
                         {ing.nomeEvento}
+                      </div>
+                      <div style={{ marginTop: 4, fontSize: 13, fontWeight: 500, textAlign: "center", opacity: 0.85, letterSpacing: "0.5px" }}>
+                        {ing.tipoIngresso || "Inteira"}
                       </div>
                     </Box>
 

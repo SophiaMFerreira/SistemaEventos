@@ -1,9 +1,15 @@
 import { mensagemErro } from '../components/toastr';
 
-export default function validarDados(dataNascimento, cpf, celular, senha, confirmarSenha){
+export default function validarDados(dataNascimento,
+  cpf,
+  celular,
+  senha,
+  confirmarSenha,
+  senhaObrigatoria = true){
     const senhaValida = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
     const cpfValido = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/; 
     const celularValido = /^\(\d{2}\)\s9\d{4}-\d{4}$/;
+    const deveValidarSenha = senhaObrigatoria || senha.trim() !== "" || confirmarSenha.trim() !== "";
 
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -20,15 +26,19 @@ export default function validarDados(dataNascimento, cpf, celular, senha, confir
         return false;
     }
 
+    
+
+if (deveValidarSenha) {
     if (!senhaValida.test(senha)) {
-      mensagemErro("A senha deve conter letra maiúscula, minúscula, número e caractere especial.");
-      return false;
+        mensagemErro("A senha deve conter letra maiúscula, minúscula, número e caractere especial.");
+        return false;
     }
 
     if (senha !== confirmarSenha) {
-          mensagemErro("As senhas não coincidem");
-          return false;
+        mensagemErro("As senhas não coincidem");
+        return false;
     }
+}
         
     if (nascimento >= hoje) {
       mensagemErro("A data de nascimento deve ser menor que a data de hoje.");
