@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Grid, Paper, Typography, TextField, Stack, Button } from "@mui/material";
 
-import Stack from "@mui/material/Stack";
 import Card from "../components/card";
 import FormGroup from "../components/form-group";
 import { mensagemSucesso, mensagemErro } from "../components/toastr";
 
 import "../custom.css";
-import axios , { BASE_URL } from "../config/axios";
+import axios, { BASE_URL } from "../config/axios";
 
 function CadastroEvento() {
   const { idParam } = useParams();
   const navigate = useNavigate();
-
   const baseURL = `${BASE_URL}/eventos`;
 
   const [id, setId] = useState("");
@@ -38,7 +37,12 @@ function CadastroEvento() {
   const [idPorteEvento, setIdPorteEvento] = useState(0);
 
   const [dados, setDados] = useState(null);
-const [idOrganizador, setIdOrganizador] = useState(null);
+  const [idOrganizador, setIdOrganizador] = useState(null);
+  const [dadosTipoEvento, setDadosTipoEvento] = useState([]);
+  const [dadosPorteEvento, setDadosPorteEvento] = useState([]);
+
+  // Título dinâmico
+  const tituloFormulario = idParam ? "Editar Evento" : "Cadastrar Evento";
 
   function inicializar() {
     if (!idParam) {
@@ -74,7 +78,6 @@ const [idOrganizador, setIdOrganizador] = useState(null);
       setHoraInicio(dados.horaInicio);
       setDataFim(dados.dataFim);
       setHoraFim(dados.horaFim);
-
       setCep(dados.cep);
       setLogradouro(dados.logradouro);
       setNumero(dados.numero);
@@ -82,32 +85,29 @@ const [idOrganizador, setIdOrganizador] = useState(null);
       setBairro(dados.bairro);
       setCidade(dados.cidade);
       setEstado(dados.estado);
-
       setIdTipoEvento(dados.idTipoEvento);
       setIdPorteEvento(dados.idPorteEvento);
     }
   }
 
   useEffect(() => {
-  async function buscarUsuarioAutenticado() {
-    try {
-      const response = await axios.get(`${BASE_URL}/usuario/me`);
-      setIdOrganizador(response.data.id);
-    } catch (error) {
-      mensagemErro("Não foi possível identificar o usuário autenticado.");
+    async function buscarUsuarioAutenticado() {
+      try {
+        const response = await axios.get(`${BASE_URL}/usuario/me`);
+        setIdOrganizador(response.data.id);
+      } catch {
+        mensagemErro("Não foi possível identificar o usuário autenticado.");
+      }
     }
-  }
-
-  buscarUsuarioAutenticado();
-}, []);
+    buscarUsuarioAutenticado();
+  }, []);
 
   async function salvar() {
     if (!idOrganizador) {
       mensagemErro("Aguarde a identificação do usuário autenticado.");
       return;
     }
-
-    if ( idadeMinima < 18) {
+    if (idadeMinima < 18) {
       mensagemErro("A idade mínima deve ser maior ou igual a 18 anos.");
       return;
     }
@@ -116,7 +116,6 @@ const [idOrganizador, setIdOrganizador] = useState(null);
       dataInicio && horaInicio
         ? new Date(`${dataInicio}T${horaInicio}`).toISOString()
         : null;
-
     const dataHoraFim =
       dataFim && horaFim
         ? new Date(`${dataFim}T${horaFim}`).toISOString()
@@ -148,9 +147,7 @@ const [idOrganizador, setIdOrganizador] = useState(null);
     };
 
     try {
-      console.log("Payload:", payload);
       let eventoId = idParam;
-
       if (!idParam) {
         const response = await axios.post(baseURL, payload);
         eventoId = response.data.id || response.data;
@@ -163,16 +160,9 @@ const [idOrganizador, setIdOrganizador] = useState(null);
       if (imagem && eventoId) {
         const formData = new FormData();
         formData.append("file", imagem);
-
-        await axios.post(
-          `${baseURL}/${eventoId}/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await axios.post(`${baseURL}/${eventoId}/upload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
       navigate("/eventos-organizados");
@@ -186,19 +176,18 @@ const [idOrganizador, setIdOrganizador] = useState(null);
   async function buscar() {
     try {
       const response = await axios.get(`${baseURL}/${idParam}`);
-      const dados = response.data;
-      setDados(dados);
+      const d = response.data;
+      setDados(d);
+      setId(d.id);
+      setNome(d.nome || "");
+      setModalidade(d.modalidade || "");
+      setDescricao(d.descricao || "");
+      setValorIngresso(d.valorIngresso ?? 0);
+      setIdadeMinima(d.idadeMinima ?? 0);
+      setLotacaoMaxima(d.lotacaoMaxima ?? 0);
 
-      setId(dados.id);
-      setNome(dados.nome || "");
-      setModalidade(dados.modalidade || "");
-      setDescricao(dados.descricao || "");
-      setValorIngresso(dados.valorIngresso ?? 0);
-      setIdadeMinima(dados.idadeMinima ?? 0);
-      setLotacaoMaxima(dados.lotacaoMaxima ?? 0);
-
-      if (dados.dataHoraInicio) {
-        const di = new Date(dados.dataHoraInicio);
+      if (d.dataHoraInicio) {
+        const di = new Date(d.dataHoraInicio);
         setDataInicio(di.toISOString().slice(0, 10));
         setHoraInicio(di.toTimeString().slice(0, 5));
       } else {
@@ -206,8 +195,8 @@ const [idOrganizador, setIdOrganizador] = useState(null);
         setHoraInicio("");
       }
 
-      if (dados.dataHoraFim) {
-        const df = new Date(dados.dataHoraFim);
+      if (d.dataHoraFim) {
+        const df = new Date(d.dataHoraFim);
         setDataFim(df.toISOString().slice(0, 10));
         setHoraFim(df.toTimeString().slice(0, 5));
       } else {
@@ -215,62 +204,63 @@ const [idOrganizador, setIdOrganizador] = useState(null);
         setHoraFim("");
       }
 
-      if (dados.endereco) {
-        setCep(dados.endereco.cep || "");
-        setLogradouro(dados.endereco.logradouro || "");
-        setNumero(dados.endereco.numero || "");
-        setComplemento(dados.endereco.complemento || "");
-        setBairro(dados.endereco.bairro || "");
-        setCidade(dados.endereco.cidade || "");
-        setEstado(dados.endereco.estado || "");
+      if (d.endereco) {
+        setCep(d.endereco.cep || "");
+        setLogradouro(d.endereco.logradouro || "");
+        setNumero(d.endereco.numero || "");
+        setComplemento(d.endereco.complemento || "");
+        setBairro(d.endereco.bairro || "");
+        setCidade(d.endereco.cidade || "");
+        setEstado(d.endereco.estado || "");
       }
-
-      setIdTipoEvento(dados.idTipoEvento ?? 0);
-      setIdPorteEvento(dados.idPorteEvento ?? 0);
-    } catch (error) {
+      setIdTipoEvento(d.idTipoEvento ?? 0);
+      setIdPorteEvento(d.idPorteEvento ?? 0);
+    } catch {
       mensagemErro("Erro ao buscar evento");
     }
   }
 
   useEffect(() => {
-    if (idParam) {
-      buscar();
-    }
+    if (idParam) buscar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idParam]);
-
-  const [dadosTipoEvento, setDadosTipoEvento] = useState([]);
-  const [dadosPorteEvento, setDadosPorteEvento] = useState([]);
 
   useEffect(() => {
     axios
       .get(`${BASE_URL}/tipoEvento`)
-      .then((response) => {
-        const res = response.data;
-        const tipos = Array.isArray(res)
-          ? res
-          : res?.content || res?.items || [];
-        setDadosTipoEvento(tipos);
+      .then((r) => {
+        const res = r.data;
+        setDadosTipoEvento(
+          Array.isArray(res) ? res : res?.content || res?.items || [],
+        );
       })
       .catch(() => setDadosTipoEvento([]));
 
     axios
       .get(`${BASE_URL}/porteEvento`)
-      .then((response) => {
-        const res = response.data;
-        const portes = Array.isArray(res)
-          ? res
-          : res?.content || res?.items || [];
-        setDadosPorteEvento(portes);
+      .then((r) => {
+        const res = r.data;
+        setDadosPorteEvento(
+          Array.isArray(res) ? res : res?.content || res?.items || [],
+        );
       })
       .catch(() => setDadosPorteEvento([]));
   }, []);
 
-  if (!dadosTipoEvento) return null;
-  if (!dadosPorteEvento) return null;
+  if (!dadosTipoEvento || !dadosPorteEvento) return null;
+
+  // Faixa de participantes do porte selecionado
+  const porteSelecionado = dadosPorteEvento.find((p) => p.id === idPorteEvento);
+  const faixaPorte = porteSelecionado
+    ? `Faixa permitida: ${porteSelecionado.minParticipantes} a ${porteSelecionado.maxParticipantes} participantes`
+    : null;
 
   return (
-    <div className="container" style={{ marginTop: "120px" }}>
-      <Card title="Cadastro de Evento">
+    <div
+      className="container"
+      style={{ marginTop: "90px", marginBottom: "60px" }}
+    >
+      <Card title={tituloFormulario}>
         <div className="row">
           <div className="col-lg-12">
             <div className="bs-component">
@@ -314,7 +304,6 @@ const [idOrganizador, setIdOrganizador] = useState(null);
                   onChange={(e) => setIdTipoEvento(Number(e.target.value))}
                 >
                   <option value={0}>Selecione</option>
-
                   {dadosTipoEvento.map((dado) => (
                     <option key={dado.id} value={dado.id}>
                       {dado.nome || dado.nomeTipoEvento}
@@ -352,6 +341,7 @@ const [idOrganizador, setIdOrganizador] = useState(null);
                 />
               </FormGroup>
 
+              {/* Porte com faixa informativa */}
               <FormGroup label="Porte do Evento: *">
                 <select
                   className="form-select"
@@ -359,13 +349,24 @@ const [idOrganizador, setIdOrganizador] = useState(null);
                   onChange={(e) => setIdPorteEvento(Number(e.target.value))}
                 >
                   <option value={0}>Selecione</option>
-
                   {dadosPorteEvento.map((dado) => (
                     <option key={dado.id} value={dado.id}>
                       {dado.nome}
                     </option>
                   ))}
                 </select>
+                {faixaPorte && (
+                  <small
+                    style={{
+                      color: "#1E66F5",
+                      marginTop: "4px",
+                      display: "block",
+                      fontSize: "0.82rem",
+                    }}
+                  >
+                    ℹ️ {faixaPorte}
+                  </small>
+                )}
               </FormGroup>
 
               <FormGroup label="Lotação Máxima: *">
@@ -377,117 +378,159 @@ const [idOrganizador, setIdOrganizador] = useState(null);
                 />
               </FormGroup>
 
-              <FormGroup label="Data de Início: *">
-                <input
-                  type="date"
-                  value={dataInicio}
-                  className="form-control"
-                  onChange={(e) => setDataInicio(e.target.value)}
-                />
-              </FormGroup>
+              {/* Data e Hora lado a lado */}
+              <div className="row">
+                <div className="col-md-6">
+                  <FormGroup label="Data de Início: *">
+                    <input
+                      type="date"
+                      value={dataInicio}
+                      className="form-control"
+                      onChange={(e) => setDataInicio(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-6">
+                  <FormGroup label="Hora de Início: *">
+                    <input
+                      type="time"
+                      value={horaInicio}
+                      className="form-control"
+                      onChange={(e) => setHoraInicio(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+              </div>
 
-              <FormGroup label="Hora de Início: *">
-                <input
-                  type="time"
-                  value={horaInicio}
-                  className="form-control"
-                  onChange={(e) => setHoraInicio(e.target.value)}
-                />
-              </FormGroup>
+              <div className="row">
+                <div className="col-md-6">
+                  <FormGroup label="Data de Fim: *">
+                    <input
+                      type="date"
+                      value={dataFim}
+                      className="form-control"
+                      onChange={(e) => setDataFim(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-6">
+                  <FormGroup label="Hora de Fim: *">
+                    <input
+                      type="time"
+                      value={horaFim}
+                      className="form-control"
+                      onChange={(e) => setHoraFim(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+              </div>
 
-              <FormGroup label="Data de Fim: *">
-                <input
-                  type="date"
-                  value={dataFim}
-                  className="form-control"
-                  onChange={(e) => setDataFim(e.target.value)}
-                />
-              </FormGroup>
+              <h6
+                className="mt-3 mb-2"
+                style={{ fontWeight: 600, color: "#0B3B91" }}
+              >
+                Endereço
+              </h6>
 
-              <FormGroup label="Hora de Fim: *">
-                <input
-                  type="time"
-                  value={horaFim}
-                  className="form-control"
-                  onChange={(e) => setHoraFim(e.target.value)}
-                />
-              </FormGroup>
+              <div className="row">
+                <div className="col-md-4">
+                  <FormGroup label="CEP:">
+                    <input
+                      value={cep}
+                      className="form-control"
+                      onChange={(e) => setCep(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-6">
+                  <FormGroup label="Logradouro:">
+                    <input
+                      value={logradouro}
+                      className="form-control"
+                      onChange={(e) => setLogradouro(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-2">
+                  <FormGroup label="Número:">
+                    <input
+                      value={numero}
+                      className="form-control"
+                      onChange={(e) => setNumero(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+              </div>
 
-              <h5 className="mt-4">Endereço</h5>
+              <div className="row">
+                <div className="col-md-4">
+                  <FormGroup label="Complemento:">
+                    <input
+                      value={complemento}
+                      className="form-control"
+                      onChange={(e) => setComplemento(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-4">
+                  <FormGroup label="Bairro:">
+                    <input
+                      value={bairro}
+                      className="form-control"
+                      onChange={(e) => setBairro(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-4">
+                  <FormGroup label="Cidade:">
+                    <input
+                      value={cidade}
+                      className="form-control"
+                      onChange={(e) => setCidade(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+              </div>
 
-              <FormGroup label="CEP:">
-                <input
-                  value={cep}
-                  className="form-control"
-                  onChange={(e) => setCep(e.target.value)}
-                />
-              </FormGroup>
+              <div className="row">
+                <div className="col-md-4">
+                  <FormGroup label="Estado:">
+                    <input
+                      value={estado}
+                      className="form-control"
+                      onChange={(e) => setEstado(e.target.value)}
+                    />
+                  </FormGroup>
+                </div>
+              </div>
 
-              <FormGroup label="Logradouro:">
-                <input
-                  value={logradouro}
-                  className="form-control"
-                  onChange={(e) => setLogradouro(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup label="Número:">
-                <input
-                  value={numero}
-                  className="form-control"
-                  onChange={(e) => setNumero(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup label="Complemento:">
-                <input
-                  value={complemento}
-                  className="form-control"
-                  onChange={(e) => setComplemento(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup label="Bairro:">
-                <input
-                  value={bairro}
-                  className="form-control"
-                  onChange={(e) => setBairro(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup label="Cidade:">
-                <input
-                  value={cidade}
-                  className="form-control"
-                  onChange={(e) => setCidade(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup label="Estado:">
-                <input
-                  value={estado}
-                  className="form-control"
-                  onChange={(e) => setEstado(e.target.value)}
-                />
-              </FormGroup>
-
-              <Stack spacing={1} padding={1} direction="row">
-                <button
-                  onClick={salvar}
-                  type="button"
-                  className="btn btn-success"
+              <Grid
+                size={12}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  mt: 2,
+                }}
+              >
+                <Stack
+                  spacing={2}
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent="flex-end"
+                  alignItems="flex-end"
                 >
-                  Salvar
-                </button>
-
-                <button
-                  onClick={inicializar}
-                  type="button"
-                  className="btn btn-danger"
-                >
-                  Cancelar
-                </button>
-              </Stack>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => navigate("/eventos-organizados")}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button variant="contained" onClick={salvar}>
+                    Salvar
+                  </Button>
+                </Stack>
+              </Grid>
             </div>
           </div>
         </div>

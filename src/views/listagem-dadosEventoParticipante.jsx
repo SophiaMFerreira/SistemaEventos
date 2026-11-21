@@ -6,6 +6,7 @@ import Lista from "../components/lista";
 import "../style/listagemDadosEvento.css";
 import axios from 'axios';
 import { BASE_URL } from '../config/axios';
+import { mensagemSucesso, mensagemErro } from "../components/toastr";
 
 const mainStackStyle = { 
   maxWidth: 1100,
@@ -58,7 +59,17 @@ function ListagemParticipantes() {
       });
     }, [idParam, baseURL]);
 
-    async function cancel(e) {
+    async function cancel() {
+      try {
+        await axios.delete(`${baseURL}/${id}`, {
+          data: { id },
+          headers: { "Content-Type": "application/json" },
+        });
+        mensagemSucesso("Evento cancelado com sucesso!");
+        setCancelado(true);
+      } catch {
+        mensagemErro("Erro ao cancelar o evento");
+      }
     }
 
     const formatarHoraCustomizada = (dataHora) => {
@@ -129,7 +140,7 @@ function ListagemParticipantes() {
                   <Button variant="outlined" onClick={() => navigate(`/eventos-organizados`)}>
                     Voltar
                   </Button>
-                  <Button variant="contained" color="warning" onClick={cancel}>
+                  <Button variant="contained" color="warning" disabled={cancelado || !id} onClick={cancel}>
                     Cancelar evento
                   </Button>
               </Stack>
